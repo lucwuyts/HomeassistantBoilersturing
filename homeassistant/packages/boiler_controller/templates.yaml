@@ -1,0 +1,47 @@
+template:
+
+  - binary_sensor:
+
+      - name: Boiler Superdal
+        unique_id: boiler_superdal
+        state: >
+
+          {{ now().hour >= 11 and now().hour < 17 }}
+
+      - name: Boiler Allow Heat
+        unique_id: boiler_allow_heat
+        state: >
+
+          {{ is_state('binary_sensor.boiler_superdal','on') }}
+          
+          
+      - name: Boiler Heating Allowed
+        unique_id: boiler_heating_allowed
+        state: >
+          {{
+             (
+               is_state('binary_sensor.boiler_superdal', 'on')
+               or
+               is_state('input_boolean.boiler_superdal_force', 'on')
+             )
+          }}          
+          
+          
+
+  - sensor:
+
+      - name: Boiler House Power
+        unique_id: boiler_house_power
+        unit_of_measurement: W
+        state: >
+          {{ states('sensor.verbruik_boven_4') }}
+
+      - name: Boiler Peak Limit
+        state: >
+          {{ states('input_number.boiler_peak_limit') }}
+
+      - name: Boiler Power
+        state: >
+          {{ states('input_number.boiler_power') }}
+
+
