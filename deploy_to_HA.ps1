@@ -1,4 +1,4 @@
 Copy-Item `
-    "D:\HomeAssistant-Boiler Sturing\homeassistant\packages\boiler_controller\*" `
-    "\\HA\Config\packages\boiler_controller\" `
+    "D:\HomeAssistant-Boiler Sturing\homeassistant\packages\*" `
+    "\\HomeAssistant\Config\packages\" `
     -Recurse -Force

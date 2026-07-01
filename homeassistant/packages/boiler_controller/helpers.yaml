@@ -1,34 +1,33 @@
-################################################################################
+#
 # Boiler Controller
-################################################################################
+# Internal state helpers
+#
+# Version: 0.1.0
+#
 
 input_boolean:
 
-  boiler_night_enable:
-    name: Boiler nachtprogramma
-    icon: mdi:water-boiler
+  boiler_controller_enabled:
+    name: Boiler Controller Enabled
+    icon: mdi:power
+    initial: true
 
-  boiler_superdal_force:
-    name: Forceer superdal
-    icon: mdi:flash
+  boiler_today_completed:
+    name: Boiler Today Completed
+    icon: mdi:water-boiler-check
+    initial: false
 
-input_number:
+  boiler_new_day_pending:
+    name: Boiler New Day Pending
+    icon: mdi:clock-start
+    initial: false
 
-  boiler_peak_limit:
-    name: Max kwartierpiek
-    min: 2500
-    max: 8000
-    step: 100
-    unit_of_measurement: W
-    mode: box
-    initial: 4000
 
-  boiler_power:
-    name: Boiler vermogen
-    min: 1000
-    max: 2500
-    step: 10
-    unit_of_measurement: W
-    mode: box
-    initial: 1500
-    
+input_datetime:
+
+  boiler_restart_after:
+    name: Boiler Restart After
+    has_date: true
+    has_time: true
+
+

@@ -1,0 +1,63 @@
+###########################################################
+#
+# Boiler Controller Helpers
+#
+###########################################################
+
+input_select:
+
+  boiler_mode:
+    name: Boiler Mode
+    icon: mdi:tune
+    options:
+      - AUTO
+      - FORCE_ON
+      - FORCE_OFF
+      - MAINTENANCE
+
+  boiler_state:
+    name: Boiler State
+    icon: mdi:state-machine
+    options:
+      - IDLE
+      - WAIT_FOR_SLOT
+      - HEATING
+      - ERROR
+
+  boiler_reason:
+    name: Boiler Reason
+    icon: mdi:comment-question
+    options:
+      - NONE
+      - PRICE_WAIT
+      - POWER_LIMIT
+      - SUPERDAL
+      - CHEAPEST_PRICE
+      - USER_REQUEST
+      - THERMOSTAT
+      - TIMEOUT
+      - SAFETY
+      - ERROR
+
+input_datetime:
+
+  boiler_state_since:
+    name: Boiler State Since
+    has_date: true
+    has_time: true
+
+
+
+input_text:
+
+  boiler_last_message:
+    name: Boiler Last Message
+    max: 255
+
+counter:
+
+  boiler_starts_today:
+    name: Boiler Starts Today
+
+  boiler_starts_total:
+    name: Boiler Starts Total

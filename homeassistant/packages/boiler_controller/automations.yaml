@@ -1,0 +1,79 @@
+automation:
+
+
+
+  - alias: Boiler - Mark Today Completed
+    triggers:
+      - trigger: state
+        entity_id: input_boolean.boiler_test_completed
+        to: "on"
+
+    actions:
+      - action: input_boolean.turn_on
+        target:
+          entity_id: input_boolean.boiler_today_completed
+
+    mode: single
+
+
+  - alias: Boiler - Reset Daily Status
+    triggers:
+      - trigger: time
+        at: "11:00:00"
+
+    actions:
+      - action: input_boolean.turn_off
+        target:
+          entity_id: input_boolean.boiler_today_completed
+
+    mode: single
+
+
+automation:
+
+  #
+  # BC001
+  #
+  - id: boiler_new_day_pending
+    alias: "BC001 - Start Superdal Pending"
+
+    trigger:
+      - platform: time
+        at: input_datetime.boiler_superdal_start
+
+    action:
+
+      - service: input_boolean.turn_on
+        target:
+          entity_id: input_boolean.boiler_new_day_pending
+
+    mode: single
+
+
+  #
+  # BC002
+  #
+  - id: boiler_reset_new_day
+    alias: "BC002 - Reset Boiler Day"
+
+    trigger:
+      - platform: state
+        entity_id: input_boolean.energy_new_quarter
+        to: "on"
+
+    condition:
+
+      - condition: state
+        entity_id: input_boolean.boiler_new_day_pending
+        state: "on"
+
+    action:
+
+      - service: input_boolean.turn_off
+        target:
+          entity_id:
+            - input_boolean.boiler_today_completed
+            - input_boolean.boiler_new_day_pending
+
+    mode: single
+

@@ -1,0 +1,59 @@
+#
+# Boiler Controller
+# User configurable parameters
+#
+# Version: 0.1.0
+#
+
+input_number:
+
+  boiler_power:
+    name: Boiler Power
+    icon: mdi:water-boiler
+    min: 500
+    max: 5000
+    step: 100
+    unit_of_measurement: W
+    initial: 1500
+
+  boiler_peak_limit:
+    name: Boiler Peak Limit
+    icon: mdi:flash
+    min: 1000
+    max: 10000
+    step: 100
+    unit_of_measurement: W
+    initial: 4000
+
+  boiler_restart_power:
+    name: Boiler Restart Power
+    icon: mdi:transmission-tower
+    min: 0
+    max: 2000
+    step: 100
+    unit_of_measurement: W
+    initial: 500
+
+  boiler_restart_delay:
+    name: Boiler Restart Delay
+    icon: mdi:timer
+    min: 5
+    max: 60
+    step: 5
+    unit_of_measurement: min
+    initial: 15
+
+
+input_datetime:
+
+  boiler_superdal_start:
+    name: Boiler Superdal Start
+    has_date: false
+    has_time: true
+    initial: "11:00"
+
+  boiler_superdal_end:
+    name: Boiler Superdal End
+    has_date: false
+    has_time: true
+    initial: "17:00"

@@ -1,0 +1,102 @@
+#############################################################
+#
+# Boiler Controller
+#
+# Bestand : boiler_set_state.yaml
+# Versie  : 0.1.0
+#
+# Doel:
+#   Centrale routine voor alle state-overgangen.
+#
+# Opmerking:
+#   Wijzig boiler_state NOOIT rechtstreeks.
+#   Gebruik altijd dit script.
+#
+#############################################################
+script:
+
+  boiler_set_state:
+    alias: Boiler Controller - Set State
+    description: >
+      Centrale routine voor alle state-overgangen.
+
+    mode: queued
+    max: 10
+
+    fields:
+
+      state:
+        name: Nieuwe State
+        description: Nieuwe controller state.
+        required: true
+        selector:
+          select:
+            options:
+              - IDLE
+              - WAIT_FOR_SLOT
+              - HEATING
+              - ERROR
+
+      reason:
+        name: Reason
+        required: true
+        selector:
+          select:
+            options:
+              - NONE
+              - PRICE_WAIT
+              - POWER_LIMIT
+              - SUPERDAL
+              - CHEAPEST_PRICE
+              - USER_REQUEST
+              - THERMOSTAT
+              - TIMEOUT
+              - SAFETY
+              - ERROR
+
+      message:
+        name: Message
+        required: false
+        default: ""
+
+    sequence:
+
+      #########################################################
+      # Controller State
+      #########################################################
+
+      - service: input_select.select_option
+        target:
+          entity_id: input_select.boiler_state
+        data:
+          option: "{{ state }}"
+
+      #########################################################
+      # Controller Reason
+      #########################################################
+
+      - service: input_select.select_option
+        target:
+          entity_id: input_select.boiler_reason
+        data:
+          option: "{{ reason }}"
+
+      #########################################################
+      # Timestamp
+      #########################################################
+
+      - service: input_datetime.set_datetime
+        target:
+          entity_id: input_datetime.boiler_state_since
+        data:
+          datetime: "{{ now().strftime('%Y-%m-%d %H:%M:%S') }}"
+
+      #########################################################
+      # Laatste boodschap
+      #########################################################
+
+      - service: input_text.set_value
+        target:
+          entity_id: input_text.boiler_last_message
+        data:
+          value: "{{ message }}"

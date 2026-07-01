@@ -1,0 +1,50 @@
+automation:
+
+  - id: energy_quarter_detector
+    alias: "Energy - Quarter Detector"
+
+    trigger:
+      - platform: state
+        entity_id: sensor.peak_current_average_quarterly_demand_2
+
+    variables:
+
+      current: >
+        {{ states('sensor.peak_current_average_quarterly_demand_2') | float(0) }}
+
+      previous: >
+        {{ states('input_number.energy_previous_average_quarter') | float(0) }}
+
+    action:
+
+      #
+      # Nieuw kwartier gedetecteerd
+      #
+      - if:
+          - condition: template
+            value_template: >
+              {{ previous > 0 and current < previous }}
+
+        then:
+
+          - service: input_boolean.turn_on
+            target:
+              entity_id: input_boolean.energy_new_quarter
+
+          - delay:
+              seconds: 2
+
+          - service: input_boolean.turn_off
+            target:
+              entity_id: input_boolean.energy_new_quarter
+
+      #
+      # Vorige waarde altijd bijwerken
+      #
+      - service: input_number.set_value
+        target:
+          entity_id: input_number.energy_previous_average_quarter
+        data:
+          value: "{{ current }}"
+
+    mode: single

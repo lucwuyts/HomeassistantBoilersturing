@@ -1,6 +1,10 @@
 # Boiler Controller - Communicatieprotocol
 
-Versie: **0.1 (Werkdocument)**
+Protocol name : SBC
+
+(Smart Boiler Controller)
+
+Protocol version : 1
 
 ---
 
@@ -145,3 +149,16 @@ Tijdens de ontwikkeling gelden de volgende regels:
 * architectuur vastgelegd;
 * keuze voor pull-communicatie;
 * fallback-regeling op de Shelly.
+
+|  Code | Betekenis                      | Prioriteit |
+| ----: | ------------------------------ | ---------: |
+| **0** | Verwarmen toegestaan           |          - |
+| **1** | Geen superdaluren              |          1 |
+| **2** | Controller uitgeschakeld       |          0 |
+| **3** | Boiler vandaag reeds verwarmd  |          2 |
+| **4** | Wachttijd na piek              |          3 |
+| **5** | Verwachte kwartierpiek te hoog |          4 |
+| **6** | Communicatieprobleem           |          5 |
+| **7** | Fallback actief                |          6 |
+
+

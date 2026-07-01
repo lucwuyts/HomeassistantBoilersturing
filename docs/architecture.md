@@ -16,7 +16,13 @@ De regeling moet robuust zijn, eenvoudig uitbreidbaar en veilig blijven function
 
 # Ontwerpfilosofie
 
-De software wordt opgesplitst in twee onafhankelijke componenten.
+De boilercontroller is ontworpen als een deterministische toestandsmachine.
+
+Elke beslissing wordt genomen op basis van objectieve sensorgegevens en instelbare parameters.
+
+Alle logica is modulair opgebouwd zodat uitbreidingen (zoals PV-sturing, batterij-integratie of legionellaprogramma's) kunnen worden toegevoegd zonder de bestaande architectuur fundamenteel te wijzigen.
+
+Veiligheid en comfort hebben altijd voorrang op kostenoptimalisatie.
 
 ## Home Assistant
 
