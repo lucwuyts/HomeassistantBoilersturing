@@ -63,6 +63,14 @@ const STATE =
     ERROR   : "ERROR"
 };
 
+const STOP_REASON =
+{
+    HEATING_NOT_ALLOWED : "Heating not allowed",
+    MAX_RUNTIME         : "Maximum runtime exceeded",
+    WATCHDOG_TIMEOUT    : "Watchdog timeout",
+    CONTROLLER_DISABLED : "Controller disabled"
+};
+
 //=============================================================================
 // Boiler Object
 //=============================================================================
@@ -289,11 +297,11 @@ function evaluateController()
 {
     if (boiler.config.heating_enabled)
     {
-        relayOn();
+        startBoiler();
     }
     else
     {
-        relayOff();
+        stopBoiler(STOP_REASON.HEATING_NOT_ALLOWED);
     }
 }
 
@@ -310,7 +318,7 @@ function relayOn()
 
     boiler.status.relay = true;
 
-    logInfo("Relay would switch ON");
+    logInfo("Relay would switch ON (simulation)");
 
     publishStatus();
 }
@@ -326,10 +334,49 @@ function relayOff()
 
     boiler.status.relay = false;
 
-    logInfo("Relay would switch OFF");
+    logInfo("Relay would switch OFF (simulation)");
 
     publishStatus();
 }
+
+
+//=============================================================================
+// Heating Manager
+//=============================================================================
+//=============================================================================
+// Boiler Manager
+//=============================================================================
+
+function startBoiler()
+{
+    if (boiler.status.relay)
+    {
+        return;
+    }
+
+    boiler.status.runtime = 0;
+
+    boiler.status.starts_today++;
+
+    logInfo("Boiler started");
+
+    relayOn();
+}
+
+//-----------------------------------------------------------------------------
+
+function stopBoiler(reason)
+{
+    if (!boiler.status.relay)
+    {
+        return;
+    }
+
+    logInfo("Boiler stopped (" + reason + ")");
+
+    relayOff();
+}
+
 
 //=============================================================================
 // Heartbeat
