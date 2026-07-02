@@ -43,6 +43,15 @@ input_number:
     unit_of_measurement: min
     initial: 15
 
+  boiler_max_runtime:
+    name: Boiler Maximum Runtime
+    icon: mdi:timer
+    min: 60
+    max: 21600
+    step: 60
+    unit_of_measurement: s
+    initial: 10800
+
 
 input_datetime:
 

@@ -5,14 +5,25 @@ script:
   # Boiler Controller
   #
   # Bestand : scripts.yaml
-  # Versie  : 0.3.0
+  # Versie  : 0.4.0
+  #
+  # Wijzigingen:
+  #   0.4.0
+  #     - Toegevoegd:
+  #         boiler_publish_controller
+  #
+  #############################################################
+
+  #############################################################
   #
   # Centrale routine voor alle state-overgangen.
   #
   #############################################################
 
   boiler_set_state:
+
     alias: Boiler Controller - Set State
+
     mode: single
 
     fields:
@@ -36,6 +47,7 @@ script:
       #########################################################
 
       - variables:
+
           old_state: "{{ states('input_select.boiler_state') }}"
           new_state: "{{ state }}"
           new_reason: "{{ reason }}"
@@ -94,3 +106,65 @@ script:
             ->
             {{ new_state }}
             ({{ new_reason }})
+
+  #############################################################
+  #
+  # Publiceer controller configuratie naar de Shelly
+  #
+  #############################################################
+
+  boiler_publish_controller:
+
+    alias: Boiler Controller - Publish Controller
+
+    mode: single
+
+    sequence:
+
+      #########################################################
+      # Lokale variabelen
+      #########################################################
+
+      - variables:
+
+          heating_enabled: >
+            {{ is_state('input_boolean.boiler_heating_enabled', 'on') }}
+
+          max_runtime: >
+            {{ states('input_number.boiler_max_runtime') | int }}
+
+      #########################################################
+      # Publiceer MQTT bericht
+      #########################################################
+
+      - service: mqtt.publish
+        data:
+          topic: boiler/v1/controller
+          qos: 1
+          retain: true
+          payload: >
+            {
+              "api": 1,
+              "source": "EnergyManager",
+              "software": "BEM 0.1.0",
+              "timestamp": "{{ now().isoformat() }}",
+              "boiler":
+              {
+                "config":
+                {
+                  "heating_enabled": {{ heating_enabled | lower }},
+                  "max_runtime": {{ max_runtime }}
+                }
+              }
+            }
+
+      #########################################################
+      # Logging
+      #########################################################
+
+      - service: system_log.write
+        data:
+          level: info
+          message: >
+            BOILER CONTROLLER:
+            MQTT controller configuration published
