@@ -2,7 +2,7 @@
  *
  * Boiler Controller Firmware (BCF)
  *
- * Version    : 0.1.0-alpha1
+ * Version    : 0.1.0-alpha5
  * Hardware   : Shelly Pro 1
  * API        : v1
  *
@@ -30,7 +30,8 @@ const CONFIG =
 {
     HEARTBEAT_INTERVAL    : 60000,
     DEFAULT_MAX_RUNTIME   : 10800,
-    DEBUG_LEVEL           : 2
+    DEBUG_LEVEL           : 2,
+    RUNTIME_INTERVAL      : 1000
 };
 
 //=============================================================================
@@ -81,6 +82,7 @@ let boiler =
     {
         heating_enabled : false,
         max_runtime     : CONFIG.DEFAULT_MAX_RUNTIME
+
     },
 
     status :
@@ -93,6 +95,32 @@ let boiler =
         last_update     : ""
     }
 };
+
+//=============================================================================
+// Runtime Manager
+//=============================================================================
+
+function runtimeTask()
+{
+    if (!boiler.status.relay)
+    {
+        return;
+    }
+
+    boiler.status.runtime++;
+
+    if ((boiler.status.runtime % 60) === 0)
+    {
+        publishStatus();
+    }
+
+    if (boiler.status.runtime >= boiler.config.max_runtime)
+    {
+        logWarning("Maximum runtime exceeded");
+
+        stopBoiler(STOP_REASON.MAX_RUNTIME);
+    }
+}
 
 
 //=============================================================================
@@ -406,6 +434,12 @@ function main()
         CONFIG.HEARTBEAT_INTERVAL,
         true,
         heartbeatTask
+    );
+
+    Timer.set(
+        CONFIG.RUNTIME_INTERVAL,
+        true,
+        runtimeTask
     );
 
     setState(STATE.IDLE);
