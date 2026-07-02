@@ -128,7 +128,7 @@ script:
       - variables:
 
           heating_enabled: >
-            {{ is_state('input_boolean.boiler_heating_enabled', 'on') }}
+            {{ is_state('binary_sensor.boiler_heating_allowed', 'on') }}
 
           max_runtime: >
             {{ states('input_number.boiler_max_runtime') | int }}

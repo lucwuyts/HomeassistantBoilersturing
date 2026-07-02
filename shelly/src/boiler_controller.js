@@ -86,6 +86,59 @@ let boiler =
     }
 };
 
+
+//=============================================================================
+// MQTT Message Handler
+//=============================================================================
+
+function processControllerMessage(topic, message)
+{
+    logInfo("Controller message received");
+
+    let data;
+
+    try
+    {
+        data = JSON.parse(message);
+    }
+    catch(error)
+    {
+        logError("Invalid JSON");
+
+        return;
+    }
+
+    if (!data.boiler)
+    {
+        logError("Missing boiler object");
+
+        return;
+    }
+
+    if (!data.boiler.config)
+    {
+        logError("Missing config object");
+
+        return;
+    }
+
+    for (let key in data.boiler.config)
+    {
+        if (boiler.config.hasOwnProperty(key))
+        {
+            boiler.config[key] = data.boiler.config[key];
+
+            logInfo(
+                key + " = " + boiler.config[key]
+            );
+        }
+    }
+
+    
+    evaluateController();
+}
+
+
 //=============================================================================
 // Logging
 //=============================================================================
@@ -165,6 +218,13 @@ function isoTimestamp()
 function mqttInit()
 {
     logInfo("MQTT framework initialized");
+
+    MQTT.subscribe(
+        TOPIC.CONTROLLER,
+        processControllerMessage
+    );
+
+    logInfo("Subscribed to " + TOPIC.CONTROLLER);
 }
 
 //-----------------------------------------------------------------------------
@@ -220,20 +280,55 @@ function setState(newState)
     logInfo("State -> " + newState);
 }
 
+
 //=============================================================================
-// Relay
+// Controller
+//=============================================================================
+
+function evaluateController()
+{
+    if (boiler.config.heating_enabled)
+    {
+        relayOn();
+    }
+    else
+    {
+        relayOff();
+    }
+}
+
+//=============================================================================
+// Relay Manager
 //=============================================================================
 
 function relayOn()
 {
-    logInfo("relayOn() not implemented");
+    if (boiler.status.relay)
+    {
+        return;
+    }
+
+    boiler.status.relay = true;
+
+    logInfo("Relay would switch ON");
+
+    publishStatus();
 }
 
 //-----------------------------------------------------------------------------
 
 function relayOff()
 {
-    logInfo("relayOff() not implemented");
+    if (!boiler.status.relay)
+    {
+        return;
+    }
+
+    boiler.status.relay = false;
+
+    logInfo("Relay would switch OFF");
+
+    publishStatus();
 }
 
 //=============================================================================

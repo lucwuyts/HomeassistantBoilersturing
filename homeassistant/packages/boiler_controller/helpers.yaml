@@ -20,10 +20,6 @@ input_boolean:
   # Runtime Control
   ###########################################################
 
-  boiler_heating_enabled:
-    name: Boiler Heating Enabled
-    icon: mdi:water-boiler
-    initial: false
 
   boiler_force_heating:
     name: Boiler Force Heating
