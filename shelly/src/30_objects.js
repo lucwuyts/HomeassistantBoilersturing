@@ -1,0 +1,65 @@
+/******************************************************************************
+ *
+ * Boiler Controller Firmware (BCF)
+ *
+ * File        : 30_objects.js
+ * Description : Global objects
+ *
+ ******************************************************************************/
+
+let boiler =
+{
+    config :
+    {
+        heating_enabled : false,
+
+        max_runtime     : CONFIG.DEFAULT_MAX_RUNTIME,
+
+        restart_delay   : 900
+    },
+
+    status :
+    {
+        state                  : STATE.BOOTING,
+
+        relay                  : false,
+
+        runtime                : 0,
+
+        starts_today           : 0,
+
+        total_starts           : 0,
+
+        total_runtime          : 0,
+
+        firmware_boots         : 0,
+
+        watchdog               : true,
+
+        last_update            : "",
+
+        last_start             : "",
+
+        last_stop              : "",
+
+        last_stop_reason       : "",
+
+        restart_delay_active   : false,
+
+        restart_remaining      : 0
+    }
+};
+
+let persistent =
+{
+    version         : STORAGE.VERSION,
+
+    firmware_boots  : 0,
+
+    starts_today    : 0,
+
+    total_starts    : 0,
+
+    total_runtime   : 0
+};
+

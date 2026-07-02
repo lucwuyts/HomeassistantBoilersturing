@@ -153,7 +153,9 @@ script:
                 "config":
                 {
                   "heating_enabled": {{ heating_enabled | lower }},
-                  "max_runtime": {{ max_runtime }}
+                  "max_runtime": {{ max_runtime }},
+                  "restart_delay":
+                      {{ states('input_number.boiler_restart_delay') | int * 60 }}
                 }
               }
             }
