@@ -1,71 +1,50 @@
-# Boiler Controller
+# Home Assistant Package - Boiler Controller
 
 ## Doel
 
-De Boiler Controller bepaalt wanneer de elektrische boiler mag verwarmen.
+Deze package levert de Home Assistant-kant van de boilersturing.
 
-Alle intelligentie bevindt zich in Home Assistant.
-De Shelly voert uitsluitend de opdrachten uit en rapporteert de actuele toestand terug.
-
----
+Home Assistant is planner en databron. Shelly blijft de controller die lokaal beslist en het relais schakelt.
 
 ## Verantwoordelijkheden
 
-- Beslissen of de boiler mag verwarmen.
-- Rekening houden met:
-  - Superdaluren
-  - Piekvermogen
-  - Wachttijden
-  - Boiler reeds verwarmd vandaag
-- Publiceren van de controllerstatus naar de Shelly.
+Home Assistant doet:
 
----
+- superdal en andere planningsvoorwaarden bepalen;
+- kwartierpiek voorspellen;
+- piekmarge berekenen;
+- gebruikersparameters beheren;
+- MQTT-bericht naar `boiler/v1/controller` publiceren.
 
-## Architectuur
+Home Assistant doet niet:
 
-```
-Energy Tools
-      │
-      ▼
-Boiler Controller
-      │
-      ▼
-MQTT / HTTP Publisher
-      │
-      ▼
-Shelly Controller
-      │
-      ▼
-Boiler
-```
+- het boilerrelais rechtstreeks schakelen;
+- runtime bewaken;
+- restart delay afdwingen;
+- watchdog of veiligheid overnemen.
 
----
+## MQTT payload
+
+`scripts.yaml` publiceert:
+
+- `boiler.config.heating_enabled`
+- `boiler.config.max_runtime`
+- `boiler.config.restart_delay`
+- `boiler.energy.predicted_quarter_peak`
+- `boiler.energy.peak_limit`
+- `boiler.energy.peak_margin`
+- `boiler.energy.boiler_power`
+- `boiler.energy.house_power`
+
+Shelly gebruikt deze waarden als invoer voor zijn lokale controllerbeslissing.
 
 ## Bestanden
 
 | Bestand | Functie |
-|---------|---------|
-| helpers.yaml | Interne toestand van de controller |
-| boiler_parameters.yaml | Instelbare parameters |
-| templates.yaml | Afgeleide sensoren en controllerstatus |
-| automations.yaml | Controllerlogica |
-| scripts.yaml | Hulpscripts |
-| architecture.md | Architectuurbeschrijving |
-| protocol.md | Communicatieprotocol |
-| README.md | Deze documentatie |
-
----
-
-## Ontwerpprincipes
-
-- Alle beslissingen gebeuren in Home Assistant.
-- De Shelly bevat zo weinig mogelijk logica.
-- Geen hardgecodeerde parameters.
-- Elke component heeft één verantwoordelijkheid.
-- Alle onderdelen moeten afzonderlijk testbaar zijn.
-
----
-
-## Status
-
-Projectstatus: **In ontwikkeling**
+| ------- | ------- |
+| `helpers.yaml` | Interne helpers |
+| `boiler_parameters.yaml` | Instelbare boilerparameters |
+| `templates.yaml` | Afgeleide sensoren zoals piekmarge en heating allowed |
+| `automations.yaml` | Dagstatus en resetlogica |
+| `scripts.yaml` | MQTT publisher |
+| `controller_helpers.yaml` | Oudere controllerhelpers, nog te evalueren/opruimen |

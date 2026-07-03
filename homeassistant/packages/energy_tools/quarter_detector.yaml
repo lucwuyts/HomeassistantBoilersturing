@@ -1,6 +1,6 @@
 automation:
 
-  - id: energy_quarter_detector
+  - id: d
     alias: "Energy - Quarter Detector"
 
     trigger:

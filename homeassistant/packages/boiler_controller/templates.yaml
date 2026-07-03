@@ -37,7 +37,7 @@ template:
           {% set boiler =
                 states('sensor.boiler_power') | float(1500) %}
 
-          {% if is_state('switch.boiler-shelly','on') %}
+          {% if is_state('switch.boiler_shelly','on') %}
             {{ average | round(0) }}
           {% else %}
             {{ (average + boiler) | round(0) }}
@@ -153,6 +153,7 @@ template:
             WAITING
 
           {% endif %}
+
 
 
 

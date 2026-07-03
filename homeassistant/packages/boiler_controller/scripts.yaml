@@ -5,9 +5,12 @@ script:
   # Boiler Controller
   #
   # Bestand : scripts.yaml
-  # Versie  : 0.4.0
+  # Versie  : 0.4.1
   #
   # Wijzigingen:
+  #   0.4.1
+  #     - MQTT controllerbericht uitgebreid met energy-metingen
+  #       voor lokale piekbeslissing door Shelly
   #   0.4.0
   #     - Toegevoegd:
   #         boiler_publish_controller
@@ -109,7 +112,10 @@ script:
 
   #############################################################
   #
-  # Publiceer controller configuratie naar de Shelly
+  # Publiceer configuratie en energiemetingen naar de Shelly.
+  #
+  # Shelly blijft de controller en beslist lokaal over relais,
+  # runtime, restart delay en piekbeveiliging.
   #
   #############################################################
 
@@ -131,7 +137,25 @@ script:
             {{ is_state('binary_sensor.boiler_heating_allowed', 'on') }}
 
           max_runtime: >
-            {{ states('input_number.boiler_max_runtime') | int }}
+            {{ states('input_number.boiler_max_runtime') | int(10800) }}
+
+          restart_delay: >
+            {{ states('input_number.boiler_restart_delay') | int(15) * 60 }}
+
+          predicted_quarter_peak: >
+            {{ states('sensor.boiler_predicted_quarter_peak') | float(0) | round(0) }}
+
+          peak_limit: >
+            {{ states('sensor.boiler_peak_limit') | float(0) | round(0) }}
+
+          peak_margin: >
+            {{ states('sensor.boiler_peak_margin') | float(0) | round(0) }}
+
+          boiler_power: >
+            {{ states('sensor.boiler_power') | float(0) | round(0) }}
+
+          house_power: >
+            {{ states('sensor.boiler_house_power') | float(0) | round(0) }}
 
       #########################################################
       # Publiceer MQTT bericht
@@ -154,8 +178,15 @@ script:
                 {
                   "heating_enabled": {{ heating_enabled | lower }},
                   "max_runtime": {{ max_runtime }},
-                  "restart_delay":
-                      {{ states('input_number.boiler_restart_delay') | int * 60 }}
+                  "restart_delay": {{ restart_delay }}
+                },
+                "energy":
+                {
+                  "predicted_quarter_peak": {{ predicted_quarter_peak }},
+                  "peak_limit": {{ peak_limit }},
+                  "peak_margin": {{ peak_margin }},
+                  "boiler_power": {{ boiler_power }},
+                  "house_power": {{ house_power }}
                 }
               }
             }

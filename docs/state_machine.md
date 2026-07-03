@@ -1,254 +1,57 @@
-# Boiler State Machine
+# Shelly Boiler State Machine
 
 ## Doel
 
-Dit document beschrijft de logische werking van de slimme boilerregeling.
+Dit document beschrijft de lokale state machine op de Shelly. Home Assistant levert planning en meetwaarden; de Shelly beslist lokaal over relais en veiligheid.
 
-De state machine bepaalt **wanneer** de boiler mag verwarmen en **waarom** een overgang naar een andere toestand plaatsvindt.
+## Huidige states
 
-Alle Home Assistant-automations zijn een implementatie van deze state machine.
+| State | Betekenis |
+| ----- | --------- |
+| `BOOTING` | Firmware start op en initialiseert storage, MQTT en timers |
+| `IDLE` | Boiler staat uit en wacht op geldige toestemming |
+| `HEATING` | Relais is aan en runtime wordt bewaakt |
+| `ERROR` | Veiligheids- of communicatiefout |
 
----
+## Belangrijke statusvelden
 
-# Ontwerpprincipes
+| Veld | Betekenis |
+| ---- | --------- |
+| `relay` | Werkelijke lokale relaisstatus volgens Shelly |
+| `runtime` | Runtime van de huidige cyclus in seconden |
+| `restart_delay_active` | Tijdelijke wachttijd actief |
+| `restart_remaining` | Resterende wachttijd in seconden |
+| `last_stop_reason` | Reden waarom Shelly de boiler stopte |
 
-De regeling probeert steeds het beste compromis te vinden tussen:
+## Beslissingsvolgorde
 
-1. Comfort (voldoende warm water)
-2. Lage elektriciteitskost
-3. Beperken van de maandpiek
-4. Betrouwbaarheid
-5. Veiligheid
+Shelly evalueert in vaste volgorde:
 
----
+1. Is restart delay actief?
+2. Staat `heating_enabled` toe dat er verwarmd mag worden?
+3. Is piekbeveiliging actief of is `peak_margin` onvoldoende?
+4. Is de maximale runtime overschreden?
+5. Is de watchdog/communicatie veilig?
+6. Mag het relais aan?
 
-# States
+## Overgangen
 
-## IDLE
+| Huidige state | Conditie | Nieuwe state | Actie |
+| ------------- | -------- | ------------ | ----- |
+| `BOOTING` | Init klaar | `IDLE` | Status publiceren |
+| `IDLE` | Verwarmen toegestaan en veilig | `HEATING` | Relais aan, runtime reset |
+| `HEATING` | `heating_enabled = false` | `IDLE` | Relais uit |
+| `HEATING` | `peak_margin < 0` | `IDLE` | Relais uit, restart delay starten |
+| `HEATING` | Max runtime bereikt | `IDLE` | Relais uit, restart delay starten |
+| Elke state | Veiligheidsfout | `ERROR` | Relais uit |
+| `ERROR` | Fout opgelost | `IDLE` | Status publiceren |
 
-### Beschrijving
+## Restart delay
 
-Er is geen actieve verwarmingscyclus.
+Restart delay voorkomt pendelen. Shelly start deze wachttijd na lokale stops die niet onmiddellijk opnieuw mogen starten, zoals max runtime of piekbeveiliging.
 
-### Ingangsvoorwaarden
+Home Assistant levert de duur via `boiler.config.restart_delay`; Shelly beheert de timer zelf.
 
-* boiler staat uit
-* geen wachttimer actief
-* geen foutconditie
+## Watchdog
 
-### Acties
-
-* Shelly OFF
-* timers resetten indien nodig
-
-### Mogelijke overgangen
-
-| Event            | Nieuwe state  |
-| ---------------- | ------------- |
-| Warm water nodig | WAIT_FOR_SLOT |
-
----
-
-## WAIT_FOR_SLOT
-
-### Beschrijving
-
-Er is warm water nodig, maar de regeling wacht op het meest geschikte kwartier.
-
-### Acties
-
-De regeling evalueert onder andere:
-
-* huidige elektriciteitsprijs
-* voorspelde kwartierprijzen
-* resterende tijd van het kwartier
-* huidig kwartiervermogen
-* verwachte maandpiek
-* minimale wachttijd
-* superdalperiode
-
-### Mogelijke overgangen
-
-| Event                    | Nieuwe state |
-| ------------------------ | ------------ |
-| Startvoorwaarden voldaan | HEATING      |
-| Boiler niet meer nodig   | IDLE         |
-| Fout gedetecteerd        | ERROR        |
-
----
-
-## HEATING
-
-### Beschrijving
-
-De boiler wordt actief verwarmd.
-
-### Acties
-
-Bij het betreden van deze state:
-
-* Shelly ON
-* starttijd registreren
-* watchdog starten
-
-Tijdens deze state wordt continu gecontroleerd:
-
-* maximale verwarmingstijd
-* piekvermogen
-* thermostaat
-* Shelly-status
-
-### Mogelijke overgangen
-
-| Event                | Nieuwe state |
-| -------------------- | ------------ |
-| Boiler warm          | FINISHED     |
-| Maximum tijd bereikt | FINISHED     |
-| Fout                 | ERROR        |
-
----
-
-## FINISHED
-
-### Beschrijving
-
-De verwarmingscyclus is beëindigd.
-
-### Acties
-
-* Shelly OFF
-* timers stoppen
-* statistieken bijwerken
-* interne variabelen resetten
-
-### Mogelijke overgangen
-
-| Event            | Nieuwe state |
-| ---------------- | ------------ |
-| Cleanup voltooid | IDLE         |
-
----
-
-## ERROR
-
-### Beschrijving
-
-Er werd een fout vastgesteld.
-
-### Mogelijke oorzaken
-
-* Shelly offline
-* communicatieprobleem
-* veiligheidstimeout
-* onverwachte toestand
-
-### Acties
-
-* Shelly OFF
-* alarm loggen
-* notificatie versturen (optioneel)
-
-### Mogelijke overgangen
-
-| Event         | Nieuwe state |
-| ------------- | ------------ |
-| Fout opgelost | IDLE         |
-
----
-
-# Events
-
-## Warm water nodig
-
-Wordt actief wanneer de regeling beslist dat een nieuwe verwarmingscyclus noodzakelijk is.
-
----
-
-## Goedkoop kwartier bereikt
-
-De geplande starttijd is bereikt.
-
----
-
-## Nieuw kwartier
-
-Iedere 15 minuten wordt:
-
-* kwartiervermogen bijgewerkt
-* resterende energieruimte berekend
-* planning eventueel aangepast
-
----
-
-## Boiler warm
-
-Gedetecteerd doordat de thermostaat opent en het opgenomen vermogen wegvalt.
-
----
-
-## Timeout
-
-De maximale verwarmingstijd werd overschreden.
-
----
-
-## Home Assistant herstart
-
-Na een herstart wordt de actuele toestand opnieuw opgebouwd aan de hand van:
-
-* Shelly-status
-* timers
-* helpers
-* sensoren
-
----
-
-# Prioriteiten
-
-De beslissingslogica gebruikt steeds onderstaande prioriteitsvolgorde:
-
-| Prioriteit | Omschrijving                     |
-| ---------- | -------------------------------- |
-| 1          | Veiligheid                       |
-| 2          | Bescherming van de boiler        |
-| 3          | Comfort                          |
-| 4          | Beperken van de maandpiek        |
-| 5          | Elektriciteitskost minimaliseren |
-
----
-
-# State-overgangen
-
-| Huidige state | Event                  | Nieuwe state  |
-| ------------- | ---------------------- | ------------- |
-| IDLE          | Warm water nodig       | WAIT_FOR_SLOT |
-| WAIT_FOR_SLOT | Goedkoop kwartier      | HEATING       |
-| WAIT_FOR_SLOT | Boiler niet meer nodig | IDLE          |
-| WAIT_FOR_SLOT | Fout                   | ERROR         |
-| HEATING       | Boiler warm            | FINISHED      |
-| HEATING       | Timeout                | FINISHED      |
-| HEATING       | Fout                   | ERROR         |
-| FINISHED      | Cleanup voltooid       | IDLE          |
-| ERROR         | Fout opgelost          | IDLE          |
-
----
-
-# Veiligheidsmechanismen
-
-* Maximale verwarmingsduur.
-* Watchdog voor vastgelopen automations.
-* Shelly-statuscontrole.
-* Herstel na Home Assistant-herstart.
-* Geen dubbele verwarmingscycli.
-* Altijd eerst uitschakelen bij een fout.
-
----
-
-# Toekomstige uitbreidingen
-
-* PV-overschot gebruiken.
-* Negatieve elektriciteitsprijzen.
-* Dynamische vermogensregeling.
-* Legionella-programma.
-* Vakantiemodus.
-* Slimme voorspelling van warmwaterverbruik.
+De watchdog bewaakt of Home Assistant nog recente geldige MQTT-berichten stuurt. Bij timeout moet Shelly veilig blijven: relais uit of fallback volgens firmwarebeleid.

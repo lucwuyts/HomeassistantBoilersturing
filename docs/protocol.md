@@ -1,164 +1,119 @@
-# Boiler Controller - Communicatieprotocol
+# Boiler Controller - MQTT Protocol
 
-Protocol name : SBC
+Protocolversie: 1
 
-(Smart Boiler Controller)
+## Topics
 
-Protocol version : 1
+| Richting | Topic | Doel |
+| -------- | ----- | ---- |
+| Home Assistant naar Shelly | `boiler/v1/controller` | Configuratie en energiemetingen |
+| Shelly naar Home Assistant | `boiler/v1/status` | Actuele Shelly-status |
 
----
+## Controllerbericht
 
-# Doel
+Home Assistant publiceert retained met QoS 1 naar `boiler/v1/controller`.
 
-Dit document beschrijft de communicatie tussen **Home Assistant** en de **Shelly Pro 1** die de elektrische boiler aanstuurt.
-
-Het protocol is bewust eenvoudig gehouden zodat:
-
-* de Shelly autonoom kan blijven werken;
-* Home Assistant de volledige beslissingslogica bevat;
-* uitbreidingen later mogelijk blijven zonder bestaande software te wijzigen.
-
----
-
-# Architectuur
-
-```
-                Home Assistant
-                 (Planner)
-                      │
-        HTTP GET      │
-        JSON          │
-                      ▼
-              Shelly Pro 1
-             (Uitvoerder)
-                      │
-                 Relais boiler
-```
-
-## Verantwoordelijkheden
-
-### Home Assistant
-
-Home Assistant is verantwoordelijk voor alle berekeningen.
-
-Voorbeelden:
-
-* superdaluren bepalen;
-* kwartierpiek berekenen;
-* beschikbare vermogensmarge bepalen;
-* toekomstige uitbreidingen (PV, batterij, dynamische tarieven...).
-
-Home Assistant schakelt **nooit rechtstreeks** het relais van de boiler.
-
----
-
-### Shelly
-
-De Shelly is verantwoordelijk voor de lokale regeling.
-
-Voorbeelden:
-
-* relais schakelen;
-* detecteren dat de boiler op temperatuur is;
-* minimale wachttijden;
-* fallback bij uitval van Home Assistant;
-* lokaal nachtprogramma.
-
----
-
-# Communicatie
-
-De Shelly leest periodiek de toestand van Home Assistant.
-
-Er wordt bewust gekozen voor **pull** in plaats van **push**.
-
-Voordelen:
-
-* de Shelly bepaalt zelf de updatefrequentie;
-* geen periodieke automations in Home Assistant;
-* eenvoudige foutdetectie;
-* de Shelly merkt onmiddellijk wanneer Home Assistant niet meer bereikbaar is.
-
----
-
-# JSON formaat
-
-Voorlopige versie:
+Voorbeeld:
 
 ```json
 {
-  "api_version": 1,
-  "allow_heat": true,
-  "superdal": true,
-  "house_power": 1835,
-  "quarter_energy": 624,
-  "previous_quarter_energy": 915,
-  "peak_limit": 4000,
-  "boiler_power": 1500,
-  "message": "Normal operation"
+  "api": 1,
+  "source": "EnergyManager",
+  "software": "BEM 0.1.0",
+  "timestamp": "2026-07-03T12:00:00+02:00",
+  "boiler": {
+    "config": {
+      "heating_enabled": true,
+      "max_runtime": 10800,
+      "restart_delay": 900
+    },
+    "energy": {
+      "predicted_quarter_peak": 4200,
+      "peak_limit": 4000,
+      "peak_margin": -200,
+      "boiler_power": 1500,
+      "house_power": 2700
+    }
+  }
 }
 ```
 
----
+### `boiler.config`
 
-# Beschrijving van de velden
+| Veld | Type | Eenheid | Betekenis |
+| ---- | ---- | ------ | --------- |
+| `heating_enabled` | boolean | - | HA geeft aan dat verwarmen volgens planning mag |
+| `max_runtime` | number | seconden | Maximale runtime voor een verwarmingscyclus |
+| `restart_delay` | number | seconden | Wachttijd na stop of piekbeveiliging |
 
-| Veld                    | Type    | Betekenis                                        |
-| ----------------------- | ------- | ------------------------------------------------ |
-| api_version             | integer | Protocolversie                                   |
-| allow_heat              | boolean | Home Assistant geeft toestemming om te verwarmen |
-| superdal                | boolean | Bevindt zich momenteel in een superdalvenster    |
-| house_power             | integer | Actueel opgenomen vermogen (W)                   |
-| quarter_energy          | integer | Verbruik in huidig kwartier (Wh)                 |
-| previous_quarter_energy | integer | Verbruik vorig kwartier (Wh)                     |
-| peak_limit              | integer | Maximale toegelaten kwartierpiek (W)             |
-| boiler_power            | integer | Gemiddeld opgenomen vermogen van de boiler (W)   |
-| message                 | string  | Diagnostische informatie                         |
+### `boiler.energy`
 
----
+| Veld | Type | Eenheid | Betekenis |
+| ---- | ---- | ------ | --------- |
+| `predicted_quarter_peak` | number | W | Door HA voorspelde kwartierpiek als de boiler actief is of wordt |
+| `peak_limit` | number | W | Ingestelde maximale kwartierpiek |
+| `peak_margin` | number | W | `peak_limit - predicted_quarter_peak` |
+| `boiler_power` | number | W | Verwacht vermogen van de boiler |
+| `house_power` | number | W | Actueel woningverbruik volgens HA |
 
-# Fallback
+Shelly mag onbekende velden negeren. Nieuwe velden moeten achterwaarts compatibel worden toegevoegd.
 
-Wanneer de Shelly gedurende een instelbare tijd geen geldige gegevens meer ontvangt:
+## Interpretatie door Shelly
 
-* wordt de communicatie als verbroken beschouwd;
-* schakelt de Shelly automatisch over op de interne fallback-regeling;
-* blijft de boiler werken volgens het lokale nachtprogramma.
+Shelly gebruikt `boiler.config` en `boiler.energy` als invoer voor de lokale beslissing.
 
-Zo blijft warm water beschikbaar, ook wanneer Home Assistant uitvalt.
+Basislogica:
 
----
+```text
+Als heating_enabled false is:
+    boiler stoppen
 
-# Ontwerpprincipes
+Anders als peak_margin < 0:
+    boiler stoppen
+    restart delay starten
 
-Tijdens de ontwikkeling gelden de volgende regels:
+Anders:
+    verwarmen toestaan als lokale veiligheid OK is
+```
 
-1. Home Assistant is de planner.
-2. De Shelly is de uitvoerder.
-3. De Shelly moet ook zonder Home Assistant veilig kunnen functioneren.
-4. Nieuwe functies mogen bestaande installaties niet verstoren.
-5. Elke uitbreiding moet achterwaarts compatibel blijven.
+De exacte beslissing blijft in de Shelly-firmware. Home Assistant stuurt geen relaiscommando.
 
----
+## Statusbericht
 
-# Versiegeschiedenis
+Shelly publiceert retained met QoS 1 naar `boiler/v1/status`.
 
-## v0.1
+Voorbeeld:
 
-* eerste ontwerp;
-* architectuur vastgelegd;
-* keuze voor pull-communicatie;
-* fallback-regeling op de Shelly.
+```json
+{
+  "api": 1,
+  "source": "Shelly",
+  "firmware": "0.2.0",
+  "timestamp": "2026-07-03T12:00:10.000Z",
+  "boiler": {
+    "config": {
+      "heating_enabled": true,
+      "max_runtime": 10800,
+      "restart_delay": 900
+    },
+    "status": {
+      "state": "HEATING",
+      "relay": true,
+      "runtime": 123,
+      "starts_today": 4,
+      "total_starts": 27,
+      "total_runtime": 34122,
+      "restart_delay_active": false,
+      "restart_remaining": 0,
+      "last_stop_reason": ""
+    }
+  }
+}
+```
 
-|  Code | Betekenis                      | Prioriteit |
-| ----: | ------------------------------ | ---------: |
-| **0** | Verwarmen toegestaan           |          - |
-| **1** | Geen superdaluren              |          1 |
-| **2** | Controller uitgeschakeld       |          0 |
-| **3** | Boiler vandaag reeds verwarmd  |          2 |
-| **4** | Wachttijd na piek              |          3 |
-| **5** | Verwachte kwartierpiek te hoog |          4 |
-| **6** | Communicatieprobleem           |          5 |
-| **7** | Fallback actief                |          6 |
+## Foutafhandeling
 
-
+- Ongeldig JSON-bericht: Shelly negeert bericht en logt fout.
+- Ontbrekend `boiler.config`: Shelly negeert bericht en logt fout.
+- Ontbrekend `boiler.energy`: Shelly behoudt bestaande energiewaarden of gebruikt veilige defaults.
+- Geen nieuw HA-bericht binnen watchdogtijd: Shelly schakelt naar veilige fallback of stopt verwarming volgens firmwarebeleid.

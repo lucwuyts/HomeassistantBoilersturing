@@ -1,45 +1,32 @@
 # Boiler Controller Roadmap
 
-## v0.1 Foundation
+## v0.2 - Firmwarestructuur en MQTT basis
 
-- [x] README
-- [x] Architecture
-- [x] State Machine
-- [x] Decision Engine
-- [ ] boiler_set_state
-- [ ] boiler_start
-- [ ] boiler_stop
-- [ ] boiler_cleanup
-- [ ] boiler_scheduler
-- [ ] dashboard controller
+- [x] Shelly-broncode opsplitsen
+- [x] Buildscript met vaste concateneervolgorde
+- [x] MQTT controller topic
+- [x] MQTT status topic
+- [x] Persistence via `Script.storage`
+- [x] HA payload uitbreiden met energy-metingen
 
----
+## v0.3 - Lokale Shelly-controller
 
-## v0.2
+- [ ] `boiler.energy` opslaan in Shelly status/object
+- [ ] Piekbeveiliging op basis van `peak_margin`
+- [ ] Watchdog voor HA MQTT updates
+- [ ] Stop reasons uitbreiden
+- [ ] Statusbericht uitbreiden met energy en watchdogstatus
 
-- [ ] Superdal
-- [ ] Dynamische kwartierregeling
-- [ ] Logging
+## v0.4 - Productietest
 
----
+- [ ] Echte relaissturing op Shelly Pro 1
+- [ ] Test zonder aangesloten boiler
+- [ ] Test met boiler onder toezicht
+- [ ] Dashboard en diagnose in Home Assistant
 
-## v0.3
+## v1.0 - Stabiele release
 
-- [ ] Recovery na HA restart
-- [ ] Watchdog
-- [ ] Notificaties
-
----
-
-## v0.4
-
-- [ ] PV-overschot
-- [ ] Simulatiemodus
-
----
-
-## v1.0
-
-- [ ] Testfase afgerond
 - [ ] Documentatie compleet
-- [ ] GitHub release
+- [ ] Foutscenario's getest
+- [ ] Release build reproduceerbaar
+- [ ] Installatiehandleiding
