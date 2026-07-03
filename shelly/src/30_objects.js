@@ -18,6 +18,19 @@ let boiler =
         restart_delay   : 900
     },
 
+    energy :
+    {
+        predicted_quarter_peak : 0,
+
+        peak_limit             : 0,
+
+        peak_margin            : 0,
+
+        boiler_power           : 0,
+
+        house_power            : 0
+    },
+
     status :
     {
         state                  : STATE.BOOTING,
@@ -62,4 +75,3 @@ let persistent =
 
     total_runtime   : 0
 };
-

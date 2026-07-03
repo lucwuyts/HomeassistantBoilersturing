@@ -7,6 +7,21 @@
  *
  ******************************************************************************/
 
+function copyKnownFields(source, target, label)
+{
+    for (let key in source)
+    {
+        if (target.hasOwnProperty(key))
+        {
+            target[key] = source[key];
+
+            logInfo(label + "." + key + " = " + target[key]);
+        }
+    }
+}
+
+//-----------------------------------------------------------------------------
+
 function processControllerMessage(topic, message)
 {
     logInfo("Controller message received");
@@ -38,17 +53,24 @@ function processControllerMessage(topic, message)
         return;
     }
 
-    for (let key in data.boiler.config)
-    {
-        if (boiler.config.hasOwnProperty(key))
-        {
-            boiler.config[key] = data.boiler.config[key];
+    copyKnownFields(
+        data.boiler.config,
+        boiler.config,
+        "config"
+    );
 
-            logInfo(key + " = " + boiler.config[key]);
-        }
+    if (data.boiler.energy)
+    {
+        copyKnownFields(
+            data.boiler.energy,
+            boiler.energy,
+            "energy"
+        );
     }
 
     evaluateController();
+
+    publishStatus();
 }
 
 //-----------------------------------------------------------------------------
@@ -99,3 +121,4 @@ function publishStatus()
 
     logTrace("Status published");
 }
+

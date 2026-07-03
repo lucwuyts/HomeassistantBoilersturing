@@ -84,13 +84,14 @@ automation:
       - platform: homeassistant
         event: start
 
+      - platform: time_pattern
+        seconds: "/30"
+
       - platform: state
         entity_id:
           - binary_sensor.boiler_heating_allowed
           - input_number.boiler_peak_limit
           - input_number.boiler_power
-          - sensor.verbruik_boven_4
-          - sensor.peak_current_average_quarterly_demand_2
           - input_number.boiler_max_runtime
           - input_number.boiler_restart_delay
 
@@ -103,5 +104,6 @@ automation:
       - service: script.boiler_publish_controller
 
     mode: restart
+
 
 

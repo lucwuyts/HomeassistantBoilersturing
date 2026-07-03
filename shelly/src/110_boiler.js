@@ -7,6 +7,13 @@
  *
  ******************************************************************************/
 
+function isPeakLimitExceeded()
+{
+    return boiler.energy.peak_margin < 0;
+}
+
+//-----------------------------------------------------------------------------
+
 function evaluateController()
 {
     if (boiler.status.restart_delay_active)
@@ -16,14 +23,25 @@ function evaluateController()
         return;
     }
 
-    if (boiler.config.heating_enabled)
-    {
-        startBoiler();
-    }
-    else
+    if (!boiler.config.heating_enabled)
     {
         stopBoiler(STOP_REASON.HEATING_NOT_ALLOWED);
+
+        return;
     }
+
+    if (isPeakLimitExceeded())
+    {
+        logWarning("Peak limit exceeded");
+
+        startRestartDelay();
+
+        stopBoiler(STOP_REASON.PEAK_LIMIT);
+
+        return;
+    }
+
+    startBoiler();
 }
 
 //-----------------------------------------------------------------------------

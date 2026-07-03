@@ -49,10 +49,11 @@ const STOP_REASON =
 
     MAX_RUNTIME         : "Maximum runtime exceeded",
 
+    PEAK_LIMIT          : "Peak limit exceeded",
+
     RESTART_DELAY       : "Restart delay active",
 
     WATCHDOG_TIMEOUT    : "Watchdog timeout",
 
     CONTROLLER_DISABLED : "Controller disabled"
 };
-
