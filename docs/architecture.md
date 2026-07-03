@@ -83,7 +83,7 @@ Het controllerbericht bevat configuratie en energiemetingen. De energiemetingen 
 
 ## Piekbeveiliging
 
-De kwartierdetectie en piekberekening blijven in Home Assistant. Home Assistant stuurt onder andere `predicted_quarter_peak`, `peak_limit` en `peak_margin` naar Shelly.
+De kwartierdetectie en piekberekening blijven in Home Assistant. Home Assistant stuurt onder andere `predicted_quarter_peak`, `peak_limit` en `peak_margin` naar Shelly. Deze waarden worden in MQTT als W verstuurd; eventuele kW-bronsensoren worden in Home Assistant omgerekend.
 
 Shelly beslist lokaal:
 
@@ -111,3 +111,4 @@ Opslaan gebeurt alleen bij boot, boiler start, boiler stop en reset van statisti
 - Geen externe libraries.
 - Alle logging via `logError()`, `logWarning()`, `logInfo()` en `logTrace()`.
 - Build moet altijd een volledig Shelly-script opleveren.
+

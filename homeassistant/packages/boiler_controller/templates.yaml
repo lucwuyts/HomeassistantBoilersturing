@@ -11,8 +11,7 @@ template:
         unique_id: boiler_allow_heat
         state: >
           {{ is_state('binary_sensor.boiler_superdal','on') }}
-          
-          
+
       - name: Boiler Heating Allowed
         unique_id: boiler_heating_allowed
         state: >
@@ -22,138 +21,119 @@ template:
                or
                is_state('input_boolean.boiler_superdal_force', 'on')
              )
-          }}          
-          
+          }}
+
+  - sensor:
+
       - name: Boiler Predicted Quarter Peak
         unique_id: boiler_predicted_quarter_peak
         unit_of_measurement: W
         device_class: power
-
         state: >
-
-          {% set average =
+          {% set average_kw =
                 states('sensor.peak_current_average_quarterly_demand_2') | float(0) %}
 
-          {% set boiler =
+          {% set average_w = average_kw * 1000 %}
+
+          {% set boiler_w =
                 states('sensor.boiler_power') | float(1500) %}
 
           {% if is_state('switch.boiler_shelly','on') %}
-            {{ average | round(0) }}
+            {{ average_w | round(0) }}
           {% else %}
-            {{ (average + boiler) | round(0) }}
+            {{ (average_w + boiler_w) | round(0) }}
           {% endif %}
-
 
       - name: Boiler Peak Margin
         unique_id: boiler_peak_margin
         unit_of_measurement: W
-
+        device_class: power
         state: >
-
           {{
-            states('sensor.boiler_peak_limit') | float(0)
-            -
-            states('sensor.boiler_predicted_quarter_peak') | float(0)
-          }}              
-
-  - sensor:
+            (
+              states('sensor.boiler_peak_limit') | float(0)
+              -
+              states('sensor.boiler_predicted_quarter_peak') | float(0)
+            ) | round(0)
+          }}
 
       - name: Boiler House Power
         unique_id: boiler_house_power
         unit_of_measurement: W
+        device_class: power
         state: >
-          {{ states('sensor.verbruik_boven_4') }}
+          {{ states('sensor.verbruik_boven_4') | float(0) | round(0) }}
 
       - name: Boiler Peak Limit
+        unique_id: boiler_peak_limit
+        unit_of_measurement: W
+        device_class: power
         state: >
-          {{ states('input_number.boiler_peak_limit') }}
+          {{ states('input_number.boiler_peak_limit') | float(0) | round(0) }}
 
       - name: Boiler Power
+        unique_id: boiler_power
+        unit_of_measurement: W
+        device_class: power
         state: >
-          {{ states('input_number.boiler_power') }}
-
+          {{ states('input_number.boiler_power') | float(0) | round(0) }}
 
       - name: Boiler Reason
         unique_id: boiler_reason
-
         state: >
           {% if is_state('input_boolean.boiler_controller_enabled', 'off') %}
             2
-
           {% elif not (
               is_state('binary_sensor.boiler_superdal', 'on')
               or
               is_state('input_boolean.boiler_superdal_force', 'on')
           ) %}
             1
-
           {% elif is_state('input_boolean.boiler_today_completed', 'on') %}
             3
-
           {% elif states('sensor.boiler_peak_margin') | float(0) < 0 %}
             5
-
           {% else %}
             0
-
           {% endif %}
-
 
       - name: Boiler Reason Text
         unique_id: boiler_reason_text
-
         state: >
           {% set reason = states('sensor.boiler_reason') | int %}
 
           {% if reason == 0 %}
             OK
-
           {% elif reason == 1 %}
             Geen superdaluren
-
           {% elif reason == 2 %}
             Controller uitgeschakeld
-
           {% elif reason == 3 %}
             Boiler vandaag reeds verwarmd
-
           {% elif reason == 4 %}
             Wachttijd actief
-
           {% elif reason == 5 %}
             Verwachte kwartierpiek te hoog
-
           {% elif reason == 6 %}
             Communicatieprobleem
-
           {% elif reason == 7 %}
             Fallback actief
-
           {% else %}
             Onbekend
-
           {% endif %}
 
       - name: Boiler Controller State
         unique_id: boiler_controller_state
-
         state: >
           {% set reason = states('sensor.boiler_reason') | int %}
 
           {% if reason == 0 %}
             READY
-
           {% elif reason == 2 %}
             DISABLED
-
           {% elif reason == 3 %}
             LOCKED
-
           {% else %}
             WAITING
-
           {% endif %}
-
-
-
 

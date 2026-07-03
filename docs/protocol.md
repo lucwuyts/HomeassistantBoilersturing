@@ -50,7 +50,7 @@ Voorbeeld:
 
 | Veld | Type | Eenheid | Betekenis |
 | ---- | ---- | ------ | --------- |
-| `predicted_quarter_peak` | number | W | Door HA voorspelde kwartierpiek als de boiler actief is of wordt |
+| `predicted_quarter_peak` | number | W | Door HA voorspelde kwartierpiek als de boiler actief is of wordt. HA rekent eventuele kW-bronnen om naar W voor MQTT |
 | `peak_limit` | number | W | Ingestelde maximale kwartierpiek |
 | `peak_margin` | number | W | `peak_limit - predicted_quarter_peak` |
 | `boiler_power` | number | W | Verwacht vermogen van de boiler |
@@ -117,3 +117,4 @@ Voorbeeld:
 - Ontbrekend `boiler.config`: Shelly negeert bericht en logt fout.
 - Ontbrekend `boiler.energy`: Shelly behoudt bestaande energiewaarden of gebruikt veilige defaults.
 - Geen nieuw HA-bericht binnen watchdogtijd: Shelly schakelt naar veilige fallback of stopt verwarming volgens firmwarebeleid.
+
