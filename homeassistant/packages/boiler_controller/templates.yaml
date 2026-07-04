@@ -71,7 +71,17 @@ template:
         unit_of_measurement: W
         device_class: power
         state: >
-          {{ states('sensor.verbruik_boven_4') | float(0) | round(0) }}
+          {% set source_state = states('sensor.verbruik_boven_4') %}
+          {% set source_w = source_state | float(0) %}
+          {% set previous_w = this.state | float(0) if this is defined else 0 %}
+
+          {% if source_state in ['unknown', 'unavailable', 'none'] %}
+            {{ previous_w | round(0) }}
+          {% elif source_w <= 0 and previous_w > 0 %}
+            {{ previous_w | round(0) }}
+          {% else %}
+            {{ source_w | round(0) }}
+          {% endif %}
 
       - name: Boiler Peak Limit
         unique_id: boiler_peak_limit
