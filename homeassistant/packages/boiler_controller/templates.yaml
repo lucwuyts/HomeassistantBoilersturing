@@ -32,20 +32,22 @@ template:
         state_class: measurement
         state: >
           {% set average_state = states('sensor.peak_current_average_quarterly_demand_2') %}
-          {% set average_kw = average_state | float(0) %}
-          {% set average_w = average_kw * 1000 %}
+          {% set average_so_far_w = average_state | float(0) * 1000 %}
+          {% set house_power_w = states('sensor.boiler_house_power') | float(0) %}
           {% set boiler_w = states('sensor.boiler_power') | float(1500) %}
+          {% set elapsed = (now().minute % 15) * 60 + now().second %}
+          {% set remaining = 900 - elapsed %}
+          {% set boiler_add_w = boiler_w if not is_state('switch.boiler_shelly','on')
+                and is_state('binary_sensor.boiler_heating_allowed', 'on') else 0 %}
+          {% set projected_power_w = house_power_w + boiler_add_w %}
 
-          {% if average_state in ['unknown', 'unavailable', 'none'] or average_w <= 0 %}
+          {% if average_state in ['unknown', 'unavailable', 'none'] %}
             0
-          {% elif is_state('switch.boiler_shelly','on') %}
-            {{ average_w | round(0) }}
-          {% elif is_state('binary_sensor.boiler_heating_allowed', 'on') %}
-            {{ (average_w + boiler_w) | round(0) }}
+          {% elif elapsed <= 0 %}
+            {{ projected_power_w | round(0) }}
           {% else %}
-            {{ average_w | round(0) }}
+            {{ ((average_so_far_w * elapsed + projected_power_w * remaining) / 900) | round(0) }}
           {% endif %}
-
       - name: Boiler Peak Margin W
         unique_id: boiler_peak_margin_w
         unit_of_measurement: W
@@ -152,12 +154,4 @@ template:
           {% else %}
             WAITING
           {% endif %}
-
-
-
-
-
-
-
-
 
