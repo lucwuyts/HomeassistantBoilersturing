@@ -11,6 +11,7 @@ const CONFIG =
 {
     HEARTBEAT_INTERVAL    : 60000,
     CONTROLLER_TIMEOUT    : 120000,
+    RELAY_ID              : 0,
     DEFAULT_MAX_RUNTIME   : 10800,
     DEBUG_LEVEL           : 2,
     RUNTIME_INTERVAL      : 1000

@@ -23,6 +23,8 @@ function main()
 
     savePersistentData();
 
+    forceRelayOff();
+
     mqttInit();
 
     publishStatus();

@@ -7,6 +7,36 @@
  *
  ******************************************************************************/
 
+function setRelay(on)
+{
+    Shelly.call(
+        "Switch.Set",
+        {
+            id : CONFIG.RELAY_ID,
+            on : on
+        },
+        function(result, error_code, error_message)
+        {
+            if (error_code !== 0)
+            {
+                logError("Relay switch failed: " + error_message);
+
+                publishStatus();
+
+                return;
+            }
+
+            boiler.status.relay = on;
+
+            logInfo("Relay switched " + (on ? "ON" : "OFF"));
+
+            publishStatus();
+        }
+    );
+}
+
+//-----------------------------------------------------------------------------
+
 function relayOn()
 {
     if (boiler.status.relay)
@@ -14,11 +44,9 @@ function relayOn()
         return;
     }
 
-    boiler.status.relay = true;
+    logInfo("Relay switch ON requested");
 
-    logInfo("Relay would switch ON (simulation)");
-
-    publishStatus();
+    setRelay(true);
 }
 
 //-----------------------------------------------------------------------------
@@ -30,9 +58,16 @@ function relayOff()
         return;
     }
 
-    boiler.status.relay = false;
+    logInfo("Relay switch OFF requested");
 
-    logInfo("Relay would switch OFF (simulation)");
+    setRelay(false);
+}
 
-    publishStatus();
+//-----------------------------------------------------------------------------
+
+function forceRelayOff()
+{
+    logInfo("Relay force OFF requested");
+
+    setRelay(false);
 }
