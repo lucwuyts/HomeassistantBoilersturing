@@ -11,3 +11,10 @@ function isoTimestamp()
 {
     return new Date().toISOString();
 }
+
+//-----------------------------------------------------------------------------
+
+function timestampMs()
+{
+    return new Date().getTime();
+}

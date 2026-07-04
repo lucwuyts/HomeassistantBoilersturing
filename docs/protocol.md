@@ -129,6 +129,10 @@ Voorbeeld:
       "starts_today": 4,
       "total_starts": 27,
       "total_runtime": 34122,
+      "watchdog": true,
+      "controller_online": true,
+      "controller_timeout": 120,
+      "last_controller_update": "2026-07-03T12:00:00.000Z",
       "restart_delay_active": false,
       "restart_remaining": 0,
       "last_stop_reason": ""
@@ -142,5 +146,5 @@ Voorbeeld:
 - Ongeldig JSON-bericht: Shelly negeert bericht en logt fout.
 - Ontbrekend `boiler.config`: Shelly negeert bericht en logt fout.
 - Ontbrekend `boiler.energy`: Shelly behoudt bestaande energiewaarden of gebruikt veilige defaults.
-- Geen nieuw HA-bericht binnen watchdogtijd: Shelly schakelt naar veilige fallback of stopt verwarming volgens firmwarebeleid.
+- Geen nieuw geldig HA-bericht binnen watchdogtijd: Shelly publiceert `controller_online: false` en `watchdog: false` in het statusbericht.
 

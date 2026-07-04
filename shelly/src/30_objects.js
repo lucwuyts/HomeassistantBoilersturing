@@ -47,7 +47,15 @@ let boiler =
 
         firmware_boots         : 0,
 
-        watchdog               : true,
+        watchdog               : false,
+
+        controller_online      : false,
+
+        controller_timeout     : CONFIG.CONTROLLER_TIMEOUT / 1000,
+
+        last_controller_update : "",
+
+        last_controller_seen   : 0,
 
         last_update            : "",
 

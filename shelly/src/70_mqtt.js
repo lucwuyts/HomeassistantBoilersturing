@@ -32,6 +32,24 @@ function processControllerCommand(command)
 
 //-----------------------------------------------------------------------------
 
+function markControllerOnline()
+{
+    if (!boiler.status.controller_online)
+    {
+        logInfo("Controller online");
+    }
+
+    boiler.status.controller_online = true;
+
+    boiler.status.watchdog = true;
+
+    boiler.status.last_controller_update = isoTimestamp();
+
+    boiler.status.last_controller_seen = timestampMs();
+}
+
+//-----------------------------------------------------------------------------
+
 function processControllerMessage(topic, message)
 {
     logInfo("Controller message received");
@@ -55,6 +73,8 @@ function processControllerMessage(topic, message)
 
         return;
     }
+
+    markControllerOnline();
 
     if (data.boiler.command)
     {

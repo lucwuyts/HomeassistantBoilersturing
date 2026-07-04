@@ -9,6 +9,8 @@
 
 function systemTimerTask()
 {
+    checkControllerWatchdog();
+
     if (boiler.status.relay)
     {
         boiler.status.runtime++;
@@ -40,4 +42,32 @@ function systemTimerTask()
             evaluateController();
         }
     }
+}
+
+//-----------------------------------------------------------------------------
+
+function checkControllerWatchdog()
+{
+    if (boiler.status.last_controller_seen === 0)
+    {
+        return;
+    }
+
+    if (!boiler.status.controller_online)
+    {
+        return;
+    }
+
+    if ((timestampMs() - boiler.status.last_controller_seen) <= CONFIG.CONTROLLER_TIMEOUT)
+    {
+        return;
+    }
+
+    boiler.status.controller_online = false;
+
+    boiler.status.watchdog = false;
+
+    logWarning("Controller offline");
+
+    publishStatus();
 }

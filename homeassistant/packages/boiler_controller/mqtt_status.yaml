@@ -30,6 +30,20 @@ mqtt:
       value_template: >
         {{ value_json.boiler.status.last_stop_reason | default('') }}
 
+    - name: Shelly Boiler Last Controller Update
+      unique_id: shelly_boiler_last_controller_update
+      state_topic: boiler/v1/status
+      value_template: >
+        {{ value_json.boiler.status.last_controller_update | default('') }}
+
+    - name: Shelly Boiler Controller Timeout
+      unique_id: shelly_boiler_controller_timeout
+      state_topic: boiler/v1/status
+      unit_of_measurement: s
+      state_class: measurement
+      value_template: >
+        {{ value_json.boiler.status.controller_timeout | default(0) }}
+
     - name: Shelly Boiler Starts Today
       unique_id: shelly_boiler_starts_today
       state_topic: boiler/v1/status
@@ -95,3 +109,11 @@ mqtt:
       payload_off: 'false'
       value_template: >
         {{ value_json.boiler.status.watchdog | default(false) | lower }}
+
+    - name: Shelly Boiler Controller Online
+      unique_id: shelly_boiler_controller_online
+      state_topic: boiler/v1/status
+      payload_on: 'true'
+      payload_off: 'false'
+      value_template: >
+        {{ value_json.boiler.status.controller_online | default(false) | lower }}
