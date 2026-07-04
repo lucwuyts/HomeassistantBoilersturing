@@ -23,7 +23,7 @@ input_number:
     max: 10000
     step: 100
     unit_of_measurement: W
-    initial: 4000
+    initial: 3000
 
   boiler_restart_power:
     name: Boiler Restart Power
