@@ -35,11 +35,13 @@ template:
           {% set average_so_far_w = average_state | float(0) * 1000 %}
           {% set house_power_w = states('sensor.boiler_house_power') | float(0) %}
           {% set boiler_w = states('sensor.boiler_power') | float(1500) %}
+          {% set previous_w = this.state | float(0) if this is defined else 0 %}
           {% set elapsed = (now().minute % 15) * 60 + now().second %}
           {% set remaining = 900 - elapsed %}
           {% set boiler_add_w = boiler_w if not is_state('switch.boiler_shelly','on')
                 and is_state('binary_sensor.boiler_heating_allowed', 'on') else 0 %}
-          {% set projected_power_w = house_power_w + boiler_add_w %}
+          {% set measured_projected_w = house_power_w + boiler_add_w %}
+          {% set projected_power_w = previous_w if measured_projected_w <= 0 and previous_w > 0 else measured_projected_w %}
 
           {% if average_state in ['unknown', 'unavailable', 'none'] %}
             {{ projected_power_w | round(0) }}
