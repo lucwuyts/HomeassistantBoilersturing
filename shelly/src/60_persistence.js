@@ -49,6 +49,21 @@ function savePersistentData()
 
 //-----------------------------------------------------------------------------
 
+function resetStatistics()
+{
+    boiler.status.starts_today = 0;
+
+    boiler.status.total_starts = 0;
+
+    boiler.status.total_runtime = 0;
+
+    savePersistentData();
+
+    logInfo("Statistics reset");
+}
+
+//-----------------------------------------------------------------------------
+
 function loadPersistentData()
 {
     let json = Script.storage.getItem(STORAGE.KEY);

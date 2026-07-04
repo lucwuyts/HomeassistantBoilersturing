@@ -202,3 +202,48 @@ script:
             BOILER CONTROLLER:
             MQTT controller configuration published
 
+  #############################################################
+  #
+  # Reset Shelly statistieken.
+  #
+  # Dit is bewust een apart command en wordt niet retained
+  # gepubliceerd, zodat een reset niet opnieuw uitgevoerd wordt
+  # na een MQTT- of Shelly-herstart.
+  #
+  #############################################################
+
+  boiler_reset_statistics:
+
+    alias: Boiler Controller - Reset Statistics
+
+    mode: single
+
+    sequence:
+
+      - service: mqtt.publish
+        data:
+          topic: boiler/v1/controller
+          qos: 1
+          retain: false
+          payload: >
+            {
+              "api": 1,
+              "source": "EnergyManager",
+              "software": "BEM 0.1.0",
+              "timestamp": "{{ now().isoformat() }}",
+              "boiler":
+              {
+                "command":
+                {
+                  "reset_statistics": true
+                }
+              }
+            }
+
+      - service: system_log.write
+        data:
+          level: warning
+          message: >
+            BOILER CONTROLLER:
+            MQTT reset statistics command published
+

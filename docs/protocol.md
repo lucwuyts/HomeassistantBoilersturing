@@ -58,6 +58,32 @@ Voorbeeld:
 
 Shelly mag onbekende velden negeren. Nieuwe velden moeten achterwaarts compatibel worden toegevoegd.
 
+## Controllercommand
+
+Home Assistant mag een niet-retained command naar hetzelfde controller-topic publiceren voor expliciete beheeracties.
+
+Voorbeeld:
+
+```json
+{
+  "api": 1,
+  "source": "EnergyManager",
+  "software": "BEM 0.1.0",
+  "timestamp": "2026-07-04T13:30:00+02:00",
+  "boiler": {
+    "command": {
+      "reset_statistics": true
+    }
+  }
+}
+```
+
+| Veld | Type | Betekenis |
+| ---- | ---- | --------- |
+| `reset_statistics` | boolean | Reset Shelly verwarmingsstatistieken `starts_today`, `total_starts` en `total_runtime` |
+
+Commands worden niet retained gepubliceerd. Een reset mag niet opnieuw uitgevoerd worden na een MQTT- of Shelly-herstart.
+
 ## Interpretatie door Shelly
 
 Shelly gebruikt `boiler.config` en `boiler.energy` als invoer voor de lokale beslissing.

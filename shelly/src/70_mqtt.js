@@ -22,6 +22,16 @@ function copyKnownFields(source, target, label)
 
 //-----------------------------------------------------------------------------
 
+function processControllerCommand(command)
+{
+    if (command.reset_statistics === true)
+    {
+        resetStatistics();
+    }
+}
+
+//-----------------------------------------------------------------------------
+
 function processControllerMessage(topic, message)
 {
     logInfo("Controller message received");
@@ -46,9 +56,21 @@ function processControllerMessage(topic, message)
         return;
     }
 
+    if (data.boiler.command)
+    {
+        processControllerCommand(data.boiler.command);
+    }
+
     if (!data.boiler.config)
     {
-        logError("Missing config object");
+        if (!data.boiler.command)
+        {
+            logError("Missing config object");
+
+            return;
+        }
+
+        publishStatus();
 
         return;
     }
