@@ -143,13 +143,13 @@ script:
             {{ states('input_number.boiler_restart_delay') | int(15) * 60 }}
 
           predicted_quarter_peak: >
-            {{ states('sensor.boiler_predicted_quarter_peak') | float(0) | round(0) }}
+            {{ states('sensor.boiler_predicted_quarter_peak_w') | float(0) | round(0) }}
 
           peak_limit: >
             {{ states('sensor.boiler_peak_limit') | float(0) | round(0) }}
 
           peak_margin: >
-            {{ states('sensor.boiler_peak_margin') | float(0) | round(0) }}
+            {{ states('sensor.boiler_peak_margin_w') | float(0) | round(0) }}
 
           boiler_power: >
             {{ states('sensor.boiler_power') | float(0) | round(0) }}
@@ -201,3 +201,4 @@ script:
           message: >
             BOILER CONTROLLER:
             MQTT controller configuration published
+

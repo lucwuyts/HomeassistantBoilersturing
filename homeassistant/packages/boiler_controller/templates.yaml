@@ -25,10 +25,11 @@ template:
 
   - sensor:
 
-      - name: Boiler Predicted Quarter Peak
-        unique_id: boiler_predicted_quarter_peak
+      - name: Boiler Predicted Quarter Peak W
+        unique_id: boiler_predicted_quarter_peak_w
         unit_of_measurement: W
         device_class: power
+        state_class: measurement
         state: >
           {% set average_state = states('sensor.peak_current_average_quarterly_demand_2') %}
           {% set average_kw = average_state | float(0) %}
@@ -45,16 +46,17 @@ template:
             {{ average_w | round(0) }}
           {% endif %}
 
-      - name: Boiler Peak Margin
-        unique_id: boiler_peak_margin
+      - name: Boiler Peak Margin W
+        unique_id: boiler_peak_margin_w
         unit_of_measurement: W
         device_class: power
+        state_class: measurement
         state: >
           {{
             (
               states('sensor.boiler_peak_limit') | float(0)
               -
-              states('sensor.boiler_predicted_quarter_peak') | float(0)
+              states('sensor.boiler_predicted_quarter_peak_w') | float(0)
             ) | round(0)
           }}
 
@@ -79,6 +81,19 @@ template:
         state: >
           {{ states('input_number.boiler_power') | float(0) | round(0) }}
 
+      - name: Shelly Boiler Relay Numeric
+        unique_id: shelly_boiler_relay_numeric
+        unit_of_measurement: "1"
+        state_class: measurement
+        state: >
+          {{ 1 if is_state('binary_sensor.shelly_boiler_relay', 'on') else 0 }}
+
+      - name: Shelly Boiler Restart Delay Active Numeric
+        unique_id: shelly_boiler_restart_delay_active_numeric
+        unit_of_measurement: "1"
+        state_class: measurement
+        state: >
+          {{ 1 if is_state('binary_sensor.shelly_boiler_restart_delay_active', 'on') else 0 }}
       - name: Boiler Reason
         unique_id: boiler_reason
         state: >
@@ -92,7 +107,7 @@ template:
             1
           {% elif is_state('input_boolean.boiler_today_completed', 'on') %}
             3
-          {% elif states('sensor.boiler_peak_margin') | float(0) < 0 %}
+          {% elif states('sensor.boiler_peak_margin_w') | float(0) < 0 %}
             5
           {% else %}
             0
@@ -137,6 +152,12 @@ template:
           {% else %}
             WAITING
           {% endif %}
+
+
+
+
+
+
 
 
 
