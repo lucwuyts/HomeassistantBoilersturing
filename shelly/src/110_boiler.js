@@ -57,9 +57,13 @@ function startBoiler()
 
     boiler.status.starts_today++;
 
+    boiler.status.total_starts++;
+
     boiler.status.last_start = isoTimestamp();
 
     logInfo("Boiler started");
+
+    savePersistentData();
 
     relayOn();
 }
@@ -80,6 +84,8 @@ function stopBoiler(reason)
     boiler.status.last_stop = isoTimestamp();
 
     logInfo("Boiler stopped (" + reason + ")");
+
+    savePersistentData();
 
     relayOff();
 }

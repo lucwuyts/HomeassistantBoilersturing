@@ -13,6 +13,8 @@ function systemTimerTask()
     {
         boiler.status.runtime++;
 
+        boiler.status.total_runtime++;
+
         if (boiler.status.runtime >= boiler.config.max_runtime)
         {
             logWarning("Maximum runtime exceeded");
