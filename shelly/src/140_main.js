@@ -25,6 +25,8 @@ function main()
 
     forceRelayOff();
 
+    startBootDelay();
+
     mqttInit();
 
     publishStatus();

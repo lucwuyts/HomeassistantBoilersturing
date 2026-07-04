@@ -11,6 +11,8 @@ function systemTimerTask()
 {
     checkControllerWatchdog();
 
+    updateBootDelay();
+
     if (boiler.status.relay)
     {
         boiler.status.runtime++;

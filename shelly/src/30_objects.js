@@ -65,6 +65,10 @@ let boiler =
 
         last_stop_reason       : "",
 
+        boot_delay_active      : false,
+
+        boot_delay_remaining   : 0,
+
         restart_delay_active   : false,
 
         restart_remaining      : 0

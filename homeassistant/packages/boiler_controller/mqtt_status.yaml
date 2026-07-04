@@ -24,6 +24,14 @@ mqtt:
       value_template: >
         {{ value_json.boiler.status.restart_remaining | default(0) }}
 
+    - name: Shelly Boiler Boot Delay Remaining
+      unique_id: shelly_boiler_boot_delay_remaining
+      state_topic: boiler/v1/status
+      unit_of_measurement: s
+      state_class: measurement
+      value_template: >
+        {{ value_json.boiler.status.boot_delay_remaining | default(0) }}
+
     - name: Shelly Boiler Last Stop Reason
       unique_id: shelly_boiler_last_stop_reason
       state_topic: boiler/v1/status
@@ -101,6 +109,14 @@ mqtt:
       payload_off: 'false'
       value_template: >
         {{ value_json.boiler.status.restart_delay_active | default(false) | lower }}
+
+    - name: Shelly Boiler Boot Delay Active
+      unique_id: shelly_boiler_boot_delay_active
+      state_topic: boiler/v1/status
+      payload_on: 'true'
+      payload_off: 'false'
+      value_template: >
+        {{ value_json.boiler.status.boot_delay_active | default(false) | lower }}
 
     - name: Shelly Boiler Watchdog
       unique_id: shelly_boiler_watchdog

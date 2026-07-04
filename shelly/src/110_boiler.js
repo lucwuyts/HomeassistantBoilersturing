@@ -16,6 +16,13 @@ function isPeakLimitExceeded()
 
 function evaluateController()
 {
+    if (boiler.status.boot_delay_active)
+    {
+        logInfo("Boot delay active");
+
+        return;
+    }
+
     if (boiler.status.restart_delay_active)
     {
         logInfo("Restart delay active");

@@ -133,6 +133,8 @@ Voorbeeld:
       "controller_online": true,
       "controller_timeout": 120,
       "last_controller_update": "2026-07-03T12:00:00.000Z",
+      "boot_delay_active": false,
+      "boot_delay_remaining": 0,
       "restart_delay_active": false,
       "restart_remaining": 0,
       "last_stop_reason": ""
