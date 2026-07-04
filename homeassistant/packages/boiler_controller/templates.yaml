@@ -42,7 +42,7 @@ template:
           {% set projected_power_w = house_power_w + boiler_add_w %}
 
           {% if average_state in ['unknown', 'unavailable', 'none'] %}
-            0
+            {{ projected_power_w | round(0) }}
           {% elif elapsed <= 0 %}
             {{ projected_power_w | round(0) }}
           {% else %}
