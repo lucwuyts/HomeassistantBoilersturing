@@ -47,4 +47,10 @@ Shelly gebruikt deze waarden als invoer voor zijn lokale controllerbeslissing.
 | `templates.yaml` | Afgeleide sensoren zoals piekmarge en heating allowed |
 | `automations.yaml` | Dagstatus en resetlogica |
 | `scripts.yaml` | MQTT publisher |
-| `controller_helpers.yaml` | Oudere controllerhelpers, nog te evalueren/opruimen |
+| `mqtt_status.yaml` | MQTT entities op basis van echte Shelly-status |
+| `controller_helpers.yaml` | Oudere controllerhelpers, niet gebruiken als actuele Shelly-status |
+
+## Actuele status
+
+Gebruik voor dashboards de entities uit `mqtt_status.yaml`. `input_select.boiler_state` is een oudere helper en is niet langer de waarheid over de actuele boilerstatus.
+

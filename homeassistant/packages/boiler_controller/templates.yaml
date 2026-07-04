@@ -30,18 +30,19 @@ template:
         unit_of_measurement: W
         device_class: power
         state: >
-          {% set average_kw =
-                states('sensor.peak_current_average_quarterly_demand_2') | float(0) %}
-
+          {% set average_state = states('sensor.peak_current_average_quarterly_demand_2') %}
+          {% set average_kw = average_state | float(0) %}
           {% set average_w = average_kw * 1000 %}
+          {% set boiler_w = states('sensor.boiler_power') | float(1500) %}
 
-          {% set boiler_w =
-                states('sensor.boiler_power') | float(1500) %}
-
-          {% if is_state('switch.boiler_shelly','on') %}
+          {% if average_state in ['unknown', 'unavailable', 'none'] or average_w <= 0 %}
+            0
+          {% elif is_state('switch.boiler_shelly','on') %}
             {{ average_w | round(0) }}
-          {% else %}
+          {% elif is_state('binary_sensor.boiler_heating_allowed', 'on') %}
             {{ (average_w + boiler_w) | round(0) }}
+          {% else %}
+            {{ average_w | round(0) }}
           {% endif %}
 
       - name: Boiler Peak Margin
@@ -136,4 +137,6 @@ template:
           {% else %}
             WAITING
           {% endif %}
+
+
 

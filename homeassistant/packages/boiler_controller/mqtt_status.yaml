@@ -1,0 +1,97 @@
+mqtt:
+
+  sensor:
+
+    - name: Shelly Boiler State
+      unique_id: shelly_boiler_state
+      state_topic: boiler/v1/status
+      value_template: >
+        {{ value_json.boiler.status.state | default('unknown') }}
+
+    - name: Shelly Boiler Runtime
+      unique_id: shelly_boiler_runtime
+      state_topic: boiler/v1/status
+      unit_of_measurement: s
+      state_class: measurement
+      value_template: >
+        {{ value_json.boiler.status.runtime | default(0) }}
+
+    - name: Shelly Boiler Restart Remaining
+      unique_id: shelly_boiler_restart_remaining
+      state_topic: boiler/v1/status
+      unit_of_measurement: s
+      state_class: measurement
+      value_template: >
+        {{ value_json.boiler.status.restart_remaining | default(0) }}
+
+    - name: Shelly Boiler Last Stop Reason
+      unique_id: shelly_boiler_last_stop_reason
+      state_topic: boiler/v1/status
+      value_template: >
+        {{ value_json.boiler.status.last_stop_reason | default('') }}
+
+    - name: Shelly Boiler Starts Today
+      unique_id: shelly_boiler_starts_today
+      state_topic: boiler/v1/status
+      state_class: total
+      value_template: >
+        {{ value_json.boiler.status.starts_today | default(0) }}
+
+    - name: Shelly Boiler Total Starts
+      unique_id: shelly_boiler_total_starts
+      state_topic: boiler/v1/status
+      state_class: total_increasing
+      value_template: >
+        {{ value_json.boiler.status.total_starts | default(0) }}
+
+    - name: Shelly Boiler Total Runtime
+      unique_id: shelly_boiler_total_runtime
+      state_topic: boiler/v1/status
+      unit_of_measurement: s
+      state_class: total_increasing
+      value_template: >
+        {{ value_json.boiler.status.total_runtime | default(0) }}
+
+    - name: Shelly Boiler Peak Margin
+      unique_id: shelly_boiler_peak_margin
+      state_topic: boiler/v1/status
+      unit_of_measurement: W
+      device_class: power
+      state_class: measurement
+      value_template: >
+        {{ value_json.boiler.energy.peak_margin | default(0) }}
+
+    - name: Shelly Boiler Predicted Quarter Peak
+      unique_id: shelly_boiler_predicted_quarter_peak
+      state_topic: boiler/v1/status
+      unit_of_measurement: W
+      device_class: power
+      state_class: measurement
+      value_template: >
+        {{ value_json.boiler.energy.predicted_quarter_peak | default(0) }}
+
+  binary_sensor:
+
+    - name: Shelly Boiler Relay
+      unique_id: shelly_boiler_relay
+      state_topic: boiler/v1/status
+      payload_on: 'true'
+      payload_off: 'false'
+      value_template: >
+        {{ value_json.boiler.status.relay | default(false) | lower }}
+
+    - name: Shelly Boiler Restart Delay Active
+      unique_id: shelly_boiler_restart_delay_active
+      state_topic: boiler/v1/status
+      payload_on: 'true'
+      payload_off: 'false'
+      value_template: >
+        {{ value_json.boiler.status.restart_delay_active | default(false) | lower }}
+
+    - name: Shelly Boiler Watchdog
+      unique_id: shelly_boiler_watchdog
+      state_topic: boiler/v1/status
+      payload_on: 'true'
+      payload_off: 'false'
+      value_template: >
+        {{ value_json.boiler.status.watchdog | default(false) | lower }}
