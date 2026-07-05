@@ -19,6 +19,11 @@ function systemTimerTask()
 
         boiler.status.total_runtime++;
 
+        if (checkWarmEnough())
+        {
+            return;
+        }
+
         if (boiler.status.runtime >= boiler.config.max_runtime)
         {
             logWarning("Maximum runtime exceeded");

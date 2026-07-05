@@ -57,6 +57,8 @@ let boiler =
 
         last_controller_seen   : 0,
 
+        controller_config_received : false,
+
         last_update            : "",
 
         last_start             : "",
@@ -64,6 +66,12 @@ let boiler =
         last_stop              : "",
 
         last_stop_reason       : "",
+
+        warm_enough            : false,
+
+        warm_enough_since      : "",
+
+        warmup_min_runtime     : CONFIG.WARMUP_MIN_RUNTIME,
 
         boot_delay_active      : false,
 
@@ -85,5 +93,9 @@ let persistent =
 
     total_starts    : 0,
 
-    total_runtime   : 0
+    total_runtime   : 0,
+
+    warm_enough     : false,
+
+    warm_enough_since : ""
 };

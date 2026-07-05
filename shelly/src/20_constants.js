@@ -13,6 +13,7 @@ const CONFIG =
     CONTROLLER_TIMEOUT    : 120000,
     BOOT_DELAY            : 30,
     RELAY_ID              : 0,
+    WARMUP_MIN_RUNTIME    : 300,
     DEFAULT_MAX_RUNTIME   : 10800,
     DEBUG_LEVEL           : 2,
     RUNTIME_INTERVAL      : 1000
@@ -53,6 +54,8 @@ const STOP_REASON =
     MAX_RUNTIME         : "Maximum runtime exceeded",
 
     PEAK_LIMIT          : "Peak limit exceeded",
+
+    WARM_ENOUGH         : "Boiler warm enough",
 
     RESTART_DELAY       : "Restart delay active",
 

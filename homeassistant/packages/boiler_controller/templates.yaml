@@ -7,10 +7,23 @@ template:
         state: >
           {{ now().hour >= 11 and now().hour < 17 }}
 
+      - name: Boiler Nachtuur
+        unique_id: boiler_nachtuur
+        state: >
+          {{ now().hour >= 22 or now().hour < 7 }}
+
       - name: Boiler Allow Heat
         unique_id: boiler_allow_heat
         state: >
-          {{ is_state('binary_sensor.boiler_superdal','on') }}
+          {{
+            is_state('binary_sensor.boiler_superdal','on')
+            or
+            (
+              is_state('binary_sensor.boiler_nachtuur', 'on')
+              and
+              not is_state('binary_sensor.shelly_boiler_warm_enough', 'on')
+            )
+          }}
 
       - name: Boiler Heating Allowed
         unique_id: boiler_heating_allowed
@@ -18,6 +31,12 @@ template:
           {{
              (
                is_state('binary_sensor.boiler_superdal', 'on')
+               or
+               (
+                 is_state('binary_sensor.boiler_nachtuur', 'on')
+                 and
+                 not is_state('binary_sensor.shelly_boiler_warm_enough', 'on')
+               )
                or
                is_state('input_boolean.boiler_superdal_force', 'on')
              )
@@ -110,6 +129,14 @@ template:
         state_class: measurement
         state: >
           {{ 1 if is_state('binary_sensor.shelly_boiler_restart_delay_active', 'on') else 0 }}
+
+      - name: Shelly Boiler Warm Enough Numeric
+        unique_id: shelly_boiler_warm_enough_numeric
+        unit_of_measurement: "1"
+        state_class: measurement
+        state: >
+          {{ 1 if is_state('binary_sensor.shelly_boiler_warm_enough', 'on') else 0 }}
+
       - name: Boiler Reason
         unique_id: boiler_reason
         state: >
@@ -121,7 +148,7 @@ template:
               is_state('input_boolean.boiler_superdal_force', 'on')
           ) %}
             1
-          {% elif is_state('input_boolean.boiler_today_completed', 'on') %}
+          {% elif is_state('binary_sensor.shelly_boiler_warm_enough', 'on') %}
             3
           {% elif states('sensor.boiler_peak_margin_w') | float(0) < 0 %}
             5

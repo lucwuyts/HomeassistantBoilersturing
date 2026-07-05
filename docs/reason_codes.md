@@ -25,3 +25,4 @@ Reason codes beschrijven waarom verwarmen wel of niet toegestaan is. Home Assist
 | `Watchdog timeout` | Geen recente geldige HA-berichten |
 | `Controller disabled` | Controller uitgeschakeld volgens configuratie |
 | `Peak limit exceeded` | Shelly stopt door negatieve piekmarge |
+| `Boiler warm enough` | Shelly detecteerde dat de boiler warm genoeg is |

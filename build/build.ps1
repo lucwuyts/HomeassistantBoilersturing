@@ -11,6 +11,7 @@ $files = @(
     "..\shelly\src\100_restart_delay.js",
     "..\shelly\src\105_boot_delay.js",
     "..\shelly\src\110_boiler.js",
+    "..\shelly\src\115_warm_detection.js",
     "..\shelly\src\120_runtime.js",
     "..\shelly\src\130_heartbeat.js",
     "..\shelly\src\140_main.js"

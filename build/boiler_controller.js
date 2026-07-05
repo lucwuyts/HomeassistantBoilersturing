@@ -30,6 +30,7 @@ const CONFIG =
     CONTROLLER_TIMEOUT    : 120000,
     BOOT_DELAY            : 30,
     RELAY_ID              : 0,
+    WARMUP_MIN_RUNTIME    : 300,
     DEFAULT_MAX_RUNTIME   : 10800,
     DEBUG_LEVEL           : 2,
     RUNTIME_INTERVAL      : 1000
@@ -70,6 +71,8 @@ const STOP_REASON =
     MAX_RUNTIME         : "Maximum runtime exceeded",
 
     PEAK_LIMIT          : "Peak limit exceeded",
+
+    WARM_ENOUGH         : "Boiler warm enough",
 
     RESTART_DELAY       : "Restart delay active",
 
@@ -138,6 +141,8 @@ let boiler =
 
         last_controller_seen   : 0,
 
+        controller_config_received : false,
+
         last_update            : "",
 
         last_start             : "",
@@ -145,6 +150,12 @@ let boiler =
         last_stop              : "",
 
         last_stop_reason       : "",
+
+        warm_enough            : false,
+
+        warm_enough_since      : "",
+
+        warmup_min_runtime     : CONFIG.WARMUP_MIN_RUNTIME,
 
         boot_delay_active      : false,
 
@@ -166,7 +177,11 @@ let persistent =
 
     total_starts    : 0,
 
-    total_runtime   : 0
+    total_runtime   : 0,
+
+    warm_enough     : false,
+
+    warm_enough_since : ""
 };
 
 
@@ -279,6 +294,11 @@ function copyPersistentToStatus()
     boiler.status.total_starts = persistent.total_starts;
 
     boiler.status.total_runtime = persistent.total_runtime;
+
+    boiler.status.warm_enough = persistent.warm_enough === true;
+
+    boiler.status.warm_enough_since =
+        persistent.warm_enough_since || "";
 }
 
 //-----------------------------------------------------------------------------
@@ -292,6 +312,10 @@ function copyStatusToPersistent()
     persistent.total_starts = boiler.status.total_starts;
 
     persistent.total_runtime = boiler.status.total_runtime;
+
+    persistent.warm_enough = boiler.status.warm_enough;
+
+    persistent.warm_enough_since = boiler.status.warm_enough_since;
 }
 
 //-----------------------------------------------------------------------------
@@ -358,7 +382,11 @@ function loadPersistentData()
 
             total_starts    : 0,
 
-            total_runtime   : 0
+            total_runtime   : 0,
+
+            warm_enough     : false,
+
+            warm_enough_since : ""
         };
 
         savePersistentData();
@@ -482,11 +510,24 @@ function processControllerMessage(topic, message)
         return;
     }
 
+    let heatingWasEnabled = boiler.config.heating_enabled;
+
     copyKnownFields(
         data.boiler.config,
         boiler.config,
         "config"
     );
+
+    if (
+        boiler.status.controller_config_received &&
+        !heatingWasEnabled &&
+        boiler.config.heating_enabled
+    )
+    {
+        resetWarmEnough();
+    }
+
+    boiler.status.controller_config_received = true;
 
     if (data.boiler.energy)
     {
@@ -772,6 +813,13 @@ function evaluateController()
         return;
     }
 
+    if (boiler.status.warm_enough)
+    {
+        logInfo("Boiler already warm enough");
+
+        return;
+    }
+
     if (isPeakLimitExceeded())
     {
         logWarning("Peak limit exceeded");
@@ -837,6 +885,83 @@ function stopBoiler(reason)
  *
  * Boiler Controller Firmware (BCF)
  *
+ * File        : 115_warm_detection.js
+ * Description : Warm enough detection
+ *
+ ******************************************************************************/
+
+function resetWarmEnough()
+{
+    if (!boiler.status.warm_enough)
+    {
+        return;
+    }
+
+    boiler.status.warm_enough = false;
+
+    boiler.status.warm_enough_since = "";
+
+    logInfo("Warm enough flag reset");
+
+    savePersistentData();
+
+    publishStatus();
+}
+
+//-----------------------------------------------------------------------------
+
+function markWarmEnough()
+{
+    boiler.status.warm_enough = true;
+
+    boiler.status.warm_enough_since = isoTimestamp();
+
+    logInfo("Boiler warm enough detected");
+}
+
+//-----------------------------------------------------------------------------
+
+function isWarmEnoughDetected()
+{
+    if (!boiler.status.relay)
+    {
+        return false;
+    }
+
+    if (boiler.status.runtime < CONFIG.WARMUP_MIN_RUNTIME)
+    {
+        return false;
+    }
+
+    if (boiler.energy.boiler_power <= 0)
+    {
+        return false;
+    }
+
+    return boiler.energy.house_power < boiler.energy.boiler_power;
+}
+
+//-----------------------------------------------------------------------------
+
+function checkWarmEnough()
+{
+    if (!isWarmEnoughDetected())
+    {
+        return false;
+    }
+
+    markWarmEnough();
+
+    stopBoiler(STOP_REASON.WARM_ENOUGH);
+
+    return true;
+}
+
+
+/******************************************************************************
+ *
+ * Boiler Controller Firmware (BCF)
+ *
  * File        : 120_runtime.js
  * Description : Runtime manager
  *
@@ -853,6 +978,11 @@ function systemTimerTask()
         boiler.status.runtime++;
 
         boiler.status.total_runtime++;
+
+        if (checkWarmEnough())
+        {
+            return;
+        }
 
         if (boiler.status.runtime >= boiler.config.max_runtime)
         {

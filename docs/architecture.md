@@ -100,7 +100,9 @@ Persistent opgeslagen:
 - `firmware_boots`;
 - `starts_today`;
 - `total_starts`;
-- `total_runtime`.
+- `total_runtime`;
+- `warm_enough`;
+- `warm_enough_since`.
 
 Opslaan gebeurt alleen bij boot, boiler start, boiler stop en reset van statistieken. Niet periodiek.
 

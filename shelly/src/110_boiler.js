@@ -37,6 +37,13 @@ function evaluateController()
         return;
     }
 
+    if (boiler.status.warm_enough)
+    {
+        logInfo("Boiler already warm enough");
+
+        return;
+    }
+
     if (isPeakLimitExceeded())
     {
         logWarning("Peak limit exceeded");
