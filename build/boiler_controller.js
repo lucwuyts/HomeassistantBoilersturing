@@ -1006,6 +1006,8 @@ function systemTimerTask()
 
             logInfo("Restart delay expired");
 
+            publishStatus();
+
             evaluateController();
         }
     }
