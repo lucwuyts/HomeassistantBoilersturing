@@ -186,7 +186,11 @@ template:
         state: >
           {% set reason = states('sensor.boiler_reason') | int %}
 
-          {% if reason == 0 %}
+          {% if is_state('sensor.shelly_boiler_state', 'HEATING') %}
+            HEATING
+          {% elif is_state('binary_sensor.shelly_boiler_relay', 'on') %}
+            HEATING
+          {% elif reason == 0 %}
             READY
           {% elif reason == 2 %}
             DISABLED

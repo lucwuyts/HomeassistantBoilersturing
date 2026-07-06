@@ -56,6 +56,10 @@ function evaluateController()
 
             stopBoiler(STOP_REASON.PEAK_LIMIT);
         }
+        else if (updateLastStopReason(STOP_REASON.PEAK_LIMIT))
+        {
+            publishStatus();
+        }
 
         return;
     }
@@ -93,14 +97,17 @@ function stopBoiler(reason)
 {
     if (!boiler.status.relay)
     {
+        if (updateLastStopReason(reason))
+        {
+            publishStatus();
+        }
+
         return;
     }
 
     boiler.status.runtime = 0;
 
-    boiler.status.last_stop_reason = reason;
-
-    boiler.status.last_stop = isoTimestamp();
+    updateLastStopReason(reason);
 
     logInfo("Boiler stopped (" + reason + ")");
 
