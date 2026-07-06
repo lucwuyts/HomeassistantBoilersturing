@@ -48,9 +48,12 @@ function evaluateController()
     {
         logWarning("Peak limit exceeded");
 
-        startRestartDelay();
+        if (boiler.status.relay)
+        {
+            startRestartDelay();
 
-        stopBoiler(STOP_REASON.PEAK_LIMIT);
+            stopBoiler(STOP_REASON.PEAK_LIMIT);
+        }
 
         return;
     }
