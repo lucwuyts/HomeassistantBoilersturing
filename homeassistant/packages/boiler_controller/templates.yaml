@@ -18,11 +18,7 @@ template:
           {{
             is_state('binary_sensor.boiler_superdal','on')
             or
-            (
-              is_state('binary_sensor.boiler_nachtuur', 'on')
-              and
-              not is_state('binary_sensor.shelly_boiler_warm_enough', 'on')
-            )
+            is_state('binary_sensor.boiler_nachtuur', 'on')
           }}
 
       - name: Boiler Heating Allowed
@@ -32,11 +28,7 @@ template:
              (
                is_state('binary_sensor.boiler_superdal', 'on')
                or
-               (
-                 is_state('binary_sensor.boiler_nachtuur', 'on')
-                 and
-                 not is_state('binary_sensor.shelly_boiler_warm_enough', 'on')
-               )
+               is_state('binary_sensor.boiler_nachtuur', 'on')
                or
                is_state('input_boolean.boiler_superdal_force', 'on')
              )
@@ -159,11 +151,7 @@ template:
           {% elif not (
               is_state('binary_sensor.boiler_superdal', 'on')
               or
-              (
-                is_state('binary_sensor.boiler_nachtuur', 'on')
-                and
-                not is_state('binary_sensor.shelly_boiler_warm_enough', 'on')
-              )
+              is_state('binary_sensor.boiler_nachtuur', 'on')
               or
               is_state('input_boolean.boiler_superdal_force', 'on')
           ) %}
