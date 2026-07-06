@@ -154,14 +154,20 @@ template:
         state: >
           {% if is_state('input_boolean.boiler_controller_enabled', 'off') %}
             2
+          {% elif is_state('binary_sensor.shelly_boiler_warm_enough', 'on') %}
+            3
           {% elif not (
               is_state('binary_sensor.boiler_superdal', 'on')
+              or
+              (
+                is_state('binary_sensor.boiler_nachtuur', 'on')
+                and
+                not is_state('binary_sensor.shelly_boiler_warm_enough', 'on')
+              )
               or
               is_state('input_boolean.boiler_superdal_force', 'on')
           ) %}
             1
-          {% elif is_state('binary_sensor.shelly_boiler_warm_enough', 'on') %}
-            3
           {% elif states('sensor.boiler_peak_margin_w') | float(0) < 0 %}
             5
           {% else %}
