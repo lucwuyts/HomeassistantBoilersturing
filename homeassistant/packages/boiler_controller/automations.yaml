@@ -157,6 +157,13 @@ automation:
 
     action:
 
+      - service: script.whatsapp_callmebot_checked_send
+        metadata: {}
+        data:
+          text: >
+            Shelly - opnieuw bereikbaar sinds
+            {{ states('sensor.boiler_shelly_last_seen') }}
+
       - service: persistent_notification.dismiss
         data:
           notification_id: boiler_shelly_offline
