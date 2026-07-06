@@ -31,7 +31,10 @@ foreach($f in $files)
     Get-Content $f |
         Add-Content $output
 
-    Add-Content $output "`r`n"
+    if ($f -ne $files[-1])
+    {
+        Add-Content $output "`r`n"
+    }
 }
 
 Write-Host ""

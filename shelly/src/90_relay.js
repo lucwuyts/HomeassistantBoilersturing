@@ -28,6 +28,8 @@ function setRelay(on)
 
             boiler.status.relay = on;
 
+            boiler.status.state = on ? STATE.HEATING : STATE.IDLE;
+
             logInfo("Relay switched " + (on ? "ON" : "OFF"));
 
             publishStatus();
