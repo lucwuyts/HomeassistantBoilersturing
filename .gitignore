@@ -3,4 +3,5 @@ build/*
 
 !build/
 !build/build.ps1
+!build/build_state.json
 !build/boiler_controller.js

@@ -10,6 +10,6 @@
 const FIRMWARE =
 {
     NAME        : "Boiler Controller",
-    VERSION     : "0.2.0",
+    VERSION     : "__BUILD_VERSION__",
     API         : 1
 };

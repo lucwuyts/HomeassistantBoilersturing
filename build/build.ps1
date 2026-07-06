@@ -19,6 +19,30 @@ $files = @(
 )
 
 $output = "..\build\boiler_controller.js"
+$stateFile = "..\build\build_state.json"
+
+$today = Get-Date -Format "yyyy.MM.dd"
+$compile = 1
+
+if (Test-Path $stateFile)
+{
+    $state = Get-Content $stateFile -Raw | ConvertFrom-Json
+
+    if ($state.date -eq $today)
+    {
+        $compile = [int]$state.compile + 1
+    }
+}
+
+$buildVersion = "{0}-{1:D2}" -f $today, $compile
+
+@{
+    date = $today
+    compile = $compile
+    version = $buildVersion
+} |
+    ConvertTo-Json |
+    Set-Content $stateFile
 
 Remove-Item $output -ErrorAction Ignore
 
@@ -29,8 +53,14 @@ foreach($f in $files)
         throw "Missing source file: $f"
     }
 
-    Get-Content $f |
-        Add-Content $output
+    $content = Get-Content $f -Raw
+
+    $content = $content.Replace(
+        "__BUILD_VERSION__",
+        $buildVersion
+    )
+
+    Add-Content $output $content
 
     if ($f -ne $files[-1])
     {
@@ -45,3 +75,4 @@ Set-Content $output $content.TrimEnd() -NoNewline
 Write-Host ""
 Write-Host "Build completed."
 Write-Host $output
+Write-Host "Version: $buildVersion"
