@@ -21,7 +21,7 @@ Daarmee is de Shelly de echte controller. Home Assistant is planner, configurati
 
 Home Assistant doet:
 
-- superdaluren bepalen;
+- superdaluren en nachttariefvenster bepalen;
 - kwartierpiek en voorspelde kwartierpiek berekenen;
 - beschikbare piekmarge berekenen;
 - tarieven en energiemanagement verwerken;
@@ -45,6 +45,7 @@ Shelly doet:
 - energiemetingen lokaal beoordelen;
 - relais schakelen;
 - runtime bewaken;
+- detecteren of de boiler warm genoeg is;
 - restart delay beheren;
 - piekbeveiliging toepassen;
 - watchdog/fallback bij uitval van Home Assistant;
@@ -87,9 +88,12 @@ De kwartierdetectie en piekberekening blijven in Home Assistant. Home Assistant 
 
 Shelly beslist lokaal:
 
-- als verwarmen niet toegestaan is: relais uit;
+- als verwarmen volgens HA niet toegestaan is: relais uit;
+- als de boiler lokaal als warm genoeg gemarkeerd is: relais uit;
 - als piekbeveiliging actief is en de piekmarge onvoldoende is: relais uit en restart delay starten;
 - anders: verwarmen mag, zolang lokale veiligheid OK is.
+
+`warm_enough` is een Shelly-status en diagnoseveld. Home Assistant gebruikt dit niet om `heating_enabled` uit te zetten. Tijdens superdal en nachttarief mag Home Assistant dus nog steeds verwarming toestaan; Shelly beslist lokaal of hij effectief niets meer doet omdat de boiler al warm genoeg is.
 
 ## Persistentie
 
