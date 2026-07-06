@@ -28,6 +28,11 @@ function processControllerCommand(command)
     {
         resetStatistics();
     }
+
+    if (command.reset_warm_enough === true)
+    {
+        resetWarmEnough();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -97,22 +102,11 @@ function processControllerMessage(topic, message)
         return;
     }
 
-    let heatingWasEnabled = boiler.config.heating_enabled;
-
     copyKnownFields(
         data.boiler.config,
         boiler.config,
         "config"
     );
-
-    if (
-        boiler.status.controller_config_received &&
-        !heatingWasEnabled &&
-        boiler.config.heating_enabled
-    )
-    {
-        resetWarmEnough();
-    }
 
     boiler.status.controller_config_received = true;
 

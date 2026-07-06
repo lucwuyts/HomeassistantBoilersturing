@@ -108,8 +108,25 @@ automation:
   #
   # BC004
   #
+  - id: boiler_reset_warm_enough_on_superdal
+    alias: "BC004 - Reset Warm Enough On Superdal"
+
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.boiler_superdal
+        to: "on"
+
+    action:
+
+      - service: script.boiler_reset_warm_enough
+
+    mode: single
+
+  #
+  # BC005
+  #
   - id: boiler_shelly_offline_alert
-    alias: "BC004 - Shelly Boiler Offline Alert"
+    alias: "BC005 - Shelly Boiler Offline Alert"
 
     trigger:
       - platform: state
@@ -145,10 +162,10 @@ automation:
 
 
   #
-  # BC005
+  # BC006
   #
   - id: boiler_shelly_online_recovery
-    alias: "BC005 - Shelly Boiler Online Recovery"
+    alias: "BC006 - Shelly Boiler Online Recovery"
 
     trigger:
       - platform: state

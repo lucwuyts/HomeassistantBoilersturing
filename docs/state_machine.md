@@ -62,6 +62,8 @@ Shelly detecteert zelf of de boiler warm genoeg is. Home Assistant gebruikt `war
 
 `heating_enabled` mag tijdens superdal en nachttarief `true` blijven. Als `warm_enough` actief is, blijft Shelly lokaal in `IDLE` en wordt het relais niet opnieuw ingeschakeld.
 
+De vlag wordt niet automatisch gereset wanneer `heating_enabled` opnieuw `true` wordt. Home Assistant stuurt alleen bij de start van een nieuwe superdalcyclus een expliciet `reset_warm_enough` command.
+
 ## Watchdog
 
 De watchdog bewaakt of Home Assistant nog recente geldige MQTT-berichten stuurt. Bij timeout moet Shelly veilig blijven: relais uit of fallback volgens firmwarebeleid.

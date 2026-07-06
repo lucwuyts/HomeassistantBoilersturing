@@ -85,6 +85,8 @@ warm_enough true betekent: verwarmen mag volgens HA, maar Shelly start het relai
 
 De vlag is een status- en diagnoseveld voor Home Assistant en Grafana. Ze is geen HA-planningsvoorwaarde.
 
+Home Assistant reset `warm_enough` alleen expliciet bij het begin van een nieuwe superdalcyclus via een niet-retained MQTT-command. Een overgang naar het gewone nachttarief reset deze vlag niet.
+
 ## Prioriteiten
 
 | Prioriteit | Omschrijving |

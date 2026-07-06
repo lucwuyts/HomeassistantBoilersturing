@@ -247,3 +247,48 @@ script:
             BOILER CONTROLLER:
             MQTT reset statistics command published
 
+  #############################################################
+  #
+  # Reset Shelly warm-enough vlag.
+  #
+  # Dit gebeurt bewust als apart niet-retained command. De vlag
+  # hoort alleen bij een nieuwe superdalcyclus gereset te worden,
+  # niet bij elk tariefvenster waarin verwarmen toegestaan is.
+  #
+  #############################################################
+
+  boiler_reset_warm_enough:
+
+    alias: Boiler Controller - Reset Warm Enough
+
+    mode: single
+
+    sequence:
+
+      - service: mqtt.publish
+        data:
+          topic: boiler/v1/controller
+          qos: 1
+          retain: false
+          payload: >
+            {
+              "api": 1,
+              "source": "EnergyManager",
+              "software": "BEM 0.1.0",
+              "timestamp": "{{ now().isoformat() }}",
+              "boiler":
+              {
+                "command":
+                {
+                  "reset_warm_enough": true
+                }
+              }
+            }
+
+      - service: system_log.write
+        data:
+          level: info
+          message: >
+            BOILER CONTROLLER:
+            MQTT reset warm enough command published
+
