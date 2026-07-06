@@ -21,6 +21,13 @@ function copyPersistentToStatus()
 
     boiler.status.warm_enough_since =
         persistent.warm_enough_since || "";
+
+    boiler.status.watchdog_reboots = persistent.watchdog_reboots || 0;
+
+    boiler.status.watchdog_reason = persistent.watchdog_reason || "";
+
+    boiler.status.last_watchdog_reboot =
+        persistent.last_watchdog_reboot || 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -38,6 +45,13 @@ function copyStatusToPersistent()
     persistent.warm_enough = boiler.status.warm_enough;
 
     persistent.warm_enough_since = boiler.status.warm_enough_since;
+
+    persistent.watchdog_reboots = boiler.status.watchdog_reboots;
+
+    persistent.watchdog_reason = boiler.status.watchdog_reason;
+
+    persistent.last_watchdog_reboot =
+        boiler.status.last_watchdog_reboot;
 }
 
 //-----------------------------------------------------------------------------
@@ -108,7 +122,13 @@ function loadPersistentData()
 
             warm_enough     : false,
 
-            warm_enough_since : ""
+            warm_enough_since : "",
+
+            watchdog_reboots : 0,
+
+            watchdog_reason : "",
+
+            last_watchdog_reboot : 0
         };
 
         savePersistentData();

@@ -49,6 +49,28 @@ let boiler =
 
         watchdog               : false,
 
+        watchdog_reboots       : 0,
+
+        watchdog_reason        : "",
+
+        last_watchdog_reboot   : 0,
+
+        watchdog_problem_since : 0,
+
+        uptime                 : 0,
+
+        wifi_rssi              : 0,
+
+        wifi_connected         : false,
+
+        mqtt_connected         : false,
+
+        ram_free               : 0,
+
+        firmware_version       : "",
+
+        script_version         : FIRMWARE.VERSION,
+
         controller_online      : false,
 
         controller_timeout     : CONFIG.CONTROLLER_TIMEOUT / 1000,
@@ -56,6 +78,12 @@ let boiler =
         last_controller_update : "",
 
         last_controller_seen   : 0,
+
+        last_controller_age    : 0,
+
+        last_mqtt_seen         : "",
+
+        last_mqtt_seen_ms      : 0,
 
         controller_config_received : false,
 
@@ -97,5 +125,11 @@ let persistent =
 
     warm_enough     : false,
 
-    warm_enough_since : ""
+    warm_enough_since : "",
+
+    watchdog_reboots : 0,
+
+    watchdog_reason : "",
+
+    last_watchdog_reboot : 0
 };

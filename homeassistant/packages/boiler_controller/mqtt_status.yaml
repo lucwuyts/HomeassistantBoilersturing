@@ -8,6 +8,78 @@ mqtt:
       value_template: >
         {{ value_json.boiler.status.state | default('unknown') }}
 
+    - name: Boiler Shelly Last Seen
+      unique_id: boiler_shelly_last_seen
+      state_topic: boiler/v1/status
+      device_class: timestamp
+      value_template: >
+        {{ value_json.timestamp | default(value_json.boiler.status.last_update) | default('') }}
+
+    - name: Shelly Boiler Uptime
+      unique_id: shelly_boiler_uptime
+      state_topic: boiler/v1/status
+      unit_of_measurement: s
+      state_class: measurement
+      value_template: >
+        {{ value_json.boiler.status.uptime | default(0) }}
+
+    - name: Shelly Boiler WiFi RSSI
+      unique_id: shelly_boiler_wifi_rssi
+      state_topic: boiler/v1/status
+      unit_of_measurement: dBm
+      device_class: signal_strength
+      state_class: measurement
+      value_template: >
+        {{ value_json.boiler.status.wifi_rssi | default(0) }}
+
+    - name: Shelly Boiler RAM Free
+      unique_id: shelly_boiler_ram_free
+      state_topic: boiler/v1/status
+      unit_of_measurement: B
+      device_class: data_size
+      state_class: measurement
+      value_template: >
+        {{ value_json.boiler.status.ram_free | default(0) }}
+
+    - name: Shelly Boiler Firmware Version
+      unique_id: shelly_boiler_firmware_version
+      state_topic: boiler/v1/status
+      value_template: >
+        {{ value_json.boiler.status.firmware_version | default('') }}
+
+    - name: Shelly Boiler Script Version
+      unique_id: shelly_boiler_script_version
+      state_topic: boiler/v1/status
+      value_template: >
+        {{ value_json.boiler.status.script_version | default(value_json.firmware) | default('') }}
+
+    - name: Shelly Boiler Last MQTT Seen
+      unique_id: shelly_boiler_last_mqtt_seen
+      state_topic: boiler/v1/status
+      value_template: >
+        {{ value_json.boiler.status.last_mqtt_seen | default('') }}
+
+    - name: Shelly Boiler Last Controller Age
+      unique_id: shelly_boiler_last_controller_age
+      state_topic: boiler/v1/status
+      unit_of_measurement: s
+      state_class: measurement
+      value_template: >
+        {{ value_json.boiler.status.last_controller_age | default(0) }}
+
+    - name: Shelly Boiler Watchdog Reboots
+      unique_id: shelly_boiler_watchdog_reboots
+      state_topic: boiler/v1/status
+      state_class: total_increasing
+      value_template: >
+        {{ value_json.boiler.status.watchdog_reboots | default(0) }}
+
+    - name: Shelly Boiler Watchdog Reason
+      unique_id: shelly_boiler_watchdog_reason
+      state_topic: boiler/v1/status
+      value_template: >
+        {{ value_json.boiler.status.watchdog_reason | default('') }}
+
     - name: Shelly Boiler Runtime
       unique_id: shelly_boiler_runtime
       state_topic: boiler/v1/status
@@ -139,6 +211,22 @@ mqtt:
       payload_off: 'false'
       value_template: >
         {{ value_json.boiler.status.watchdog | default(false) | lower }}
+
+    - name: Shelly Boiler WiFi Connected
+      unique_id: shelly_boiler_wifi_connected
+      state_topic: boiler/v1/status
+      payload_on: 'true'
+      payload_off: 'false'
+      value_template: >
+        {{ value_json.boiler.status.wifi_connected | default(false) | lower }}
+
+    - name: Shelly Boiler MQTT Connected
+      unique_id: shelly_boiler_mqtt_connected
+      state_topic: boiler/v1/status
+      payload_on: 'true'
+      payload_off: 'false'
+      value_template: >
+        {{ value_json.boiler.status.mqtt_connected | default(false) | lower }}
 
     - name: Shelly Boiler Controller Online
       unique_id: shelly_boiler_controller_online

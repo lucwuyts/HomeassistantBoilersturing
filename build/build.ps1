@@ -13,6 +13,7 @@ $files = @(
     "..\shelly\src\110_boiler.js",
     "..\shelly\src\115_warm_detection.js",
     "..\shelly\src\120_runtime.js",
+    "..\shelly\src\125_watchdog.js",
     "..\shelly\src\130_heartbeat.js",
     "..\shelly\src\140_main.js"
 )
@@ -36,6 +37,10 @@ foreach($f in $files)
         Add-Content $output "`r`n"
     }
 }
+
+$content = Get-Content $output -Raw
+
+Set-Content $output $content.TrimEnd() -NoNewline
 
 Write-Host ""
 Write-Host "Build completed."

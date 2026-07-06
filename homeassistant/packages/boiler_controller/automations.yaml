@@ -105,5 +105,68 @@ automation:
 
     mode: restart
 
+  #
+  # BC004
+  #
+  - id: boiler_shelly_offline_alert
+    alias: "BC004 - Shelly Boiler Offline Alert"
 
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.boiler_shelly_offline
+        to: "on"
+        for: "00:01:00"
+
+    action:
+
+      - service: persistent_notification.create
+        data:
+          notification_id: boiler_shelly_offline
+          title: "Shelly boilercontroller offline"
+          message: >
+            Shelly boilercontroller is langer dan 5 minuten offline.
+            Controleer Shelly Pro 1 / wifi / voeding.
+
+      - service: logbook.log
+        data:
+          name: "Boiler Controller"
+          message: >
+            Shelly boilercontroller is langer dan 5 minuten offline.
+          entity_id: binary_sensor.boiler_shelly_offline
+
+    mode: single
+
+
+  #
+  # BC005
+  #
+  - id: boiler_shelly_online_recovery
+    alias: "BC005 - Shelly Boiler Online Recovery"
+
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.boiler_shelly_offline
+        to: "off"
+
+    action:
+
+      - service: persistent_notification.dismiss
+        data:
+          notification_id: boiler_shelly_offline
+
+      - service: persistent_notification.create
+        data:
+          notification_id: boiler_shelly_online
+          title: "Shelly boilercontroller online"
+          message: >
+            Shelly boilercontroller is opnieuw online.
+
+      - service: logbook.log
+        data:
+          name: "Boiler Controller"
+          message: >
+            Shelly boilercontroller is opnieuw online.
+          entity_id: binary_sensor.boiler_shelly_offline
+
+    mode: single
 

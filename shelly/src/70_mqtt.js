@@ -54,6 +54,8 @@ function processControllerMessage(topic, message)
 {
     logInfo("Controller message received");
 
+    updateLastMqttSeen();
+
     let data;
 
     try

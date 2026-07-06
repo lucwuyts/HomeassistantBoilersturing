@@ -32,7 +32,7 @@ function main()
     publishStatus();
 
     Timer.set(
-        CONFIG.HEARTBEAT_INTERVAL,
+        CONFIG.WATCHDOG_INTERVAL,
         true,
         heartbeatTask
     );
