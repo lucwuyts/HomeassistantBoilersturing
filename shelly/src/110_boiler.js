@@ -27,6 +27,8 @@ function evaluateController()
     {
         logInfo("Restart delay active");
 
+        forceRelayOff();
+
         return;
     }
 

@@ -803,6 +803,8 @@ function evaluateController()
     {
         logInfo("Restart delay active");
 
+        forceRelayOff();
+
         return;
     }
 
@@ -999,6 +1001,11 @@ function systemTimerTask()
 
     if (boiler.status.restart_delay_active)
     {
+        if (boiler.status.relay)
+        {
+            relayOff();
+        }
+
         boiler.status.restart_remaining--;
 
         if (boiler.status.restart_remaining <= 0)
