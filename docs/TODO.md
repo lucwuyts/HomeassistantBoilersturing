@@ -8,7 +8,7 @@
 - [x] Energy-blok in MQTT payload
 - [ ] Automations opschonen rond publicatiemomenten
 - [x] MQTT status van Shelly uitlezen in sensoren
-- [ ] Dashboard/debugkaart
+- [x] Dashboard/debugkaart
 
 ## Shelly
 

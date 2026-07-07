@@ -1,0 +1,110 @@
+# Boiler Controller Debug Card
+#
+# Gebruik:
+#   Kopieer deze Lovelace YAML in een dashboard view/card.
+#   De kaart gebruikt alleen standaard Home Assistant cards.
+
+type: vertical-stack
+cards:
+  - type: entities
+    title: Boiler Controller
+    show_header_toggle: false
+    entities:
+      - entity: sensor.shelly_boiler_state
+        name: Shelly state
+      - entity: binary_sensor.shelly_boiler_relay
+        name: Relais
+      - entity: binary_sensor.boiler_heating_allowed
+        name: HA heating allowed
+      - entity: binary_sensor.shelly_boiler_warm_enough
+        name: Warm genoeg
+      - entity: sensor.shelly_boiler_last_stop_reason
+        name: Laatste stopreden
+      - entity: sensor.boiler_reason_text
+        name: HA reden
+      - entity: sensor.boiler_controller_state
+        name: HA controller state
+
+  - type: entities
+    title: Planning en beveiliging
+    show_header_toggle: false
+    entities:
+      - entity: binary_sensor.boiler_superdal
+        name: Superdal
+      - entity: binary_sensor.boiler_nachtuur
+        name: Nachtuur
+      - entity: binary_sensor.shelly_boiler_restart_delay_active
+        name: Restart delay actief
+      - entity: sensor.shelly_boiler_restart_remaining
+        name: Restart resterend
+      - entity: binary_sensor.shelly_boiler_boot_delay_active
+        name: Boot delay actief
+      - entity: sensor.shelly_boiler_boot_delay_remaining
+        name: Boot delay resterend
+
+  - type: entities
+    title: Energie
+    show_header_toggle: false
+    entities:
+      - entity: sensor.boiler_house_power
+        name: Huisverbruik
+      - entity: sensor.boiler_power
+        name: Boiler vermogen
+      - entity: sensor.boiler_predicted_quarter_peak_w
+        name: Voorspelde kwartierpiek
+      - entity: sensor.boiler_peak_limit
+        name: Pieklimiet
+      - entity: sensor.boiler_peak_margin_w
+        name: Piekmarge HA
+      - entity: sensor.shelly_boiler_peak_margin
+        name: Piekmarge Shelly
+      - entity: sensor.shelly_boiler_predicted_quarter_peak
+        name: Voorspelde piek Shelly
+
+  - type: entities
+    title: Shelly diagnose
+    show_header_toggle: false
+    entities:
+      - entity: binary_sensor.boiler_shelly_offline
+        name: Shelly offline
+      - entity: sensor.boiler_shelly_last_seen
+        name: Laatste heartbeat
+      - entity: binary_sensor.shelly_boiler_controller_online
+        name: Controller online
+      - entity: sensor.shelly_boiler_last_controller_update
+        name: Laatste controller update
+      - entity: sensor.shelly_boiler_last_controller_age
+        name: Leeftijd controllerbericht
+      - entity: binary_sensor.shelly_boiler_wifi_connected
+        name: Wifi verbonden
+      - entity: sensor.shelly_boiler_wifi_rssi
+        name: Wifi RSSI
+      - entity: binary_sensor.shelly_boiler_mqtt_connected
+        name: MQTT verbonden
+      - entity: sensor.shelly_boiler_ram_free
+        name: Vrij RAM
+      - entity: sensor.shelly_boiler_uptime
+        name: Uptime
+      - entity: sensor.shelly_boiler_script_version
+        name: Script versie
+      - entity: sensor.shelly_boiler_firmware_version
+        name: Shelly firmware
+      - entity: sensor.shelly_boiler_watchdog_reboots
+        name: Watchdog reboots
+      - entity: sensor.shelly_boiler_watchdog_reason
+        name: Watchdog reden
+
+  - type: history-graph
+    title: Boiler debug historiek
+    hours_to_show: 12
+    entities:
+      - entity: binary_sensor.shelly_boiler_relay
+        name: Relais
+      - entity: binary_sensor.shelly_boiler_restart_delay_active
+        name: Restart delay
+      - entity: binary_sensor.shelly_boiler_warm_enough
+        name: Warm genoeg
+      - entity: binary_sensor.boiler_heating_allowed
+        name: HA allowed
+      - entity: binary_sensor.boiler_shelly_offline
+        name: Offline
