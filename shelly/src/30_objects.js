@@ -95,6 +95,10 @@ let boiler =
 
         last_stop_reason       : "",
 
+        stop_hold_active       : false,
+
+        stop_hold_remaining    : 0,
+
         warm_enough            : false,
 
         warm_enough_since      : "",

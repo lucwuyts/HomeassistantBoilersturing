@@ -10,7 +10,7 @@
 const FIRMWARE =
 {
     NAME        : "Boiler Controller",
-    VERSION     : "2026.07.07-01",
+    VERSION     : "2026.07.07-02",
     API         : 1
 };
 
@@ -34,6 +34,7 @@ const CONFIG =
     WATCHDOG_MIN_UPTIME   : 300,
     WATCHDOG_REBOOT_GAP   : 3600000,
     BOOT_DELAY            : 30,
+    STOP_HOLD             : 300,
     RELAY_ID              : 0,
     WARMUP_MIN_RUNTIME    : 300,
     DEFAULT_MAX_RUNTIME   : 10800,
@@ -78,6 +79,8 @@ const STOP_REASON =
     PEAK_LIMIT          : "Peak limit exceeded",
 
     WARM_ENOUGH         : "Boiler warm enough",
+
+    STOP_HOLD           : "Stop hold active",
 
     RESTART_DELAY       : "Restart delay active",
 
@@ -184,6 +187,10 @@ let boiler =
         last_stop              : "",
 
         last_stop_reason       : "",
+
+        stop_hold_active       : false,
+
+        stop_hold_remaining    : 0,
 
         warm_enough            : false,
 
@@ -865,6 +872,57 @@ function updateBootDelay()
  *
  * Boiler Controller Firmware (BCF)
  *
+ * File        : 107_stop_hold.js
+ * Description : Short anti-cycle hold after stop
+ *
+ ******************************************************************************/
+
+function startStopHold()
+{
+    boiler.status.stop_hold_active = true;
+
+    boiler.status.stop_hold_remaining = CONFIG.STOP_HOLD;
+
+    logInfo(
+        "Stop hold started (" +
+        boiler.status.stop_hold_remaining +
+        " s)"
+    );
+}
+
+//-----------------------------------------------------------------------------
+
+function updateStopHold()
+{
+    if (!boiler.status.stop_hold_active)
+    {
+        return;
+    }
+
+    boiler.status.stop_hold_remaining--;
+
+    if (boiler.status.stop_hold_remaining > 0)
+    {
+        return;
+    }
+
+    boiler.status.stop_hold_active = false;
+
+    boiler.status.stop_hold_remaining = 0;
+
+    logInfo("Stop hold expired");
+
+    publishStatus();
+
+    evaluateController();
+}
+
+
+
+/******************************************************************************
+ *
+ * Boiler Controller Firmware (BCF)
+ *
  * File        : 110_boiler.js
  * Description : Boiler manager
  *
@@ -891,6 +949,13 @@ function evaluateController()
         logInfo("Restart delay active");
 
         forceRelayOff();
+
+        return;
+    }
+
+    if (boiler.status.stop_hold_active)
+    {
+        logInfo("Stop hold active");
 
         return;
     }
@@ -971,6 +1036,11 @@ function stopBoiler(reason)
     boiler.status.runtime = 0;
 
     updateLastStopReason(reason);
+
+    if (reason !== STOP_REASON.WARM_ENOUGH)
+    {
+        startStopHold();
+    }
 
     logInfo("Boiler stopped (" + reason + ")");
 
@@ -1073,6 +1143,8 @@ function systemTimerTask()
     checkControllerWatchdog();
 
     updateBootDelay();
+
+    updateStopHold();
 
     if (boiler.status.relay)
     {

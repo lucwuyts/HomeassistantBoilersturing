@@ -41,6 +41,10 @@ cards:
         name: Boot delay actief
       - entity: sensor.shelly_boiler_boot_delay_remaining
         name: Boot delay resterend
+      - entity: binary_sensor.shelly_boiler_stop_hold_active
+        name: Stop-hold actief
+      - entity: sensor.shelly_boiler_stop_hold_remaining
+        name: Stop-hold resterend
 
   - type: entities
     title: Energie
@@ -102,6 +106,8 @@ cards:
         name: Relais
       - entity: binary_sensor.shelly_boiler_restart_delay_active
         name: Restart delay
+      - entity: binary_sensor.shelly_boiler_stop_hold_active
+        name: Stop-hold
       - entity: binary_sensor.shelly_boiler_warm_enough
         name: Warm genoeg
       - entity: binary_sensor.boiler_heating_allowed

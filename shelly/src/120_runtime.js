@@ -13,6 +13,8 @@ function systemTimerTask()
 
     updateBootDelay();
 
+    updateStopHold();
+
     if (boiler.status.relay)
     {
         boiler.status.runtime++;

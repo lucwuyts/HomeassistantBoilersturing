@@ -10,6 +10,7 @@ $files = @(
     "..\shelly\src\90_relay.js",
     "..\shelly\src\100_restart_delay.js",
     "..\shelly\src\105_boot_delay.js",
+    "..\shelly\src\107_stop_hold.js",
     "..\shelly\src\110_boiler.js",
     "..\shelly\src\115_warm_detection.js",
     "..\shelly\src\120_runtime.js",

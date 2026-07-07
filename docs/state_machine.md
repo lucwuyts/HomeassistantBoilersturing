@@ -21,6 +21,8 @@ Dit document beschrijft de lokale state machine op de Shelly. Home Assistant lev
 | `runtime` | Runtime van de huidige cyclus in seconden |
 | `restart_delay_active` | Tijdelijke wachttijd actief |
 | `restart_remaining` | Resterende wachttijd in seconden |
+| `stop_hold_active` | Korte anti-pendel wachttijd na een stop |
+| `stop_hold_remaining` | Resterende anti-pendel wachttijd in seconden |
 | `warm_enough` | Shelly heeft lokaal beslist dat de boiler voldoende opgewarmd is |
 | `last_stop_reason` | Reden waarom Shelly de boiler stopte |
 
@@ -29,12 +31,13 @@ Dit document beschrijft de lokale state machine op de Shelly. Home Assistant lev
 Shelly evalueert in vaste volgorde:
 
 1. Is restart delay actief?
-2. Staat `heating_enabled` toe dat er verwarmd mag worden?
-3. Is `warm_enough` actief?
-4. Is piekbeveiliging actief of is `peak_margin` onvoldoende?
-5. Is de maximale runtime overschreden?
-6. Is de watchdog/communicatie veilig?
-7. Mag het relais aan?
+2. Is stop-hold actief?
+3. Staat `heating_enabled` toe dat er verwarmd mag worden?
+4. Is `warm_enough` actief?
+5. Is piekbeveiliging actief of is `peak_margin` onvoldoende?
+6. Is de maximale runtime overschreden?
+7. Is de watchdog/communicatie veilig?
+8. Mag het relais aan?
 
 ## Overgangen
 
@@ -55,6 +58,10 @@ Shelly evalueert in vaste volgorde:
 Restart delay voorkomt pendelen. Shelly start deze wachttijd na lokale stops die niet onmiddellijk opnieuw mogen starten, zoals max runtime of piekbeveiliging.
 
 Home Assistant levert de duur via `boiler.config.restart_delay`; Shelly beheert de timer zelf.
+
+## Stop-hold
+
+Na een gewone stop houdt Shelly het relais kort uit om snelle herstarts na korte onderbrekingen te voorkomen. Dit is een lokale anti-pendelbeveiliging en staat los van de langere restart delay na piekbeveiliging of max runtime.
 
 ## Warm genoeg
 

@@ -150,6 +150,8 @@ Voorbeeld:
       "warmup_min_runtime": 300,
       "boot_delay_active": false,
       "boot_delay_remaining": 0,
+      "stop_hold_active": false,
+      "stop_hold_remaining": 0,
       "restart_delay_active": false,
       "restart_remaining": 0,
       "last_stop_reason": ""

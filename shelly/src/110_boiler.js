@@ -32,6 +32,13 @@ function evaluateController()
         return;
     }
 
+    if (boiler.status.stop_hold_active)
+    {
+        logInfo("Stop hold active");
+
+        return;
+    }
+
     if (!boiler.config.heating_enabled)
     {
         stopBoiler(STOP_REASON.HEATING_NOT_ALLOWED);
@@ -108,6 +115,11 @@ function stopBoiler(reason)
     boiler.status.runtime = 0;
 
     updateLastStopReason(reason);
+
+    if (reason !== STOP_REASON.WARM_ENOUGH)
+    {
+        startStopHold();
+    }
 
     logInfo("Boiler stopped (" + reason + ")");
 
