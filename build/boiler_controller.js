@@ -10,7 +10,7 @@
 const FIRMWARE =
 {
     NAME        : "Boiler Controller",
-    VERSION     : "2026.07.06-01",
+    VERSION     : "2026.07.07-01",
     API         : 1
 };
 
@@ -1212,12 +1212,31 @@ function updateDiagnostics(status)
         }
     }
 
-    boiler.status.firmware_version =
-        status.ver || status.fw_id || boiler.status.firmware_version;
-
     boiler.status.script_version = FIRMWARE.VERSION;
 
     updateControllerAge();
+}
+
+//-----------------------------------------------------------------------------
+
+function updateDeviceInfo(info)
+{
+    boiler.status.firmware_version =
+        info.ver ||
+        info.fw_id ||
+        info.version ||
+        boiler.status.firmware_version;
+
+    boiler.status.script_version = FIRMWARE.VERSION;
+}
+
+//-----------------------------------------------------------------------------
+
+function publishWatchdogStatus()
+{
+    evaluateSoftwareWatchdog();
+
+    publishStatus();
 }
 
 //-----------------------------------------------------------------------------
@@ -1370,9 +1389,26 @@ function watchdogTask()
 
             updateDiagnostics(result);
 
-            evaluateSoftwareWatchdog();
+            Shelly.call(
+                "Shelly.GetDeviceInfo",
+                {},
+                function(info, info_error_code, info_error_message)
+                {
+                    if (info_error_code === 0)
+                    {
+                        updateDeviceInfo(info);
+                    }
+                    else
+                    {
+                        logWarning(
+                            "Device info failed: " +
+                            info_error_message
+                        );
+                    }
 
-            publishStatus();
+                    publishWatchdogStatus();
+                }
+            );
         }
     );
 }
