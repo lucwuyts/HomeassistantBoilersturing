@@ -100,7 +100,7 @@ cards:
 
   - type: history-graph
     title: Boiler debug historiek
-    hours_to_show: 12
+    hours_to_show: 2
     entities:
       - entity: binary_sensor.shelly_boiler_relay
         name: Relais
