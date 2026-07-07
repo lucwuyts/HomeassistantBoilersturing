@@ -15,7 +15,9 @@ let boiler =
 
         max_runtime     : CONFIG.DEFAULT_MAX_RUNTIME,
 
-        restart_delay   : 900
+        restart_delay   : 900,
+
+        stop_hold       : CONFIG.STOP_HOLD
     },
 
     energy :

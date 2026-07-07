@@ -11,7 +11,7 @@ function startStopHold()
 {
     boiler.status.stop_hold_active = true;
 
-    boiler.status.stop_hold_remaining = CONFIG.STOP_HOLD;
+    boiler.status.stop_hold_remaining = boiler.config.stop_hold;
 
     logInfo(
         "Stop hold started (" +

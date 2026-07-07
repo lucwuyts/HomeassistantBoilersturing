@@ -10,11 +10,9 @@
 const FIRMWARE =
 {
     NAME        : "Boiler Controller",
-    VERSION     : "2026.07.07-02",
+    VERSION     : "2026.07.07-05",
     API         : 1
 };
-
-
 
 /******************************************************************************
  *
@@ -89,8 +87,6 @@ const STOP_REASON =
     CONTROLLER_DISABLED : "Controller disabled"
 };
 
-
-
 /******************************************************************************
  *
  * Boiler Controller Firmware (BCF)
@@ -108,7 +104,9 @@ let boiler =
 
         max_runtime     : CONFIG.DEFAULT_MAX_RUNTIME,
 
-        restart_delay   : 900
+        restart_delay   : 900,
+
+        stop_hold       : CONFIG.STOP_HOLD
     },
 
     energy :
@@ -231,8 +229,6 @@ let persistent =
     last_watchdog_reboot : 0
 };
 
-
-
 /******************************************************************************
  *
  * Boiler Controller Firmware (BCF)
@@ -301,7 +297,6 @@ function logTrace(text)
     log(DEBUG.TRACE, text);
 }
 
-
 /******************************************************************************
  *
  * Boiler Controller Firmware (BCF)
@@ -322,8 +317,6 @@ function timestampMs()
 {
     return new Date().getTime();
 }
-
-
 
 /******************************************************************************
  *
@@ -480,8 +473,6 @@ function loadPersistentData()
 
     logInfo("Total runtime  : " + boiler.status.total_runtime + " s");
 }
-
-
 
 /******************************************************************************
  *
@@ -658,9 +649,6 @@ function publishStatus()
     logTrace("Status published");
 }
 
-
-
-
 /******************************************************************************
  *
  * Boiler Controller Firmware (BCF)
@@ -704,8 +692,6 @@ function updateLastStopReason(reason)
 
     return true;
 }
-
-
 
 /******************************************************************************
  *
@@ -783,8 +769,6 @@ function forceRelayOff()
     setRelay(false);
 }
 
-
-
 /******************************************************************************
  *
  * Boiler Controller Firmware (BCF)
@@ -814,8 +798,6 @@ function startRestartDelay()
 
     publishStatus();
 }
-
-
 
 /******************************************************************************
  *
@@ -866,8 +848,6 @@ function updateBootDelay()
     evaluateController();
 }
 
-
-
 /******************************************************************************
  *
  * Boiler Controller Firmware (BCF)
@@ -881,7 +861,7 @@ function startStopHold()
 {
     boiler.status.stop_hold_active = true;
 
-    boiler.status.stop_hold_remaining = CONFIG.STOP_HOLD;
+    boiler.status.stop_hold_remaining = boiler.config.stop_hold;
 
     logInfo(
         "Stop hold started (" +
@@ -916,8 +896,6 @@ function updateStopHold()
 
     evaluateController();
 }
-
-
 
 /******************************************************************************
  *
@@ -1049,8 +1027,6 @@ function stopBoiler(reason)
     relayOff();
 }
 
-
-
 /******************************************************************************
  *
  * Boiler Controller Firmware (BCF)
@@ -1126,8 +1102,6 @@ function checkWarmEnough()
 
     return true;
 }
-
-
 
 /******************************************************************************
  *
@@ -1218,8 +1192,6 @@ function checkControllerWatchdog()
 
     publishStatus();
 }
-
-
 
 /******************************************************************************
  *
@@ -1485,8 +1457,6 @@ function watchdogTask()
     );
 }
 
-
-
 /******************************************************************************
  *
  * Boiler Controller Firmware (BCF)
@@ -1500,8 +1470,6 @@ function heartbeatTask()
 {
     watchdogTask();
 }
-
-
 
 /******************************************************************************
  *

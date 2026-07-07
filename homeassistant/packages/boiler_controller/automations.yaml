@@ -94,6 +94,7 @@ automation:
           - input_number.boiler_power
           - input_number.boiler_max_runtime
           - input_number.boiler_restart_delay
+          - input_number.boiler_stop_hold
 
       - platform: state
         entity_id: input_boolean.energy_new_quarter

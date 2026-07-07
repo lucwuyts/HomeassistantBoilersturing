@@ -56,12 +56,14 @@ foreach($f in $files)
 
     $content = Get-Content $f -Raw
 
+    $content = $content.TrimEnd()
+
     $content = $content.Replace(
         "__BUILD_VERSION__",
         $buildVersion
     )
 
-    Add-Content $output $content
+    Add-Content $output $content -NoNewline
 
     if ($f -ne $files[-1])
     {

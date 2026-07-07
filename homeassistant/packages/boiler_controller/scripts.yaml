@@ -142,6 +142,9 @@ script:
           restart_delay: >
             {{ states('input_number.boiler_restart_delay') | int(15) * 60 }}
 
+          stop_hold: >
+            {{ states('input_number.boiler_stop_hold') | int(5) * 60 }}
+
           predicted_quarter_peak: >
             {{ states('sensor.boiler_predicted_quarter_peak_w') | float(0) | round(0) }}
 
@@ -178,7 +181,8 @@ script:
                 {
                   "heating_enabled": {{ heating_enabled | lower }},
                   "max_runtime": {{ max_runtime }},
-                  "restart_delay": {{ restart_delay }}
+                  "restart_delay": {{ restart_delay }},
+                  "stop_hold": {{ stop_hold }}
                 },
                 "energy":
                 {

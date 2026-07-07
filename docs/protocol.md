@@ -25,7 +25,8 @@ Voorbeeld:
     "config": {
       "heating_enabled": true,
       "max_runtime": 10800,
-      "restart_delay": 900
+      "restart_delay": 900,
+      "stop_hold": 300
     },
     "energy": {
       "predicted_quarter_peak": 4200,
@@ -45,6 +46,7 @@ Voorbeeld:
 | `heating_enabled` | boolean | - | HA geeft aan dat verwarmen volgens planning mag |
 | `max_runtime` | number | seconden | Maximale runtime voor een verwarmingscyclus |
 | `restart_delay` | number | seconden | Wachttijd na stop of piekbeveiliging |
+| `stop_hold` | number | seconden | Minimale lokale wachttijd na een gewone stop om korte herstarts te vermijden |
 
 ### `boiler.energy`
 

@@ -30,6 +30,7 @@ Home Assistant doet niet:
 - `boiler.config.heating_enabled`
 - `boiler.config.max_runtime`
 - `boiler.config.restart_delay`
+- `boiler.config.stop_hold`
 - `boiler.energy.predicted_quarter_peak`
 - `boiler.energy.peak_limit`
 - `boiler.energy.peak_margin`

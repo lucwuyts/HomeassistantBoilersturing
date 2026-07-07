@@ -63,6 +63,8 @@ Home Assistant levert de duur via `boiler.config.restart_delay`; Shelly beheert 
 
 Na een gewone stop houdt Shelly het relais kort uit om snelle herstarts na korte onderbrekingen te voorkomen. Dit is een lokale anti-pendelbeveiliging en staat los van de langere restart delay na piekbeveiliging of max runtime.
 
+Home Assistant levert de duur via `boiler.config.stop_hold`; Shelly beheert de timer zelf.
+
 ## Warm genoeg
 
 Shelly detecteert zelf of de boiler warm genoeg is. Home Assistant gebruikt `warm_enough` alleen voor weergave, diagnose en grafieken.
