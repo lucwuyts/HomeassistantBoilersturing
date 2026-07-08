@@ -195,7 +195,11 @@ script:
             }}
 
           predicted_without_boiler_wh: >
-            {% set projected_power_w = [(house_power | float(0)) - (boiler_power | float(0)), 0] | max %}
+            {% if is_state('binary_sensor.shelly_boiler_relay', 'on') %}
+              {% set projected_power_w = [(house_power | float(0)) - (boiler_power | float(0)), 0] | max %}
+            {% else %}
+              {% set projected_power_w = house_power | float(0) %}
+            {% endif %}
             {{
               (
                 quarter_energy_wh | float(0)
@@ -212,7 +216,11 @@ script:
           latest_safe_off_seconds: >
             {% set current_power_w = house_power | float(0) %}
             {% set boiler_power_w = boiler_power | float(0) %}
-            {% set without_boiler_w = [current_power_w - boiler_power_w, 0] | max %}
+            {% if is_state('binary_sensor.shelly_boiler_relay', 'on') %}
+              {% set without_boiler_w = [current_power_w - boiler_power_w, 0] | max %}
+            {% else %}
+              {% set without_boiler_w = current_power_w %}
+            {% endif %}
             {% set allowed_wh = (quarter_max_energy_wh | float(0)) - (peak_safety_margin_wh | float(0)) %}
             {% set without_boiler_future_wh = without_boiler_w * (quarter_remaining_seconds | int(0)) / 3600 %}
             {% if boiler_power_w <= 0 %}
@@ -234,14 +242,20 @@ script:
             {% set predicted_wh = predicted_with_boiler_wh | float(0) %}
             {% set max_wh = quarter_max_energy_wh | float(0) %}
             {% set safety_wh = peak_safety_margin_wh | float(0) %}
+            {% set quarter_wh = quarter_energy_wh | float(0) %}
+            {% set latest_safe_off = latest_safe_off_seconds | int(0) %}
             {% set runtime = states('sensor.shelly_boiler_runtime') | int(0) %}
             {% set min_on = peak_min_on_seconds | int(60) %}
-            {% if predicted_wh > max_wh %}
+            {% if max_wh <= 0 %}
+              ok
+            {% elif quarter_wh >= max_wh %}
               exceeded
-            {% elif predicted_wh > (max_wh - safety_wh) and runtime < min_on %}
+            {% elif latest_safe_off <= 0 and runtime < min_on %}
               min_on_hold
-            {% elif predicted_wh > (max_wh - safety_wh) %}
+            {% elif latest_safe_off <= 0 %}
               stop
+            {% elif predicted_wh > (max_wh - safety_wh) %}
+              run_until_off
             {% else %}
               ok
             {% endif %}

@@ -24,5 +24,5 @@ Reason codes beschrijven waarom verwarmen wel of niet toegestaan is. Home Assist
 | `Restart delay active` | Shelly restart delay blokkeert starten |
 | `Watchdog timeout` | Geen recente geldige HA-berichten |
 | `Controller disabled` | Controller uitgeschakeld volgens configuratie |
-| `Peak limit exceeded` | Shelly stopt omdat de voorspelde kwartierenergie boven de toegelaten limiet zou eindigen |
+| `Peak limit exceeded` | Shelly stopt omdat het laatste veilige uitschakelmoment voor de kwartierpiek bereikt is |
 | `Boiler warm enough` | Shelly detecteerde dat de boiler warm genoeg is |

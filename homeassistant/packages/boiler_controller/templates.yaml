@@ -121,7 +121,11 @@ template:
           {% set current_power_w = states('sensor.boiler_house_power') | float(0) %}
           {% set boiler_power_w = states('sensor.boiler_power') | float(0) %}
           {% set remaining = states('sensor.boiler_quarter_remaining_seconds') | int(0) %}
-          {% set projected_power_w = [current_power_w - boiler_power_w, 0] | max %}
+          {% if is_state('binary_sensor.shelly_boiler_relay', 'on') %}
+            {% set projected_power_w = [current_power_w - boiler_power_w, 0] | max %}
+          {% else %}
+            {% set projected_power_w = current_power_w %}
+          {% endif %}
           {{ (quarter_energy_wh + (projected_power_w * remaining / 3600)) | round(1) }}
 
       - name: Boiler Peak Headroom Wh
@@ -148,7 +152,11 @@ template:
           {% set current_power_w = states('sensor.boiler_house_power') | float(0) %}
           {% set boiler_power_w = states('sensor.boiler_power') | float(0) %}
           {% set remaining = states('sensor.boiler_quarter_remaining_seconds') | int(0) %}
-          {% set without_boiler_w = [current_power_w - boiler_power_w, 0] | max %}
+          {% if is_state('binary_sensor.shelly_boiler_relay', 'on') %}
+            {% set without_boiler_w = [current_power_w - boiler_power_w, 0] | max %}
+          {% else %}
+            {% set without_boiler_w = current_power_w %}
+          {% endif %}
           {% set allowed_wh = max_wh - safety_wh %}
           {% set without_boiler_future_wh = without_boiler_w * remaining / 3600 %}
           {% if boiler_power_w <= 0 %}
@@ -164,14 +172,20 @@ template:
           {% set predicted_wh = states('sensor.boiler_predicted_with_boiler_wh') | float(0) %}
           {% set max_wh = states('sensor.boiler_quarter_max_energy_wh') | float(0) %}
           {% set safety_wh = states('input_number.boiler_peak_safety_margin_wh') | float(0) %}
+          {% set quarter_energy_wh = states('sensor.boiler_quarter_energy_wh') | float(0) %}
+          {% set latest_safe_off = states('sensor.boiler_latest_safe_off_seconds') | int(0) %}
           {% set runtime = states('sensor.shelly_boiler_runtime') | int(0) %}
           {% set min_on = states('input_number.boiler_peak_min_on_seconds') | int(60) %}
-          {% if predicted_wh > max_wh %}
+          {% if max_wh <= 0 %}
+            ok
+          {% elif quarter_energy_wh >= max_wh %}
             exceeded
-          {% elif predicted_wh > (max_wh - safety_wh) and runtime < min_on %}
+          {% elif latest_safe_off <= 0 and runtime < min_on %}
             min_on_hold
-          {% elif predicted_wh > (max_wh - safety_wh) %}
+          {% elif latest_safe_off <= 0 %}
             stop
+          {% elif predicted_wh > (max_wh - safety_wh) %}
+            run_until_off
           {% else %}
             ok
           {% endif %}

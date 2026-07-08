@@ -47,7 +47,7 @@ Heating enabled false?
 Warm enough actief?
     ja -> niet starten
 
-Voorspelde kwartierenergie met boiler boven limiet?
+Laatste veilige uitschakelmoment bereikt?
     ja -> stoppen en restart delay starten zodra minimum looptijd dit toelaat
 
 Max runtime bereikt?
@@ -73,16 +73,25 @@ predicted_with_boiler_wh =
 
 peak_headroom_wh =
     max_quarter_energy_wh - predicted_with_boiler_wh
+
+latest_safe_off_seconds =
+    aantal seconden dat de boiler nog kan blijven verwarmen
+    zonder de kwartierlimiet minus veiligheidsmarge te overschrijden
 ```
 
 Shelly interpreteert:
 
 ```text
-predicted_with_boiler_wh > max_quarter_energy_wh - peak_safety_margin_wh
-betekent: verwarmen blijft niet veilig tot het einde van het kwartier.
+latest_safe_off_seconds > 0 betekent:
+    boiler mag blijven verwarmen.
+
+latest_safe_off_seconds <= 0 betekent:
+    boiler moet uit om de kwartierlimiet te beschermen.
 ```
 
-Shelly schakelt dan de boiler tijdelijk uit en start restart delay. Binnen `peak_min_on_seconds` stopt Shelly alleen meteen wanneer de echte kwartierlimiet overschreden zou worden, niet alleen wanneer de veiligheidsmarge geraakt wordt.
+Shelly schakelt dus niet uit zodra de projectie boven de limiet zou eindigen als de boiler tot het einde van het kwartier aan blijft. Shelly wacht tot het laatste veilige uitschakelmoment bereikt is, zodat de boiler zo lang mogelijk kan verwarmen.
+
+Binnen `peak_min_on_seconds` stopt Shelly alleen meteen wanneer de gemeten kwartierenergie de harde kwartierlimiet al bereikt heeft.
 
 Home Assistant geeft dus geen direct stopcommando; het levert de meetwaarden waarop Shelly beslist.
 

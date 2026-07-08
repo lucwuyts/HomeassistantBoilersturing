@@ -90,7 +90,7 @@ Shelly beslist lokaal:
 
 - als verwarmen volgens HA niet toegestaan is: relais uit;
 - als de boiler lokaal als warm genoeg gemarkeerd is: relais uit;
-- als de voorspelde kwartierenergie met boiler boven de limiet minus veiligheidsmarge zou eindigen: relais uit en restart delay starten;
+- als het laatste veilige uitschakelmoment voor de kwartierpiek bereikt is: relais uit en restart delay starten;
 - anders: verwarmen mag, zolang lokale veiligheid OK is.
 
 `warm_enough` is een Shelly-status en diagnoseveld. Home Assistant gebruikt dit niet om `heating_enabled` uit te zetten. Tijdens superdal en nachttarief mag Home Assistant dus nog steeds verwarming toestaan; Shelly beslist lokaal of hij effectief niets meer doet omdat de boiler al warm genoeg is.

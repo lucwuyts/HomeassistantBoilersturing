@@ -44,7 +44,7 @@ Voorbeeld:
       "predicted_without_boiler_wh": 830,
       "peak_headroom_wh": -17.5,
       "latest_safe_off_seconds": 410,
-      "peak_decision": "stop"
+      "peak_decision": "run_until_off"
     }
   }
 }
@@ -78,7 +78,7 @@ Voorbeeld:
 | `predicted_without_boiler_wh` | number | Wh | Verwachte kwartierenergie als het boilervermogen wegvalt |
 | `peak_headroom_wh` | number | Wh | `quarter_max_energy_wh - predicted_with_boiler_wh` |
 | `latest_safe_off_seconds` | number | seconden | Laatste veilige uitschakelmoment binnen het kwartier, gerekend vanaf nu |
-| `peak_decision` | string | - | Diagnose uit HA: `ok`, `min_on_hold`, `stop` of `exceeded` |
+| `peak_decision` | string | - | Diagnose uit HA: `ok`, `run_until_off`, `min_on_hold`, `stop` of `exceeded` |
 
 Shelly mag onbekende velden negeren. Nieuwe velden moeten achterwaarts compatibel worden toegevoegd.
 
@@ -119,7 +119,7 @@ Basislogica:
 Als heating_enabled false is:
     boiler stoppen
 
-Anders als predicted_with_boiler_wh boven de kwartierlimiet minus veiligheidsmarge eindigt:
+Anders als latest_safe_off_seconds <= 0:
     boiler stoppen zodra minimum looptijd dit toelaat
     restart delay starten
 

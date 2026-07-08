@@ -34,7 +34,7 @@ Shelly evalueert in vaste volgorde:
 2. Is stop-hold actief?
 3. Staat `heating_enabled` toe dat er verwarmd mag worden?
 4. Is `warm_enough` actief?
-5. Eindigt de voorspelde kwartierenergie met boiler boven de limiet?
+5. Is het laatste veilige uitschakelmoment voor de kwartierpiek bereikt?
 6. Is de maximale runtime overschreden?
 7. Is de watchdog/communicatie veilig?
 8. Mag het relais aan?
@@ -48,7 +48,7 @@ Shelly evalueert in vaste volgorde:
 | `HEATING` | `heating_enabled = false` | `IDLE` | Relais uit |
 | `HEATING` | Boiler warm genoeg gedetecteerd | `IDLE` | Relais uit, `warm_enough` zetten |
 | `IDLE` | `warm_enough = true` | `IDLE` | Relais blijft uit |
-| `HEATING` | `predicted_with_boiler_wh` boven toegelaten kwartierenergie | `IDLE` | Relais uit, restart delay starten |
+| `HEATING` | `latest_safe_off_seconds <= 0` | `IDLE` | Relais uit, restart delay starten |
 | `HEATING` | Max runtime bereikt | `IDLE` | Relais uit, restart delay starten |
 | Elke state | Veiligheidsfout | `ERROR` | Relais uit |
 | `ERROR` | Fout opgelost | `IDLE` | Status publiceren |
