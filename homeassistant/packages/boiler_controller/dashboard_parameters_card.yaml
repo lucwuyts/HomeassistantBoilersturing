@@ -38,8 +38,6 @@ cards:
         name: Superdal start
       - entity: input_datetime.boiler_superdal_end
         name: Superdal einde
-      - entity: input_boolean.boiler_controller_enabled
-        name: Controller actief
       - entity: binary_sensor.boiler_heating_allowed
         name: Verwarmen toegestaan
       - entity: sensor.boiler_peak_decision
