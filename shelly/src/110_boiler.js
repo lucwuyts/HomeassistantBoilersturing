@@ -9,7 +9,41 @@
 
 function isPeakLimitExceeded()
 {
-    return boiler.energy.peak_margin < 0;
+    let maxEnergy =
+        boiler.energy.quarter_max_energy_wh;
+
+    let predictedEnergy =
+        boiler.energy.predicted_with_boiler_wh;
+
+    if (maxEnergy <= 0)
+    {
+        return boiler.energy.peak_margin < 0;
+    }
+
+    if (predictedEnergy <= 0)
+    {
+        return boiler.energy.peak_margin < 0;
+    }
+
+    let safetyLimit =
+        maxEnergy - boiler.config.peak_safety_margin_wh;
+
+    if (predictedEnergy <= safetyLimit)
+    {
+        return false;
+    }
+
+    if (!boiler.status.relay)
+    {
+        return true;
+    }
+
+    if (boiler.status.runtime >= boiler.config.peak_min_on_seconds)
+    {
+        return true;
+    }
+
+    return predictedEnergy > maxEnergy;
 }
 
 //-----------------------------------------------------------------------------

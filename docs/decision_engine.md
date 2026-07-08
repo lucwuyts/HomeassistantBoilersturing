@@ -15,6 +15,9 @@ Home Assistant bepaalt:
 - de voorspelde kwartierpiek;
 - de pieklimiet;
 - de piekmarge;
+- de kwartierenergie tot nu toe;
+- de voorspelde kwartierenergie met en zonder boiler;
+- de resterende Wh-ruimte in het kwartier;
 - het verwachte boilervermogen;
 - het actuele woningvermogen.
 
@@ -44,8 +47,8 @@ Heating enabled false?
 Warm enough actief?
     ja -> niet starten
 
-Peak margin negatief?
-    ja -> stoppen en restart delay starten
+Voorspelde kwartierenergie met boiler boven limiet?
+    ja -> stoppen en restart delay starten zodra minimum looptijd dit toelaat
 
 Max runtime bereikt?
     ja -> stoppen en restart delay starten
@@ -62,16 +65,26 @@ Anders:
 Home Assistant berekent:
 
 ```text
-peak_margin = peak_limit - predicted_quarter_peak
+max_quarter_energy_wh = peak_limit * 0.25
+
+predicted_with_boiler_wh =
+    quarter_energy_wh
+    + (current_power_w * remaining_seconds / 3600)
+
+peak_headroom_wh =
+    max_quarter_energy_wh - predicted_with_boiler_wh
 ```
 
 Shelly interpreteert:
 
 ```text
-peak_margin < 0 betekent: verwarmen is lokaal niet veilig voor de kwartierpiek.
+predicted_with_boiler_wh > max_quarter_energy_wh - peak_safety_margin_wh
+betekent: verwarmen blijft niet veilig tot het einde van het kwartier.
 ```
 
-Shelly schakelt dan de boiler tijdelijk uit en start restart delay. Home Assistant geeft dus geen direct stopcommando; het levert de meetwaarde waarop Shelly beslist.
+Shelly schakelt dan de boiler tijdelijk uit en start restart delay. Binnen `peak_min_on_seconds` stopt Shelly alleen meteen wanneer de echte kwartierlimiet overschreden zou worden, niet alleen wanneer de veiligheidsmarge geraakt wordt.
+
+Home Assistant geeft dus geen direct stopcommando; het levert de meetwaarden waarop Shelly beslist.
 
 ## Warm genoeg
 

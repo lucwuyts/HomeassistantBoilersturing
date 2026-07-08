@@ -25,6 +25,24 @@ input_number:
     unit_of_measurement: W
     initial: 3000
 
+  boiler_peak_safety_margin_wh:
+    name: Boiler Peak Safety Margin
+    icon: mdi:flash-alert
+    min: 0
+    max: 250
+    step: 10
+    unit_of_measurement: Wh
+    initial: 50
+
+  boiler_peak_min_on_seconds:
+    name: Boiler Peak Minimum On Time
+    icon: mdi:timer-play
+    min: 0
+    max: 600
+    step: 10
+    unit_of_measurement: s
+    initial: 60
+
   boiler_restart_power:
     name: Boiler Restart Power
     icon: mdi:transmission-tower

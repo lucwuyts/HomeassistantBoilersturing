@@ -145,20 +145,106 @@ script:
           stop_hold: >
             {{ states('input_number.boiler_stop_hold') | int(5) * 60 }}
 
-          predicted_quarter_peak: >
-            {{ states('sensor.boiler_predicted_quarter_peak_w') | float(0) | round(0) }}
+          peak_safety_margin_wh: >
+            {{ states('input_number.boiler_peak_safety_margin_wh') | float(50) | round(1) }}
+
+          peak_min_on_seconds: >
+            {{ states('input_number.boiler_peak_min_on_seconds') | int(60) }}
 
           peak_limit: >
             {{ states('sensor.boiler_peak_limit') | float(0) | round(0) }}
-
-          peak_margin: >
-            {{ states('sensor.boiler_peak_margin_w') | float(0) | round(0) }}
 
           boiler_power: >
             {{ states('sensor.boiler_power') | float(0) | round(0) }}
 
           house_power: >
             {{ states('sensor.boiler_house_power') | float(0) | round(0) }}
+
+          quarter_elapsed_seconds: >
+            {{ ((now().minute % 15) * 60 + now().second) | int }}
+
+      - variables:
+
+          quarter_remaining_seconds: >
+            {{ [900 - (quarter_elapsed_seconds | int(0)), 0] | max }}
+
+          quarter_energy_wh: >
+            {% set average_state = states('sensor.peak_current_average_quarterly_demand_2') %}
+            {% set average_so_far_w = average_state | float(0) * 1000 %}
+            {% if average_state in ['unknown', 'unavailable', 'none'] %}
+              {{ states('sensor.boiler_quarter_energy_wh') | float(0) | round(1) }}
+            {% else %}
+              {{ (average_so_far_w * (quarter_elapsed_seconds | int(0)) / 3600) | round(1) }}
+            {% endif %}
+
+          quarter_max_energy_wh: >
+            {{ (peak_limit | float(0) * 0.25) | round(1) }}
+
+      - variables:
+
+          predicted_with_boiler_wh: >
+            {% set boiler_add_w = (boiler_power | float(0)) if not is_state('switch.boiler_shelly','on')
+                  and is_state('binary_sensor.boiler_heating_allowed', 'on') else 0 %}
+            {% set projected_power_w = house_power | float(0) + boiler_add_w %}
+            {{
+              (
+                quarter_energy_wh | float(0)
+                +
+                (projected_power_w * (quarter_remaining_seconds | int(0)) / 3600)
+              ) | round(1)
+            }}
+
+          predicted_without_boiler_wh: >
+            {% set projected_power_w = [(house_power | float(0)) - (boiler_power | float(0)), 0] | max %}
+            {{
+              (
+                quarter_energy_wh | float(0)
+                +
+                (projected_power_w * (quarter_remaining_seconds | int(0)) / 3600)
+              ) | round(1)
+            }}
+
+      - variables:
+
+          peak_headroom_wh: >
+            {{ ((quarter_max_energy_wh | float(0)) - (predicted_with_boiler_wh | float(0))) | round(1) }}
+
+          latest_safe_off_seconds: >
+            {% set current_power_w = house_power | float(0) %}
+            {% set boiler_power_w = boiler_power | float(0) %}
+            {% set without_boiler_w = [current_power_w - boiler_power_w, 0] | max %}
+            {% set allowed_wh = (quarter_max_energy_wh | float(0)) - (peak_safety_margin_wh | float(0)) %}
+            {% set without_boiler_future_wh = without_boiler_w * (quarter_remaining_seconds | int(0)) / 3600 %}
+            {% if boiler_power_w <= 0 %}
+              {{ quarter_remaining_seconds | int(0) }}
+            {% else %}
+              {% set seconds = ((allowed_wh - (quarter_energy_wh | float(0)) - without_boiler_future_wh) * 3600 / boiler_power_w) | int(0) %}
+              {{ [[seconds, 0] | max, quarter_remaining_seconds | int(0)] | min }}
+            {% endif %}
+
+          predicted_quarter_peak: >
+            {{ ((predicted_with_boiler_wh | float(0)) * 4) | round(0) }}
+
+      - variables:
+
+          peak_margin: >
+            {{ ((peak_limit | float(0)) - (predicted_quarter_peak | float(0))) | round(0) }}
+
+          peak_decision: >
+            {% set predicted_wh = predicted_with_boiler_wh | float(0) %}
+            {% set max_wh = quarter_max_energy_wh | float(0) %}
+            {% set safety_wh = peak_safety_margin_wh | float(0) %}
+            {% set runtime = states('sensor.shelly_boiler_runtime') | int(0) %}
+            {% set min_on = peak_min_on_seconds | int(60) %}
+            {% if predicted_wh > max_wh %}
+              exceeded
+            {% elif predicted_wh > (max_wh - safety_wh) and runtime < min_on %}
+              min_on_hold
+            {% elif predicted_wh > (max_wh - safety_wh) %}
+              stop
+            {% else %}
+              ok
+            {% endif %}
 
       #########################################################
       # Publiceer MQTT bericht
@@ -182,7 +268,9 @@ script:
                   "heating_enabled": {{ heating_enabled | lower }},
                   "max_runtime": {{ max_runtime }},
                   "restart_delay": {{ restart_delay }},
-                  "stop_hold": {{ stop_hold }}
+                  "stop_hold": {{ stop_hold }},
+                  "peak_safety_margin_wh": {{ peak_safety_margin_wh }},
+                  "peak_min_on_seconds": {{ peak_min_on_seconds }}
                 },
                 "energy":
                 {
@@ -190,7 +278,16 @@ script:
                   "peak_limit": {{ peak_limit }},
                   "peak_margin": {{ peak_margin }},
                   "boiler_power": {{ boiler_power }},
-                  "house_power": {{ house_power }}
+                  "house_power": {{ house_power }},
+                  "quarter_elapsed_seconds": {{ quarter_elapsed_seconds }},
+                  "quarter_remaining_seconds": {{ quarter_remaining_seconds }},
+                  "quarter_energy_wh": {{ quarter_energy_wh }},
+                  "quarter_max_energy_wh": {{ quarter_max_energy_wh }},
+                  "predicted_with_boiler_wh": {{ predicted_with_boiler_wh }},
+                  "predicted_without_boiler_wh": {{ predicted_without_boiler_wh }},
+                  "peak_headroom_wh": {{ peak_headroom_wh }},
+                  "latest_safe_off_seconds": {{ latest_safe_off_seconds }},
+                  "peak_decision": "{{ peak_decision | trim }}"
                 }
               }
             }

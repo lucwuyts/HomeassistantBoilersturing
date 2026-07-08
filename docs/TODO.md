@@ -22,7 +22,7 @@
 - [x] Heartbeat
 - [x] Persistence Manager via `Script.storage`
 - [x] `boiler.energy` verwerken uit MQTT
-- [x] Piekbeveiliging op basis van `peak_margin`
+- [x] Piekbeveiliging op basis van voorspelde kwartierenergie
 - [x] Watchdog
 - [x] Reset statistics
 

@@ -22,8 +22,8 @@ Daarmee is de Shelly de echte controller. Home Assistant is planner, configurati
 Home Assistant doet:
 
 - superdaluren en nachttariefvenster bepalen;
-- kwartierpiek en voorspelde kwartierpiek berekenen;
-- beschikbare piekmarge berekenen;
+- kwartierpiek en voorspelde kwartierenergie berekenen;
+- beschikbare piekruimte in W en Wh berekenen;
 - tarieven en energiemanagement verwerken;
 - gebruikersparameters beheren;
 - MQTT-configuratie en energiemetingen publiceren.
@@ -84,13 +84,13 @@ Het controllerbericht bevat configuratie en energiemetingen. De energiemetingen 
 
 ## Piekbeveiliging
 
-De kwartierdetectie en piekberekening blijven in Home Assistant. Home Assistant stuurt onder andere `predicted_quarter_peak`, `peak_limit` en `peak_margin` naar Shelly. Deze waarden worden in MQTT als W verstuurd; eventuele kW-bronsensoren worden in Home Assistant omgerekend.
+De kwartierdetectie en piekberekening blijven in Home Assistant. Home Assistant stuurt onder andere `predicted_quarter_peak`, `peak_limit`, `peak_margin`, `quarter_energy_wh`, `quarter_max_energy_wh`, `predicted_with_boiler_wh` en `peak_headroom_wh` naar Shelly. W-bronsensoren en kW-bronsensoren worden in Home Assistant naar de juiste MQTT-eenheid omgerekend.
 
 Shelly beslist lokaal:
 
 - als verwarmen volgens HA niet toegestaan is: relais uit;
 - als de boiler lokaal als warm genoeg gemarkeerd is: relais uit;
-- als piekbeveiliging actief is en de piekmarge onvoldoende is: relais uit en restart delay starten;
+- als de voorspelde kwartierenergie met boiler boven de limiet minus veiligheidsmarge zou eindigen: relais uit en restart delay starten;
 - anders: verwarmen mag, zolang lokale veiligheid OK is.
 
 `warm_enough` is een Shelly-status en diagnoseveld. Home Assistant gebruikt dit niet om `heating_enabled` uit te zetten. Tijdens superdal en nachttarief mag Home Assistant dus nog steeds verwarming toestaan; Shelly beslist lokaal of hij effectief niets meer doet omdat de boiler al warm genoeg is.

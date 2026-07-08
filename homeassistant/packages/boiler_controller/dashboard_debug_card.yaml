@@ -60,6 +60,16 @@ cards:
         name: Pieklimiet
       - entity: sensor.boiler_peak_margin_w
         name: Piekmarge HA
+      - entity: sensor.boiler_peak_headroom_wh
+        name: Piekruimte Wh
+      - entity: sensor.boiler_predicted_with_boiler_wh
+        name: Voorspeld met boiler
+      - entity: sensor.boiler_predicted_without_boiler_wh
+        name: Voorspeld zonder boiler
+      - entity: sensor.boiler_latest_safe_off_seconds
+        name: Laatste veilige stop
+      - entity: sensor.boiler_peak_decision
+        name: Piekbeslissing
       - entity: sensor.shelly_boiler_peak_margin
         name: Piekmarge Shelly
       - entity: sensor.shelly_boiler_predicted_quarter_peak

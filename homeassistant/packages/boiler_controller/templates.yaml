@@ -54,27 +54,128 @@ template:
         device_class: power
         state_class: measurement
         state: >
+          {% set previous_w = states('sensor.boiler_predicted_quarter_peak_w') | float(0) %}
+          {% set predicted_wh = states('sensor.boiler_predicted_with_boiler_wh') | float(0) %}
+          {% set prediction_w = predicted_wh * 4 %}
+          {{ previous_w | round(0) if prediction_w <= 0 and previous_w > 0 else prediction_w | round(0) }}
+
+      - name: Boiler Quarter Elapsed Seconds
+        unique_id: boiler_quarter_elapsed_seconds
+        unit_of_measurement: s
+        state_class: measurement
+        state: >
+          {{ ((now().minute % 15) * 60 + now().second) | int }}
+
+      - name: Boiler Quarter Remaining Seconds
+        unique_id: boiler_quarter_remaining_seconds
+        unit_of_measurement: s
+        state_class: measurement
+        state: >
+          {% set elapsed = states('sensor.boiler_quarter_elapsed_seconds') | int(0) %}
+          {{ [900 - elapsed, 0] | max }}
+
+      - name: Boiler Quarter Energy Wh
+        unique_id: boiler_quarter_energy_wh
+        unit_of_measurement: Wh
+        state_class: measurement
+        state: >
           {% set average_state = states('sensor.peak_current_average_quarterly_demand_2') %}
           {% set average_so_far_w = average_state | float(0) * 1000 %}
-          {% set house_power_w = states('sensor.boiler_house_power') | float(0) %}
-          {% set boiler_w = states('sensor.boiler_power') | float(1500) %}
-          {% set previous_w = states('sensor.boiler_predicted_quarter_peak_w') | float(0) %}
-          {% set elapsed = (now().minute % 15) * 60 + now().second %}
-          {% set remaining = 900 - elapsed %}
-          {% set boiler_add_w = boiler_w if not is_state('switch.boiler_shelly','on')
-                and is_state('binary_sensor.boiler_heating_allowed', 'on') else 0 %}
-          {% set measured_projected_w = house_power_w + boiler_add_w %}
-          {% set projected_power_w = previous_w if measured_projected_w <= 0 and previous_w > 0 else measured_projected_w %}
-
+          {% set elapsed = states('sensor.boiler_quarter_elapsed_seconds') | int(0) %}
+          {% set previous_wh = states('sensor.boiler_quarter_energy_wh') | float(0) %}
           {% if average_state in ['unknown', 'unavailable', 'none'] %}
-            {% set prediction_w = projected_power_w %}
-          {% elif elapsed <= 0 %}
-            {% set prediction_w = projected_power_w %}
+            {{ previous_wh | round(1) }}
           {% else %}
-            {% set prediction_w = (average_so_far_w * elapsed + projected_power_w * remaining) / 900 %}
+            {{ (average_so_far_w * elapsed / 3600) | round(1) }}
           {% endif %}
 
-          {{ previous_w | round(0) if prediction_w <= 0 and previous_w > 0 else prediction_w | round(0) }}
+      - name: Boiler Quarter Max Energy Wh
+        unique_id: boiler_quarter_max_energy_wh
+        unit_of_measurement: Wh
+        state_class: measurement
+        state: >
+          {{ (states('sensor.boiler_peak_limit') | float(0) * 0.25) | round(1) }}
+
+      - name: Boiler Predicted With Boiler Wh
+        unique_id: boiler_predicted_with_boiler_wh
+        unit_of_measurement: Wh
+        state_class: measurement
+        state: >
+          {% set quarter_energy_wh = states('sensor.boiler_quarter_energy_wh') | float(0) %}
+          {% set current_power_w = states('sensor.boiler_house_power') | float(0) %}
+          {% set boiler_power_w = states('sensor.boiler_power') | float(0) %}
+          {% set previous_wh = states('sensor.boiler_predicted_with_boiler_wh') | float(0) %}
+          {% set remaining = states('sensor.boiler_quarter_remaining_seconds') | int(0) %}
+          {% set boiler_add_w = boiler_power_w if not is_state('switch.boiler_shelly','on')
+                and is_state('binary_sensor.boiler_heating_allowed', 'on') else 0 %}
+          {% set projected_power_w = current_power_w + boiler_add_w %}
+          {% set prediction_wh = quarter_energy_wh + (projected_power_w * remaining / 3600) %}
+          {{ previous_wh | round(1) if prediction_wh <= 0 and previous_wh > 0 else prediction_wh | round(1) }}
+
+      - name: Boiler Predicted Without Boiler Wh
+        unique_id: boiler_predicted_without_boiler_wh
+        unit_of_measurement: Wh
+        state_class: measurement
+        state: >
+          {% set quarter_energy_wh = states('sensor.boiler_quarter_energy_wh') | float(0) %}
+          {% set current_power_w = states('sensor.boiler_house_power') | float(0) %}
+          {% set boiler_power_w = states('sensor.boiler_power') | float(0) %}
+          {% set remaining = states('sensor.boiler_quarter_remaining_seconds') | int(0) %}
+          {% set projected_power_w = [current_power_w - boiler_power_w, 0] | max %}
+          {{ (quarter_energy_wh + (projected_power_w * remaining / 3600)) | round(1) }}
+
+      - name: Boiler Peak Headroom Wh
+        unique_id: boiler_peak_headroom_wh
+        unit_of_measurement: Wh
+        state_class: measurement
+        state: >
+          {{
+            (
+              states('sensor.boiler_quarter_max_energy_wh') | float(0)
+              -
+              states('sensor.boiler_predicted_with_boiler_wh') | float(0)
+            ) | round(1)
+          }}
+
+      - name: Boiler Latest Safe Off Seconds
+        unique_id: boiler_latest_safe_off_seconds
+        unit_of_measurement: s
+        state_class: measurement
+        state: >
+          {% set max_wh = states('sensor.boiler_quarter_max_energy_wh') | float(0) %}
+          {% set safety_wh = states('input_number.boiler_peak_safety_margin_wh') | float(0) %}
+          {% set quarter_energy_wh = states('sensor.boiler_quarter_energy_wh') | float(0) %}
+          {% set current_power_w = states('sensor.boiler_house_power') | float(0) %}
+          {% set boiler_power_w = states('sensor.boiler_power') | float(0) %}
+          {% set remaining = states('sensor.boiler_quarter_remaining_seconds') | int(0) %}
+          {% set without_boiler_w = [current_power_w - boiler_power_w, 0] | max %}
+          {% set allowed_wh = max_wh - safety_wh %}
+          {% set without_boiler_future_wh = without_boiler_w * remaining / 3600 %}
+          {% if boiler_power_w <= 0 %}
+            {{ remaining }}
+          {% else %}
+            {% set seconds = ((allowed_wh - quarter_energy_wh - without_boiler_future_wh) * 3600 / boiler_power_w) | int(0) %}
+            {{ [[seconds, 0] | max, remaining] | min }}
+          {% endif %}
+
+      - name: Boiler Peak Decision
+        unique_id: boiler_peak_decision
+        state: >
+          {% set predicted_wh = states('sensor.boiler_predicted_with_boiler_wh') | float(0) %}
+          {% set max_wh = states('sensor.boiler_quarter_max_energy_wh') | float(0) %}
+          {% set safety_wh = states('input_number.boiler_peak_safety_margin_wh') | float(0) %}
+          {% set runtime = states('sensor.shelly_boiler_runtime') | int(0) %}
+          {% set min_on = states('input_number.boiler_peak_min_on_seconds') | int(60) %}
+          {% if predicted_wh > max_wh %}
+            exceeded
+          {% elif predicted_wh > (max_wh - safety_wh) and runtime < min_on %}
+            min_on_hold
+          {% elif predicted_wh > (max_wh - safety_wh) %}
+            stop
+          {% else %}
+            ok
+          {% endif %}
+
       - name: Boiler Peak Margin W
         unique_id: boiler_peak_margin_w
         unit_of_measurement: W
@@ -156,7 +257,7 @@ template:
               is_state('input_boolean.boiler_superdal_force', 'on')
           ) %}
             1
-          {% elif states('sensor.boiler_peak_margin_w') | float(0) < 0 %}
+          {% elif states('sensor.boiler_peak_decision') in ['stop', 'exceeded'] %}
             5
           {% else %}
             0

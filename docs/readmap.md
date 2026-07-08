@@ -12,7 +12,7 @@
 ## v0.3 - Lokale Shelly-controller
 
 - [ ] `boiler.energy` opslaan in Shelly status/object
-- [ ] Piekbeveiliging op basis van `peak_margin`
+- [x] Piekbeveiliging op basis van voorspelde kwartierenergie
 - [ ] Watchdog voor HA MQTT updates
 - [ ] Stop reasons uitbreiden
 - [ ] Statusbericht uitbreiden met energy en watchdogstatus

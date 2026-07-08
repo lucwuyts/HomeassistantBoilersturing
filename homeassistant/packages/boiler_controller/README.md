@@ -12,7 +12,7 @@ Home Assistant doet:
 
 - superdal en andere planningsvoorwaarden bepalen;
 - kwartierpiek voorspellen;
-- piekmarge berekenen;
+- piekmarge en kwartierenergie-headroom berekenen;
 - gebruikersparameters beheren;
 - MQTT-bericht naar `boiler/v1/controller` publiceren.
 
@@ -31,11 +31,22 @@ Home Assistant doet niet:
 - `boiler.config.max_runtime`
 - `boiler.config.restart_delay`
 - `boiler.config.stop_hold`
+- `boiler.config.peak_safety_margin_wh`
+- `boiler.config.peak_min_on_seconds`
 - `boiler.energy.predicted_quarter_peak`
 - `boiler.energy.peak_limit`
 - `boiler.energy.peak_margin`
 - `boiler.energy.boiler_power`
 - `boiler.energy.house_power`
+- `boiler.energy.quarter_elapsed_seconds`
+- `boiler.energy.quarter_remaining_seconds`
+- `boiler.energy.quarter_energy_wh`
+- `boiler.energy.quarter_max_energy_wh`
+- `boiler.energy.predicted_with_boiler_wh`
+- `boiler.energy.predicted_without_boiler_wh`
+- `boiler.energy.peak_headroom_wh`
+- `boiler.energy.latest_safe_off_seconds`
+- `boiler.energy.peak_decision`
 
 Shelly gebruikt deze waarden als invoer voor zijn lokale controllerbeslissing.
 

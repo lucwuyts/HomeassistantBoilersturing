@@ -91,6 +91,8 @@ automation:
         entity_id:
           - binary_sensor.boiler_heating_allowed
           - input_number.boiler_peak_limit
+          - input_number.boiler_peak_safety_margin_wh
+          - input_number.boiler_peak_min_on_seconds
           - input_number.boiler_power
           - input_number.boiler_max_runtime
           - input_number.boiler_restart_delay

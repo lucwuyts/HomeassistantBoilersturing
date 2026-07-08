@@ -26,14 +26,25 @@ Voorbeeld:
       "heating_enabled": true,
       "max_runtime": 10800,
       "restart_delay": 900,
-      "stop_hold": 300
+      "stop_hold": 300,
+      "peak_safety_margin_wh": 50,
+      "peak_min_on_seconds": 60
     },
     "energy": {
       "predicted_quarter_peak": 4200,
       "peak_limit": 4000,
       "peak_margin": -200,
       "boiler_power": 1500,
-      "house_power": 2700
+      "house_power": 2700,
+      "quarter_elapsed_seconds": 450,
+      "quarter_remaining_seconds": 450,
+      "quarter_energy_wh": 480,
+      "quarter_max_energy_wh": 1000,
+      "predicted_with_boiler_wh": 1017.5,
+      "predicted_without_boiler_wh": 830,
+      "peak_headroom_wh": -17.5,
+      "latest_safe_off_seconds": 410,
+      "peak_decision": "stop"
     }
   }
 }
@@ -47,6 +58,8 @@ Voorbeeld:
 | `max_runtime` | number | seconden | Maximale runtime voor een verwarmingscyclus |
 | `restart_delay` | number | seconden | Wachttijd na stop of piekbeveiliging |
 | `stop_hold` | number | seconden | Minimale lokale wachttijd na een gewone stop om korte herstarts te vermijden |
+| `peak_safety_margin_wh` | number | Wh | Veiligheidsmarge onder de kwartierlimiet |
+| `peak_min_on_seconds` | number | seconden | Minimum looptijd voor piekstop, behalve bij echte overschrijding van de kwartierlimiet |
 
 ### `boiler.energy`
 
@@ -57,6 +70,15 @@ Voorbeeld:
 | `peak_margin` | number | W | `peak_limit - predicted_quarter_peak` |
 | `boiler_power` | number | W | Verwacht vermogen van de boiler |
 | `house_power` | number | W | Actueel woningverbruik volgens HA |
+| `quarter_elapsed_seconds` | number | seconden | Verstreken seconden in het huidige kwartier |
+| `quarter_remaining_seconds` | number | seconden | Resterende seconden in het huidige kwartier |
+| `quarter_energy_wh` | number | Wh | Gemeten kwartierenergie tot nu toe |
+| `quarter_max_energy_wh` | number | Wh | Maximaal toegelaten kwartierenergie, `peak_limit * 0.25` |
+| `predicted_with_boiler_wh` | number | Wh | Verwachte kwartierenergie als het huidige vermogen aanhoudt |
+| `predicted_without_boiler_wh` | number | Wh | Verwachte kwartierenergie als het boilervermogen wegvalt |
+| `peak_headroom_wh` | number | Wh | `quarter_max_energy_wh - predicted_with_boiler_wh` |
+| `latest_safe_off_seconds` | number | seconden | Laatste veilige uitschakelmoment binnen het kwartier, gerekend vanaf nu |
+| `peak_decision` | string | - | Diagnose uit HA: `ok`, `min_on_hold`, `stop` of `exceeded` |
 
 Shelly mag onbekende velden negeren. Nieuwe velden moeten achterwaarts compatibel worden toegevoegd.
 
@@ -97,8 +119,8 @@ Basislogica:
 Als heating_enabled false is:
     boiler stoppen
 
-Anders als peak_margin < 0:
-    boiler stoppen
+Anders als predicted_with_boiler_wh boven de kwartierlimiet minus veiligheidsmarge eindigt:
+    boiler stoppen zodra minimum looptijd dit toelaat
     restart delay starten
 
 Anders:

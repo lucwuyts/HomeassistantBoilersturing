@@ -10,7 +10,7 @@
 const FIRMWARE =
 {
     NAME        : "Boiler Controller",
-    VERSION     : "2026.07.07-05",
+    VERSION     : "2026.07.08-02",
     API         : 1
 };
 
@@ -106,7 +106,11 @@ let boiler =
 
         restart_delay   : 900,
 
-        stop_hold       : CONFIG.STOP_HOLD
+        stop_hold       : CONFIG.STOP_HOLD,
+
+        peak_safety_margin_wh : 50,
+
+        peak_min_on_seconds   : 60
     },
 
     energy :
@@ -119,7 +123,25 @@ let boiler =
 
         boiler_power           : 0,
 
-        house_power            : 0
+        house_power            : 0,
+
+        quarter_elapsed_seconds   : 0,
+
+        quarter_remaining_seconds : 0,
+
+        quarter_energy_wh         : 0,
+
+        quarter_max_energy_wh     : 0,
+
+        predicted_with_boiler_wh  : 0,
+
+        predicted_without_boiler_wh : 0,
+
+        peak_headroom_wh          : 0,
+
+        latest_safe_off_seconds   : 0,
+
+        peak_decision             : "unknown"
     },
 
     status :
@@ -908,7 +930,41 @@ function updateStopHold()
 
 function isPeakLimitExceeded()
 {
-    return boiler.energy.peak_margin < 0;
+    let maxEnergy =
+        boiler.energy.quarter_max_energy_wh;
+
+    let predictedEnergy =
+        boiler.energy.predicted_with_boiler_wh;
+
+    if (maxEnergy <= 0)
+    {
+        return boiler.energy.peak_margin < 0;
+    }
+
+    if (predictedEnergy <= 0)
+    {
+        return boiler.energy.peak_margin < 0;
+    }
+
+    let safetyLimit =
+        maxEnergy - boiler.config.peak_safety_margin_wh;
+
+    if (predictedEnergy <= safetyLimit)
+    {
+        return false;
+    }
+
+    if (!boiler.status.relay)
+    {
+        return true;
+    }
+
+    if (boiler.status.runtime >= boiler.config.peak_min_on_seconds)
+    {
+        return true;
+    }
+
+    return predictedEnergy > maxEnergy;
 }
 
 //-----------------------------------------------------------------------------
