@@ -61,11 +61,12 @@ Shelly gebruikt deze waarden als invoer voor zijn lokale controllerbeslissing.
 | `scripts.yaml` | MQTT publisher |
 | `mqtt_status.yaml` | MQTT entities op basis van echte Shelly-status |
 | `dashboard_debug_card.yaml` | Lovelace debugkaart voor status en diagnose |
+| `dashboard_parameters_card.yaml` | Lovelace kaart om boilerparameters in te stellen |
 | `controller_helpers.yaml` | Oudere controllerhelpers, niet gebruiken als actuele Shelly-status |
 
 ## Actuele status
 
 Gebruik voor dashboards de entities uit `mqtt_status.yaml`. `input_select.boiler_state` is een oudere helper en is niet langer de waarheid over de actuele boilerstatus.
 
-Voor diagnose kan de Lovelace snippet uit `dashboard_debug_card.yaml` in een dashboard worden geplakt.
+Voor diagnose kan de Lovelace snippet uit `dashboard_debug_card.yaml` in een dashboard worden geplakt. Voor instellingen kan `dashboard_parameters_card.yaml` gebruikt worden.
 
