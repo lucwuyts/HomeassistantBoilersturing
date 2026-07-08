@@ -44,20 +44,3 @@ cards:
         name: Verwarmen toegestaan
       - entity: sensor.boiler_peak_decision
         name: Piekbeslissing
-
-  - type: entities
-    title: Actuele piekdiagnose
-    show_header_toggle: false
-    entities:
-      - entity: sensor.boiler_house_power
-        name: Huisverbruik
-      - entity: sensor.boiler_predicted_quarter_peak_w
-        name: Voorspelde kwartierpiek
-      - entity: sensor.boiler_quarter_energy_wh
-        name: Kwartierenergie
-      - entity: sensor.boiler_quarter_max_energy_wh
-        name: Maximum kwartierenergie
-      - entity: sensor.boiler_predicted_with_boiler_wh
-        name: Voorspeld met boiler
-      - entity: sensor.boiler_peak_headroom_wh
-        name: Piekruimte
