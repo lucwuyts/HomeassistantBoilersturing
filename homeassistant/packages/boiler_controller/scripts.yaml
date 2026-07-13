@@ -183,8 +183,7 @@ script:
       - variables:
 
           predicted_with_boiler_wh: >
-            {% set boiler_add_w = (boiler_power | float(0)) if not is_state('switch.boiler_shelly','on')
-                  and is_state('binary_sensor.boiler_heating_allowed', 'on') else 0 %}
+            {% set boiler_add_w = (boiler_power | float(0)) if not is_state('binary_sensor.shelly_boiler_relay', 'on') else 0 %}
             {% set projected_power_w = house_power | float(0) + boiler_add_w %}
             {{
               (

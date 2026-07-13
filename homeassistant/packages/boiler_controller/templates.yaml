@@ -106,8 +106,7 @@ template:
           {% set boiler_power_w = states('sensor.boiler_power') | float(0) %}
           {% set previous_wh = states('sensor.boiler_predicted_with_boiler_wh') | float(0) %}
           {% set remaining = states('sensor.boiler_quarter_remaining_seconds') | int(0) %}
-          {% set boiler_add_w = boiler_power_w if not is_state('switch.boiler_shelly','on')
-                and is_state('binary_sensor.boiler_heating_allowed', 'on') else 0 %}
+          {% set boiler_add_w = boiler_power_w if not is_state('binary_sensor.shelly_boiler_relay', 'on') else 0 %}
           {% set projected_power_w = current_power_w + boiler_add_w %}
           {% set prediction_wh = quarter_energy_wh + (projected_power_w * remaining / 3600) %}
           {{ previous_wh | round(1) if prediction_wh <= 0 and previous_wh > 0 else prediction_wh | round(1) }}
