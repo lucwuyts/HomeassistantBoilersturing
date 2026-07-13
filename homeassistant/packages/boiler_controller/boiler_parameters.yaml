@@ -78,18 +78,3 @@ input_number:
     step: 60
     unit_of_measurement: s
     initial: 10800
-
-
-input_datetime:
-
-  boiler_superdal_start:
-    name: Boiler Superdal Start
-    has_date: false
-    has_time: true
-    initial: "11:00"
-
-  boiler_superdal_end:
-    name: Boiler Superdal End
-    has_date: false
-    has_time: true
-    initial: "17:00"

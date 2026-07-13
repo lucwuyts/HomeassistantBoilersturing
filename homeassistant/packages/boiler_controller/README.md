@@ -16,6 +16,8 @@ Home Assistant doet:
 - gebruikersparameters beheren;
 - MQTT-bericht naar `boiler/v1/controller` publiceren.
 
+Superdal staat voorlopig vast op 11:00-17:00 in `templates.yaml`.
+
 Home Assistant doet niet:
 
 - het boilerrelais rechtstreeks schakelen;

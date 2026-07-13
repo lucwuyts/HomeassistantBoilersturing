@@ -35,7 +35,7 @@ automation:
 
     trigger:
       - platform: time
-        at: input_datetime.boiler_superdal_start
+        at: "11:00:00"
 
     action:
 
