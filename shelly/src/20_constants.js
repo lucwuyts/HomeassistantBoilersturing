@@ -66,7 +66,5 @@ const STOP_REASON =
 
     RESTART_DELAY       : "Restart delay active",
 
-    WATCHDOG_TIMEOUT    : "Watchdog timeout",
-
-    CONTROLLER_DISABLED : "Controller disabled"
+    WATCHDOG_TIMEOUT    : "Watchdog timeout"
 };

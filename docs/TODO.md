@@ -2,11 +2,11 @@
 
 ## Home Assistant
 
-- [x] Boiler helpers
+- [x] Verouderde Boiler helpers opgeschoond
 - [x] Energy quarter detector
 - [x] MQTT publisher naar `boiler/v1/controller`
 - [x] Energy-blok in MQTT payload
-- [ ] Automations opschonen rond publicatiemomenten
+- [x] Automations opschonen rond publicatiemomenten
 - [x] MQTT status van Shelly uitlezen in sensoren
 - [x] Dashboard/debugkaart
 
@@ -32,3 +32,4 @@
 - [x] MQTT protocol actualiseren
 - [x] State machine actualiseren
 - [x] Status payload exact afstemmen na Shelly energy-implementatie
+- [x] Installatie- en releasehandleiding toevoegen

@@ -56,19 +56,19 @@ Shelly gebruikt deze waarden als invoer voor zijn lokale controllerbeslissing.
 
 | Bestand | Functie |
 | ------- | ------- |
-| `helpers.yaml` | Interne helpers |
 | `boiler_parameters.yaml` | Instelbare boilerparameters |
 | `templates.yaml` | Afgeleide sensoren zoals piekmarge en heating allowed |
-| `automations.yaml` | Dagstatus en resetlogica |
+| `automations.yaml` | MQTT publicatie, warm-enough reset en Shelly offline alerts |
 | `scripts.yaml` | MQTT publisher |
 | `mqtt_status.yaml` | MQTT entities op basis van echte Shelly-status |
 | `dashboard_debug_card.yaml` | Lovelace debugkaart voor status en diagnose |
 | `dashboard_parameters_card.yaml` | Lovelace kaart om boilerparameters in te stellen |
-| `controller_helpers.yaml` | Oudere controllerhelpers, niet gebruiken als actuele Shelly-status |
 
 ## Actuele status
 
-Gebruik voor dashboards de entities uit `mqtt_status.yaml`. `input_select.boiler_state` is een oudere helper en is niet langer de waarheid over de actuele boilerstatus.
+Gebruik voor dashboards de entities uit `mqtt_status.yaml`. De actuele boilerstatus komt van Shelly via MQTT, niet uit Home Assistant input helpers.
 
 Voor diagnose kan de Lovelace snippet uit `dashboard_debug_card.yaml` in een dashboard worden geplakt. Voor instellingen kan `dashboard_parameters_card.yaml` gebruikt worden.
+
+Zie [../../../docs/installation.md](../../../docs/installation.md) voor installatie- en releasecontrole.
 

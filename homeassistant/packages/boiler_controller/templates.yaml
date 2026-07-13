@@ -12,15 +12,6 @@ template:
         state: >
           {{ now().hour >= 22 or now().hour < 7 }}
 
-      - name: Boiler Allow Heat
-        unique_id: boiler_allow_heat
-        state: >
-          {{
-            is_state('binary_sensor.boiler_superdal','on')
-            or
-            is_state('binary_sensor.boiler_nachtuur', 'on')
-          }}
-
       - name: Boiler Heating Allowed
         unique_id: boiler_heating_allowed
         state: >
@@ -29,8 +20,6 @@ template:
                is_state('binary_sensor.boiler_superdal', 'on')
                or
                is_state('binary_sensor.boiler_nachtuur', 'on')
-               or
-               is_state('input_boolean.boiler_superdal_force', 'on')
              )
           }}
 
@@ -258,17 +247,9 @@ template:
       - name: Boiler Reason
         unique_id: boiler_reason
         state: >
-          {% if is_state('input_boolean.boiler_controller_enabled', 'off') %}
-            2
-          {% elif is_state('binary_sensor.shelly_boiler_warm_enough', 'on') %}
+          {% if is_state('binary_sensor.shelly_boiler_warm_enough', 'on') %}
             3
-          {% elif not (
-              is_state('binary_sensor.boiler_superdal', 'on')
-              or
-              is_state('binary_sensor.boiler_nachtuur', 'on')
-              or
-              is_state('input_boolean.boiler_superdal_force', 'on')
-          ) %}
+          {% elif is_state('binary_sensor.boiler_heating_allowed', 'off') %}
             1
           {% elif states('sensor.boiler_peak_decision') in ['stop', 'exceeded'] %}
             5
@@ -285,8 +266,6 @@ template:
             OK
           {% elif reason == 1 %}
             Geen superdaluren
-          {% elif reason == 2 %}
-            Controller uitgeschakeld
           {% elif reason == 3 %}
             Boiler vandaag reeds verwarmd
           {% elif reason == 4 %}
@@ -312,8 +291,6 @@ template:
             HEATING
           {% elif reason == 0 %}
             READY
-          {% elif reason == 2 %}
-            DISABLED
           {% elif reason == 3 %}
             LOCKED
           {% else %}

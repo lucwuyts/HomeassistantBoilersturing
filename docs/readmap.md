@@ -11,22 +11,22 @@
 
 ## v0.3 - Lokale Shelly-controller
 
-- [ ] `boiler.energy` opslaan in Shelly status/object
+- [x] `boiler.energy` opslaan in Shelly status/object
 - [x] Piekbeveiliging op basis van voorspelde kwartierenergie
-- [ ] Watchdog voor HA MQTT updates
-- [ ] Stop reasons uitbreiden
-- [ ] Statusbericht uitbreiden met energy en watchdogstatus
+- [x] Watchdog voor HA MQTT updates
+- [x] Stop reasons uitbreiden
+- [x] Statusbericht uitbreiden met energy en watchdogstatus
 
 ## v0.4 - Productietest
 
-- [ ] Echte relaissturing op Shelly Pro 1
-- [ ] Test zonder aangesloten boiler
-- [ ] Test met boiler onder toezicht
-- [ ] Dashboard en diagnose in Home Assistant
+- [x] Echte relaissturing op Shelly Pro 1
+- [x] Test zonder aangesloten boiler
+- [x] Test met boiler onder toezicht
+- [x] Dashboard en diagnose in Home Assistant
 
 ## v1.0 - Stabiele release
 
 - [ ] Documentatie compleet
 - [ ] Foutscenario's getest
 - [ ] Release build reproduceerbaar
-- [ ] Installatiehandleiding
+- [x] Installatiehandleiding

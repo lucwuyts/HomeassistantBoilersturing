@@ -10,7 +10,7 @@
 const FIRMWARE =
 {
     NAME        : "Boiler Controller",
-    VERSION     : "2026.07.08-03",
+    VERSION     : "2026.07.13-01",
     API         : 1
 };
 
@@ -82,9 +82,7 @@ const STOP_REASON =
 
     RESTART_DELAY       : "Restart delay active",
 
-    WATCHDOG_TIMEOUT    : "Watchdog timeout",
-
-    CONTROLLER_DISABLED : "Controller disabled"
+    WATCHDOG_TIMEOUT    : "Watchdog timeout"
 };
 
 /******************************************************************************
