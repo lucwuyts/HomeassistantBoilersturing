@@ -16,8 +16,8 @@ Optionele Lovelace snippets:
 
 | Bestand | Doel |
 | ------- | ---- |
-| `dashboard_debug_card.yaml` | Debugkaart voor status en diagnose |
-| `dashboard_parameters_card.yaml` | Kaart om boilerparameters in te stellen |
+| `dashboard_debug_card.yaml.txt` | Debugkaart voor status en diagnose |
+| `dashboard_parameters_card.yaml.txt` | Kaart om boilerparameters in te stellen |
 
 ## Vereiste Home Assistant entities
 
