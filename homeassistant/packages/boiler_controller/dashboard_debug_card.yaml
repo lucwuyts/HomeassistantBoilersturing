@@ -103,6 +103,8 @@ cards:
         name: Script versie
       - entity: sensor.shelly_boiler_firmware_version
         name: Shelly firmware
+      - entity: sensor.shelly_boiler_firmware_boots
+        name: Firmware boots
       - entity: sensor.shelly_boiler_watchdog_reboots
         name: Watchdog reboots
       - entity: sensor.shelly_boiler_watchdog_reason

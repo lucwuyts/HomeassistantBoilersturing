@@ -29,6 +29,8 @@ function main()
 
     mqttInit();
 
+    checkDailyStatisticsReset();
+
     publishStatus();
 
     Timer.set(

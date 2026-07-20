@@ -9,6 +9,8 @@
 
 function systemTimerTask()
 {
+    checkDailyStatisticsReset();
+
     checkControllerWatchdog();
 
     updateBootDelay();

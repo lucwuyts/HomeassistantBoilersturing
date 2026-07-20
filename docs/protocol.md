@@ -152,6 +152,7 @@ Voorbeeld:
       "relay": true,
       "runtime": 123,
       "starts_today": 4,
+      "starts_today_date": "2026-07-03",
       "total_starts": 27,
       "total_runtime": 34122,
       "uptime": 86400,

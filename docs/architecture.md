@@ -103,12 +103,15 @@ Persistent opgeslagen:
 
 - `firmware_boots`;
 - `starts_today`;
+- `starts_today_date`;
 - `total_starts`;
 - `total_runtime`;
 - `warm_enough`;
 - `warm_enough_since`.
 
-Opslaan gebeurt alleen bij boot, boiler start, boiler stop en reset van statistieken. Niet periodiek.
+Shelly reset `starts_today` zelf bij het begin van een nieuwe kalenderdag. Home Assistant stuurt hiervoor geen dagelijks resetcommando.
+
+Opslaan gebeurt alleen bij boot, boiler start, boiler stop, dagreset en reset van statistieken. Niet periodiek.
 
 ## Ontwikkelregels
 

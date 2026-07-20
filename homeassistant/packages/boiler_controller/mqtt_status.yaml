@@ -80,6 +80,13 @@ mqtt:
       value_template: >
         {{ value_json.boiler.status.watchdog_reason | default('') }}
 
+    - name: Shelly Boiler Firmware Boots
+      unique_id: shelly_boiler_firmware_boots
+      state_topic: boiler/v1/status
+      state_class: total_increasing
+      value_template: >
+        {{ value_json.boiler.status.firmware_boots | default(0) }}
+
     - name: Shelly Boiler Runtime
       unique_id: shelly_boiler_runtime
       state_topic: boiler/v1/status

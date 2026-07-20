@@ -10,7 +10,7 @@
 const FIRMWARE =
 {
     NAME        : "Boiler Controller",
-    VERSION     : "2026.07.13-01",
+    VERSION     : "2026.07.20-02",
     API         : 1
 };
 
@@ -152,6 +152,8 @@ let boiler =
 
         starts_today           : 0,
 
+        starts_today_date      : "",
+
         total_starts           : 0,
 
         total_runtime          : 0,
@@ -233,6 +235,8 @@ let persistent =
     firmware_boots  : 0,
 
     starts_today    : 0,
+
+    starts_today_date : "",
 
     total_starts    : 0,
 
@@ -338,6 +342,40 @@ function timestampMs()
     return new Date().getTime();
 }
 
+//-----------------------------------------------------------------------------
+
+function twoDigits(value)
+{
+    if (value < 10)
+    {
+        return "0" + value;
+    }
+
+    return "" + value;
+}
+
+//-----------------------------------------------------------------------------
+
+function dateKey()
+{
+    let now = new Date();
+
+    let year = now.getFullYear();
+
+    if (year < 2024)
+    {
+        return "";
+    }
+
+    return (
+        year +
+        "-" +
+        twoDigits(now.getMonth() + 1) +
+        "-" +
+        twoDigits(now.getDate())
+    );
+}
+
 /******************************************************************************
  *
  * Boiler Controller Firmware (BCF)
@@ -352,6 +390,9 @@ function copyPersistentToStatus()
     boiler.status.firmware_boots = persistent.firmware_boots;
 
     boiler.status.starts_today = persistent.starts_today;
+
+    boiler.status.starts_today_date =
+        persistent.starts_today_date || "";
 
     boiler.status.total_starts = persistent.total_starts;
 
@@ -377,6 +418,8 @@ function copyStatusToPersistent()
     persistent.firmware_boots = boiler.status.firmware_boots;
 
     persistent.starts_today = boiler.status.starts_today;
+
+    persistent.starts_today_date = boiler.status.starts_today_date;
 
     persistent.total_starts = boiler.status.total_starts;
 
@@ -416,6 +459,8 @@ function resetStatistics()
 {
     boiler.status.starts_today = 0;
 
+    boiler.status.starts_today_date = dateKey();
+
     boiler.status.total_starts = 0;
 
     boiler.status.total_runtime = 0;
@@ -423,6 +468,47 @@ function resetStatistics()
     savePersistentData();
 
     logInfo("Statistics reset");
+}
+
+//-----------------------------------------------------------------------------
+
+function resetDailyStatistics()
+{
+    boiler.status.starts_today = 0;
+
+    boiler.status.starts_today_date = dateKey();
+
+    savePersistentData();
+
+    logInfo("Daily statistics reset");
+}
+
+//-----------------------------------------------------------------------------
+
+function checkDailyStatisticsReset()
+{
+    let today = dateKey();
+
+    if (today === "")
+    {
+        return;
+    }
+
+    if (boiler.status.starts_today_date === "")
+    {
+        resetDailyStatistics();
+
+        return;
+    }
+
+    if (boiler.status.starts_today_date === today)
+    {
+        return;
+    }
+
+    resetDailyStatistics();
+
+    publishStatus();
 }
 
 //-----------------------------------------------------------------------------
@@ -455,6 +541,8 @@ function loadPersistentData()
             firmware_boots  : 0,
 
             starts_today    : 0,
+
+            starts_today_date : "",
 
             total_starts    : 0,
 
@@ -1171,6 +1259,8 @@ function checkWarmEnough()
 
 function systemTimerTask()
 {
+    checkDailyStatisticsReset();
+
     checkControllerWatchdog();
 
     updateBootDelay();
@@ -1558,6 +1648,8 @@ function main()
     startBootDelay();
 
     mqttInit();
+
+    checkDailyStatisticsReset();
 
     publishStatus();
 

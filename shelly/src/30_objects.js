@@ -65,6 +65,8 @@ let boiler =
 
         starts_today           : 0,
 
+        starts_today_date      : "",
+
         total_starts           : 0,
 
         total_runtime          : 0,
@@ -146,6 +148,8 @@ let persistent =
     firmware_boots  : 0,
 
     starts_today    : 0,
+
+    starts_today_date : "",
 
     total_starts    : 0,
 
