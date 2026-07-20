@@ -99,6 +99,12 @@ cards:
         name: Vrij RAM
       - entity: sensor.shelly_boiler_uptime
         name: Uptime
+      - entity: sensor.shelly_boiler_starts_today
+        name: Starts vandaag
+      - entity: sensor.shelly_boiler_total_starts
+        name: Starts totaal
+      - entity: sensor.shelly_boiler_total_runtime
+        name: Runtime totaal
       - entity: sensor.shelly_boiler_script_version
         name: Script versie
       - entity: sensor.shelly_boiler_firmware_version
