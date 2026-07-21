@@ -23,6 +23,7 @@ automation:
           - input_number.boiler_max_runtime
           - input_number.boiler_restart_delay
           - input_number.boiler_stop_hold
+          - binary_sensor.shelly_boiler_warm_enough
 
       - platform: state
         entity_id: input_boolean.energy_new_quarter
@@ -44,6 +45,9 @@ automation:
       - platform: state
         entity_id: binary_sensor.boiler_superdal
         to: "on"
+
+      - platform: time
+        at: "11:00:00"
 
     action:
 
