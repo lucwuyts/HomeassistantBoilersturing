@@ -78,3 +78,10 @@ input_number:
     step: 60
     unit_of_measurement: s
     initial: 10800
+
+input_text:
+
+  boiler_warm_enough_reset_date:
+    name: Boiler Warm Enough Reset Date
+    icon: mdi:calendar-check
+    max: 10

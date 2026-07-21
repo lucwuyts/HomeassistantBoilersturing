@@ -9,6 +9,8 @@
 
 function systemTimerTask()
 {
+    syncRelayState();
+
     checkDailyStatisticsReset();
 
     checkControllerWatchdog();

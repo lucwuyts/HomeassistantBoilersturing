@@ -85,6 +85,11 @@ function evaluateController()
 
     if (boiler.status.warm_enough)
     {
+        if (boiler.status.relay)
+        {
+            stopBoiler(STOP_REASON.WARM_ENOUGH);
+        }
+
         logInfo("Boiler already warm enough");
 
         return;

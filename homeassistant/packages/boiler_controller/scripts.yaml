@@ -311,6 +311,10 @@ script:
               }
             }
 
+      - delay: "00:00:01"
+
+      - service: script.boiler_publish_controller
+
       - service: system_log.write
         data:
           level: info

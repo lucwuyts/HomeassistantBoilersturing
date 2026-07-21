@@ -97,6 +97,12 @@ function processControllerMessage(topic, message)
             return;
         }
 
+        if (data.boiler.command.reset_warm_enough === true &&
+            boiler.status.controller_config_received)
+        {
+            evaluateController();
+        }
+
         publishStatus();
 
         return;

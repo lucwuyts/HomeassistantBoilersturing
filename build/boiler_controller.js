@@ -10,7 +10,7 @@
 const FIRMWARE =
 {
     NAME        : "Boiler Controller",
-    VERSION     : "2026.07.20-02",
+    VERSION     : "2026.07.21-01",
     API         : 1
 };
 
@@ -681,6 +681,12 @@ function processControllerMessage(topic, message)
             return;
         }
 
+        if (data.boiler.command.reset_warm_enough === true &&
+            boiler.status.controller_config_received)
+        {
+            evaluateController();
+        }
+
         publishStatus();
 
         return;
@@ -810,6 +816,77 @@ function updateLastStopReason(reason)
  *
  ******************************************************************************/
 
+let relaySyncInProgress = false;
+
+//-----------------------------------------------------------------------------
+
+function applyRelayState(on, source)
+{
+    if (boiler.status.relay === on)
+    {
+        return false;
+    }
+
+    boiler.status.relay = on;
+
+    boiler.status.state = on ? STATE.HEATING : STATE.IDLE;
+
+    if (!on)
+    {
+        boiler.status.runtime = 0;
+    }
+
+    logInfo("Relay state synced " + (on ? "ON" : "OFF") + " (" + source + ")");
+
+    publishStatus();
+
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+
+function syncRelayState()
+{
+    if (relaySyncInProgress)
+    {
+        return;
+    }
+
+    relaySyncInProgress = true;
+
+    Shelly.call(
+        "Switch.Get",
+        {
+            id : CONFIG.RELAY_ID
+        },
+        function(result, error_code, error_message)
+        {
+            relaySyncInProgress = false;
+
+            if (error_code !== 0)
+            {
+                logError("Relay state read failed: " + error_message);
+
+                return;
+            }
+
+            if (!result || typeof result.output !== "boolean")
+            {
+                logError("Relay state read returned invalid data");
+
+                return;
+            }
+
+            if (applyRelayState(result.output, "switch"))
+            {
+                evaluateController();
+            }
+        }
+    );
+}
+
+//-----------------------------------------------------------------------------
+
 function setRelay(on)
 {
     Shelly.call(
@@ -829,13 +906,9 @@ function setRelay(on)
                 return;
             }
 
-            boiler.status.relay = on;
-
-            boiler.status.state = on ? STATE.HEATING : STATE.IDLE;
+            applyRelayState(on, "controller");
 
             logInfo("Relay switched " + (on ? "ON" : "OFF"));
-
-            publishStatus();
         }
     );
 }
@@ -1092,6 +1165,11 @@ function evaluateController()
 
     if (boiler.status.warm_enough)
     {
+        if (boiler.status.relay)
+        {
+            stopBoiler(STOP_REASON.WARM_ENOUGH);
+        }
+
         logInfo("Boiler already warm enough");
 
         return;
@@ -1259,6 +1337,8 @@ function checkWarmEnough()
 
 function systemTimerTask()
 {
+    syncRelayState();
+
     checkDailyStatisticsReset();
 
     checkControllerWatchdog();

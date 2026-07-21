@@ -49,9 +49,34 @@ automation:
       - platform: time
         at: "11:00:00"
 
+      - platform: homeassistant
+        event: start
+
+      - platform: event
+        event_type: automation_reloaded
+
+    condition:
+      - condition: state
+        entity_id: binary_sensor.boiler_superdal
+        state: "on"
+
+      - condition: state
+        entity_id: binary_sensor.boiler_shelly_offline
+        state: "off"
+
+      - condition: template
+        value_template: >
+          {{ states('input_text.boiler_warm_enough_reset_date') != now().date().isoformat() }}
+
     action:
 
       - service: script.boiler_reset_warm_enough
+
+      - service: input_text.set_value
+        target:
+          entity_id: input_text.boiler_warm_enough_reset_date
+        data:
+          value: "{{ now().date().isoformat() }}"
 
     mode: single
 

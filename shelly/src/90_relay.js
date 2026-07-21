@@ -7,6 +7,77 @@
  *
  ******************************************************************************/
 
+let relaySyncInProgress = false;
+
+//-----------------------------------------------------------------------------
+
+function applyRelayState(on, source)
+{
+    if (boiler.status.relay === on)
+    {
+        return false;
+    }
+
+    boiler.status.relay = on;
+
+    boiler.status.state = on ? STATE.HEATING : STATE.IDLE;
+
+    if (!on)
+    {
+        boiler.status.runtime = 0;
+    }
+
+    logInfo("Relay state synced " + (on ? "ON" : "OFF") + " (" + source + ")");
+
+    publishStatus();
+
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+
+function syncRelayState()
+{
+    if (relaySyncInProgress)
+    {
+        return;
+    }
+
+    relaySyncInProgress = true;
+
+    Shelly.call(
+        "Switch.Get",
+        {
+            id : CONFIG.RELAY_ID
+        },
+        function(result, error_code, error_message)
+        {
+            relaySyncInProgress = false;
+
+            if (error_code !== 0)
+            {
+                logError("Relay state read failed: " + error_message);
+
+                return;
+            }
+
+            if (!result || typeof result.output !== "boolean")
+            {
+                logError("Relay state read returned invalid data");
+
+                return;
+            }
+
+            if (applyRelayState(result.output, "switch"))
+            {
+                evaluateController();
+            }
+        }
+    );
+}
+
+//-----------------------------------------------------------------------------
+
 function setRelay(on)
 {
     Shelly.call(
@@ -26,13 +97,9 @@ function setRelay(on)
                 return;
             }
 
-            boiler.status.relay = on;
-
-            boiler.status.state = on ? STATE.HEATING : STATE.IDLE;
+            applyRelayState(on, "controller");
 
             logInfo("Relay switched " + (on ? "ON" : "OFF"));
-
-            publishStatus();
         }
     );
 }
