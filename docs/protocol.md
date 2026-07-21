@@ -65,7 +65,7 @@ Voorbeeld:
 
 | Veld | Type | Eenheid | Betekenis |
 | ---- | ---- | ------ | --------- |
-| `predicted_quarter_peak` | number | W | Door HA voorspelde kwartierpiek als de boiler actief is of wordt. HA rekent eventuele kW-bronnen om naar W voor MQTT |
+| `predicted_quarter_peak` | number | W | Door HA voorspelde kwartierpiek. Als het relais uit staat, telt HA het boilervermogen alleen mee wanneer verwarmen toegestaan is en Shelly niet `warm_enough` meldt. HA rekent eventuele kW-bronnen om naar W voor MQTT |
 | `peak_limit` | number | W | Ingestelde maximale kwartierpiek |
 | `peak_margin` | number | W | `peak_limit - predicted_quarter_peak` |
 | `boiler_power` | number | W | Verwacht vermogen van de boiler |
@@ -74,7 +74,7 @@ Voorbeeld:
 | `quarter_remaining_seconds` | number | seconden | Resterende seconden in het huidige kwartier |
 | `quarter_energy_wh` | number | Wh | Gemeten kwartierenergie tot nu toe |
 | `quarter_max_energy_wh` | number | Wh | Maximaal toegelaten kwartierenergie, `peak_limit * 0.25` |
-| `predicted_with_boiler_wh` | number | Wh | Verwachte kwartierenergie als het huidige vermogen aanhoudt |
+| `predicted_with_boiler_wh` | number | Wh | Verwachte kwartierenergie als het huidige vermogen aanhoudt, plus boilervermogen wanneer de boiler nog mag starten |
 | `predicted_without_boiler_wh` | number | Wh | Verwachte kwartierenergie als het boilervermogen wegvalt |
 | `peak_headroom_wh` | number | Wh | `quarter_max_energy_wh - predicted_with_boiler_wh` |
 | `latest_safe_off_seconds` | number | seconden | Laatste veilige uitschakelmoment binnen het kwartier, gerekend vanaf nu |

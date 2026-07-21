@@ -69,7 +69,11 @@ max_quarter_energy_wh = peak_limit * 0.25
 
 predicted_with_boiler_wh =
     quarter_energy_wh
-    + (current_power_w * remaining_seconds / 3600)
+    + (projected_power_w * remaining_seconds / 3600)
+
+projected_power_w is het actuele woningvermogen. Als het relais uit staat,
+telt Home Assistant het boilervermogen alleen mee wanneer verwarmen toegestaan
+is en Shelly niet `warm_enough` meldt.
 
 peak_headroom_wh =
     max_quarter_energy_wh - predicted_with_boiler_wh
