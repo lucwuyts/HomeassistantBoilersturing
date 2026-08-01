@@ -1,134 +1,396 @@
-# Boiler Controller Debug Card
-#
-# Gebruik:
-#   Kopieer deze Lovelace YAML in een dashboard view/card.
-#   De kaart gebruikt alleen standaard Home Assistant cards.
-
-type: vertical-stack
-cards:
-  - type: entities
-    title: Boiler Controller
-    show_header_toggle: false
-    entities:
-      - entity: sensor.shelly_boiler_state
-        name: Shelly state
-      - entity: binary_sensor.shelly_boiler_relay
-        name: Relais
-      - entity: binary_sensor.boiler_heating_allowed
-        name: HA heating allowed
-      - entity: binary_sensor.shelly_boiler_warm_enough
-        name: Warm genoeg
-      - entity: sensor.shelly_boiler_last_stop_reason
-        name: Laatste stopreden
-      - entity: sensor.boiler_reason_text
-        name: HA reden
-      - entity: sensor.boiler_controller_state
-        name: HA controller state
-
-  - type: entities
-    title: Planning en beveiliging
-    show_header_toggle: false
-    entities:
-      - entity: binary_sensor.boiler_superdal
-        name: Superdal
-      - entity: binary_sensor.boiler_nachtuur
-        name: Nachtuur
-      - entity: binary_sensor.shelly_boiler_restart_delay_active
-        name: Restart delay actief
-      - entity: sensor.shelly_boiler_restart_remaining
-        name: Restart resterend
-      - entity: binary_sensor.shelly_boiler_boot_delay_active
-        name: Boot delay actief
-      - entity: sensor.shelly_boiler_boot_delay_remaining
-        name: Boot delay resterend
-      - entity: binary_sensor.shelly_boiler_stop_hold_active
-        name: Stop-hold actief
-      - entity: sensor.shelly_boiler_stop_hold_remaining
-        name: Stop-hold resterend
-
-  - type: entities
-    title: Energie
-    show_header_toggle: false
-    entities:
-      - entity: sensor.boiler_house_power
-        name: Huisverbruik
-      - entity: sensor.boiler_power
-        name: Boiler vermogen
-      - entity: sensor.boiler_predicted_quarter_peak_w
-        name: Voorspelde kwartierpiek
-      - entity: sensor.boiler_peak_limit
-        name: Pieklimiet
-      - entity: sensor.boiler_peak_margin_w
-        name: Piekmarge HA
-      - entity: sensor.boiler_peak_headroom_wh
-        name: Piekruimte Wh
-      - entity: sensor.boiler_predicted_with_boiler_wh
-        name: Voorspeld met boiler
-      - entity: sensor.boiler_predicted_without_boiler_wh
-        name: Voorspeld zonder boiler
-      - entity: sensor.boiler_latest_safe_off_seconds
-        name: Laatste veilige stop
-      - entity: sensor.boiler_peak_decision
-        name: Piekbeslissing
-      - entity: sensor.shelly_boiler_peak_margin
-        name: Piekmarge Shelly
-      - entity: sensor.shelly_boiler_predicted_quarter_peak
-        name: Voorspelde piek Shelly
-
-  - type: entities
-    title: Shelly diagnose
-    show_header_toggle: false
-    entities:
-      - entity: binary_sensor.boiler_shelly_offline
-        name: Shelly offline
-      - entity: sensor.boiler_shelly_last_seen
-        name: Laatste heartbeat
-      - entity: binary_sensor.shelly_boiler_controller_online
-        name: Controller online
-      - entity: sensor.shelly_boiler_last_controller_update
-        name: Laatste controller update
-      - entity: sensor.shelly_boiler_last_controller_age
-        name: Leeftijd controllerbericht
-      - entity: binary_sensor.shelly_boiler_wifi_connected
-        name: Wifi verbonden
-      - entity: sensor.shelly_boiler_wifi_rssi
-        name: Wifi RSSI
-      - entity: binary_sensor.shelly_boiler_mqtt_connected
-        name: MQTT verbonden
-      - entity: sensor.shelly_boiler_ram_free
-        name: Vrij RAM
-      - entity: sensor.shelly_boiler_uptime
-        name: Uptime
-      - entity: sensor.shelly_boiler_starts_today
-        name: Starts vandaag
-      - entity: sensor.shelly_boiler_total_starts
-        name: Starts totaal
-      - entity: sensor.shelly_boiler_total_runtime
-        name: Runtime totaal
-      - entity: sensor.shelly_boiler_script_version
-        name: Script versie
-      - entity: sensor.shelly_boiler_firmware_version
-        name: Shelly firmware
-      - entity: sensor.shelly_boiler_firmware_boots
-        name: Firmware boots
-      - entity: sensor.shelly_boiler_watchdog_reboots
-        name: Watchdog reboots
-      - entity: sensor.shelly_boiler_watchdog_reason
-        name: Watchdog reden
-
-  - type: history-graph
-    title: Boiler debug historiek
-    hours_to_show: 2
-    entities:
-      - entity: binary_sensor.shelly_boiler_relay
-        name: Relais
-      - entity: binary_sensor.shelly_boiler_restart_delay_active
-        name: Restart delay
-      - entity: binary_sensor.shelly_boiler_stop_hold_active
-        name: Stop-hold
-      - entity: binary_sensor.shelly_boiler_warm_enough
-        name: Warm genoeg
-      - entity: binary_sensor.boiler_heating_allowed
-        name: HA allowed
-      - entity: binary_sensor.boiler_shelly_offline
-        name: Offline
+views:
+  - type: sections
+    max_columns: 4
+    title: Boiler
+    path: boiler
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading_style: title
+            heading: Debug
+          - type: vertical-stack
+            cards:
+              - type: history-graph
+                title: Boiler debug historiek
+                hours_to_show: 2
+                entities:
+                  - entity: binary_sensor.shelly_boiler_relay
+                    name: Relais
+                  - entity: binary_sensor.shelly_boiler_restart_delay_active
+                    name: Restart delay
+                  - entity: binary_sensor.shelly_boiler_stop_hold_active
+                    name: Stop-hold
+                  - entity: binary_sensor.shelly_boiler_warm_enough
+                    name: Warm genoeg
+                  - entity: binary_sensor.boiler_heating_allowed
+                    name: HA allowed
+                  - entity: binary_sensor.boiler_shelly_offline
+                    name: Offline
+              - type: entities
+                title: Boiler Controller
+                show_header_toggle: false
+                entities:
+                  - entity: sensor.shelly_boiler_state
+                    name: Shelly state
+                  - entity: binary_sensor.shelly_boiler_relay
+                    name: Relais
+                  - entity: binary_sensor.boiler_heating_allowed
+                    name: HA heating allowed
+                  - entity: binary_sensor.shelly_boiler_warm_enough
+                    name: Warm genoeg
+                  - entity: sensor.shelly_boiler_last_stop_reason
+                    name: Laatste stopreden
+                  - entity: sensor.boiler_reason_text
+                    name: HA reden
+                  - entity: sensor.boiler_controller_state
+                    name: HA controller state
+              - type: entities
+                title: Planning en beveiliging
+                show_header_toggle: false
+                entities:
+                  - entity: binary_sensor.boiler_superdal
+                    name: Superdal
+                  - entity: binary_sensor.boiler_nachtuur
+                    name: Nachtuur
+                  - entity: binary_sensor.shelly_boiler_restart_delay_active
+                    name: Restart delay actief
+                  - entity: sensor.shelly_boiler_restart_remaining
+                    name: Restart resterend
+                  - entity: binary_sensor.shelly_boiler_boot_delay_active
+                    name: Boot delay actief
+                  - entity: sensor.shelly_boiler_boot_delay_remaining
+                    name: Boot delay resterend
+                  - entity: binary_sensor.shelly_boiler_stop_hold_active
+                    name: Stop-hold actief
+                  - entity: sensor.shelly_boiler_stop_hold_remaining
+                    name: Stop-hold resterend
+              - type: entities
+                title: Energie
+                show_header_toggle: false
+                entities:
+                  - entity: sensor.boiler_house_power
+                    name: Huisverbruik
+                  - entity: sensor.boiler_power
+                    name: Boiler vermogen
+                  - entity: sensor.boiler_predicted_quarter_peak_w
+                    name: Voorspelde kwartierpiek
+                  - entity: sensor.boiler_peak_limit
+                    name: Pieklimiet
+                  - entity: sensor.boiler_peak_margin_w
+                    name: Piekmarge HA
+                  - entity: sensor.boiler_peak_headroom_wh
+                    name: Piekruimte Wh
+                  - entity: sensor.boiler_predicted_with_boiler_wh
+                    name: Voorspeld met boiler
+                  - entity: sensor.boiler_predicted_without_boiler_wh
+                    name: Voorspeld zonder boiler
+                  - entity: sensor.boiler_latest_safe_off_seconds
+                    name: Laatste veilige stop
+                  - entity: sensor.boiler_peak_decision
+                    name: Piekbeslissing
+                  - entity: sensor.shelly_boiler_peak_margin
+                    name: Piekmarge Shelly
+                  - entity: sensor.shelly_boiler_predicted_quarter_peak
+                    name: Voorspelde piek Shelly
+              - type: entities
+                title: Shelly diagnose
+                show_header_toggle: false
+                entities:
+                  - entity: binary_sensor.boiler_shelly_offline
+                    name: Shelly offline
+                  - entity: sensor.boiler_shelly_last_seen
+                    name: Laatste heartbeat
+                  - entity: binary_sensor.shelly_boiler_controller_online
+                    name: Controller online
+                  - entity: sensor.shelly_boiler_last_controller_update
+                    name: Laatste controller update
+                  - entity: sensor.shelly_boiler_last_controller_age
+                    name: Leeftijd controllerbericht
+                  - entity: binary_sensor.shelly_boiler_wifi_connected
+                    name: Wifi verbonden
+                  - entity: sensor.shelly_boiler_wifi_rssi
+                    name: Wifi RSSI
+                  - entity: binary_sensor.shelly_boiler_mqtt_connected
+                    name: MQTT verbonden
+                  - entity: sensor.shelly_boiler_ram_free
+                    name: Vrij RAM
+                  - entity: sensor.shelly_boiler_uptime
+                    name: Uptime
+                  - entity: sensor.shelly_boiler_starts_today
+                    name: Boiler Starts vandaag
+                  - entity: sensor.shelly_boiler_total_starts
+                    name: Boiler Starts totaal
+                  - entity: sensor.shelly_boiler_total_runtime
+                    name: Runtime totaal
+                  - entity: sensor.shelly_boiler_script_version
+                    name: Script versie
+                  - entity: sensor.shelly_boiler_firmware_version
+                    name: Shelly firmware
+                  - entity: sensor.shelly_boiler_firmware_boots
+                    name: Firmware boots
+                  - entity: sensor.shelly_boiler_watchdog_reboots
+                    name: Watchdog reboots
+                  - entity: sensor.shelly_boiler_watchdog_reason
+                    name: Watchdog reden
+      - type: grid
+        cards:
+          - type: heading
+            heading: Shelly
+            heading_style: title
+          - type: entities
+            entities:
+              - entity: switch.boiler_shelly
+              - entity: sensor.boiler_shelly_signaalsterkte
+              - entity: sensor.boiler_shelly_temperatuur
+              - entity: sensor.boiler_shelly_uptime
+              - entity: button.boiler_shelly_herstarten
+          - show_name: true
+            show_icon: true
+            type: button
+            name: Boiler Shelly
+            icon: mdi:water
+            tap_action:
+              action: url
+              url_path: http://10.0.250.93
+            icon_height: 50px
+            show_state: true
+      - type: grid
+        cards:
+          - type: heading
+            heading_style: title
+            heading: Instellingen
+          - type: vertical-stack
+            cards:
+              - type: entities
+                title: Boiler parameters
+                show_header_toggle: false
+                entities:
+                  - entity: input_number.boiler_power
+                    name: Boiler vermogen
+                  - entity: input_number.boiler_peak_limit
+                    name: Pieklimiet
+                  - entity: input_number.boiler_peak_safety_margin_wh
+                    name: Piek veiligheidsmarge
+                  - entity: input_number.boiler_peak_min_on_seconds
+                    name: Minimum aan-tijd piekstop
+              - type: entities
+                title: Boiler timers
+                show_header_toggle: false
+                entities:
+                  - entity: input_number.boiler_max_runtime
+                    name: Maximum runtime
+                  - entity: input_number.boiler_restart_delay
+                    name: Restart delay
+                  - entity: input_number.boiler_stop_hold
+                    name: Stop-hold
+              - type: entities
+                title: Boiler planning
+                show_header_toggle: false
+                entities:
+                  - entity: binary_sensor.boiler_heating_allowed
+                    name: Verwarmen toegestaan
+                  - entity: sensor.boiler_peak_decision
+                    name: Piekbeslissing
+    cards: []
+    header:
+      card:
+        type: markdown
+        text_only: true
+        content: BOILER ✨
+    icon: mdi:water-boiler
+  - type: sections
+    max_columns: 4
+    title: Pomp
+    path: pomp
+    sections:
+      - type: grid
+        cards:
+          - type: vertical-stack
+            cards:
+              - type: history-graph
+                title: Pump debug historiek
+                hours_to_show: 8
+                entities:
+                  - entity: binary_sensor.shelly_pump_relay
+                    name: Relais
+                  - entity: binary_sensor.pump_run_allowed
+                    name: HA allowed
+                  - entity: binary_sensor.pump_allowed_window
+                    name: Tariefvenster
+                  - entity: binary_sensor.pump_cycle_due
+                    name: Cyclus klaar
+                  - entity: binary_sensor.shelly_pump_restart_delay_active
+                    name: Restart delay
+                  - entity: binary_sensor.shelly_pump_stop_hold_active
+                    name: Stop-hold
+                  - entity: binary_sensor.pump_shelly_offline
+                    name: Offline
+              - type: entities
+                title: Pump Controller
+                show_header_toggle: false
+                entities:
+                  - entity: sensor.shelly_pump_state
+                    name: Shelly state
+                  - entity: binary_sensor.shelly_pump_relay
+                    name: Relais
+                  - entity: binary_sensor.pump_run_allowed
+                    name: HA run allowed
+                  - entity: binary_sensor.pump_allowed_window
+                    name: Tariefvenster toegestaan
+                  - entity: binary_sensor.pump_cycle_due
+                    name: Vieruurscyclus klaar
+                  - entity: sensor.shelly_pump_last_stop_reason
+                    name: Laatste stopreden
+                  - entity: sensor.pump_reason_text
+                    name: HA reden
+                  - entity: sensor.pump_controller_state
+                    name: HA controller state
+              - type: entities
+                title: Planning en timers
+                show_header_toggle: false
+                entities:
+                  - entity: binary_sensor.pump_piekdal
+                    name: Piekdal
+                  - entity: binary_sensor.pump_dal
+                    name: Dal
+                  - entity: sensor.pump_next_due
+                    name: Volgende cyclus
+                  - entity: sensor.shelly_pump_last_start
+                    name: Laatste start
+                  - entity: sensor.shelly_pump_last_stop
+                    name: Laatste stop
+                  - entity: sensor.shelly_pump_runtime
+                    name: Runtime huidig
+                  - entity: binary_sensor.shelly_pump_restart_delay_active
+                    name: Restart delay actief
+                  - entity: sensor.shelly_pump_restart_remaining
+                    name: Restart resterend
+                  - entity: binary_sensor.shelly_pump_boot_delay_active
+                    name: Boot delay actief
+                  - entity: sensor.shelly_pump_boot_delay_remaining
+                    name: Boot delay resterend
+                  - entity: binary_sensor.shelly_pump_stop_hold_active
+                    name: Stop-hold actief
+                  - entity: sensor.shelly_pump_stop_hold_remaining
+                    name: Stop-hold resterend
+              - type: entities
+                title: Shelly diagnose
+                show_header_toggle: false
+                entities:
+                  - entity: binary_sensor.pump_shelly_offline
+                    name: Shelly offline
+                  - entity: sensor.pump_shelly_last_seen
+                    name: Laatste heartbeat
+                  - entity: binary_sensor.shelly_pump_controller_online
+                    name: Controller online
+                  - entity: sensor.shelly_pump_last_controller_update
+                    name: Laatste controller update
+                  - entity: sensor.shelly_pump_last_controller_age
+                    name: Leeftijd controllerbericht
+                  - entity: binary_sensor.shelly_pump_wifi_connected
+                    name: Wifi verbonden
+                  - entity: sensor.shelly_pump_wifi_rssi
+                    name: Wifi RSSI
+                  - entity: binary_sensor.shelly_pump_mqtt_connected
+                    name: MQTT verbonden
+                  - entity: sensor.shelly_pump_ram_free
+                    name: Vrij RAM
+                  - entity: sensor.shelly_pump_uptime
+                    name: Uptime
+                  - entity: sensor.shelly_pump_starts_today
+                    name: Starts vandaag
+                  - entity: sensor.shelly_pump_total_starts
+                    name: Starts totaal
+                  - entity: sensor.shelly_pump_total_runtime
+                    name: Runtime totaal
+                  - entity: sensor.shelly_pump_script_version
+                    name: Script versie
+                  - entity: sensor.shelly_pump_firmware_version
+                    name: Shelly firmware
+                  - entity: sensor.shelly_pump_firmware_boots
+                    name: Firmware boots
+                  - entity: sensor.shelly_pump_watchdog_reboots
+                    name: Watchdog reboots
+                  - entity: sensor.shelly_pump_watchdog_reason
+                    name: Watchdog reden
+          - type: heading
+            heading: New section
+      - type: grid
+        cards:
+          - type: entities
+            entities:
+              - entity: switch.dompelpomp
+              - entity: sensor.dompelpomp_signaalsterkte
+              - entity: sensor.dompelpomp_temperatuur
+              - entity: sensor.dompelpomp_uptime
+              - entity: button.dompelpomp_herstarten
+              - entity: sensor.shelly_dompelpomp_energie_2
+              - entity: sensor.shelly_dompelpomp_energie_3
+              - entity: sensor.shelly_dompelpomp_vermogen_2
+              - entity: sensor.shelly_dompelpomp_vermogen_3
+          - show_name: true
+            show_icon: true
+            type: button
+            name: Dompelpomp Shelly
+            icon: mdi:water
+            tap_action:
+              action: url
+              url_path: http://10.0.250.83/
+            icon_height: 50px
+            show_state: true
+      - type: grid
+        cards:
+          - type: heading
+            heading: New section
+          - type: vertical-stack
+            cards:
+              - type: entities
+                title: Pump parameters
+                show_header_toggle: false
+                entities:
+                  - entity: input_number.pump_cycle_interval_hours
+                    name: Cyclusinterval
+                  - entity: input_number.pump_max_runtime
+                    name: Maximum runtime
+                  - entity: input_number.pump_restart_delay
+                    name: Restart delay
+                  - entity: input_number.pump_stop_hold
+                    name: Stop-hold
+              - type: entities
+                title: Pump tariefvensters
+                show_header_toggle: false
+                entities:
+                  - entity: input_datetime.pump_peakdal_start
+                    name: Piekdal start
+                  - entity: input_datetime.pump_peakdal_end
+                    name: Piekdal einde
+                  - entity: input_datetime.pump_dal_start
+                    name: Dal start
+                  - entity: input_datetime.pump_dal_end
+                    name: Dal einde
+              - type: entities
+                title: Pump planning
+                show_header_toggle: false
+                entities:
+                  - entity: binary_sensor.pump_piekdal
+                    name: Piekdal actief
+                  - entity: binary_sensor.pump_dal
+                    name: Dal actief
+                  - entity: binary_sensor.pump_allowed_window
+                    name: Tariefvenster toegestaan
+                  - entity: binary_sensor.pump_cycle_due
+                    name: Vieruurscyclus klaar
+                  - entity: binary_sensor.pump_run_allowed
+                    name: Pomp toegestaan
+                  - entity: sensor.pump_next_due
+                    name: Volgende cyclus
+                  - entity: sensor.pump_reason_text
+                    name: Reden
+    icon: mdi:pump
+    cards: []
+    header:
+      card:
+        type: markdown
+        text_only: true
+        content: KELDER POMP ✨
