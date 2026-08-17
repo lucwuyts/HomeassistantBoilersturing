@@ -10,7 +10,7 @@
 const FIRMWARE =
 {
     NAME        : "Boiler Controller",
-    VERSION     : "2026.07.21-01",
+    VERSION     : "2026.08.17-01",
     API         : 1
 };
 
@@ -736,7 +736,7 @@ function mqttPublish(topic, object)
         topic,
         JSON.stringify(object),
         1,
-        true
+        false
     );
 }
 

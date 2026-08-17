@@ -152,7 +152,7 @@ function mqttPublish(topic, object)
         topic,
         JSON.stringify(object),
         1,
-        true
+        false
     );
 }
 

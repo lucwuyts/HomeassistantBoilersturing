@@ -37,7 +37,7 @@ Als de WhatsApp alert niet gebruikt wordt, verwijder of vervang dan de twee acti
 | Topic | Richting | Retained |
 | ----- | -------- | -------- |
 | `boiler/v1/controller` | Home Assistant naar Shelly | ja voor configuratie |
-| `boiler/v1/status` | Shelly naar Home Assistant | ja |
+| `boiler/v1/status` | Shelly naar Home Assistant | nee |
 
 De MQTT broker draait extern. Home Assistant en Shelly moeten allebei met dezelfde broker verbonden zijn.
 
@@ -75,7 +75,8 @@ Controleer in Home Assistant:
 Controleer op MQTT:
 
 - `boiler/v1/controller` bevat het laatste retained controllerbericht van Home Assistant.
-- `boiler/v1/status` bevat het laatste retained heartbeat/statusbericht van Shelly.
+- `boiler/v1/status` krijgt elke minuut een nieuw niet-retained heartbeat/statusbericht van Shelly.
+- Er staat geen retained bericht meer op `boiler/v1/status`. Wis een oud retained statusbericht eenmalig op de broker als MQTT Explorer nog `RETAINED` toont.
 
 ## Release checklist
 

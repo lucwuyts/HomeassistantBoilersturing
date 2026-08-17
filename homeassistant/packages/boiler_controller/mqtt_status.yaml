@@ -5,12 +5,14 @@ mqtt:
     - name: Shelly Boiler State
       unique_id: shelly_boiler_state
       state_topic: boiler/v1/status
+      expire_after: 360
       value_template: >
         {{ value_json.boiler.status.state | default('unknown') }}
 
     - name: Boiler Shelly Last Seen
       unique_id: boiler_shelly_last_seen
       state_topic: boiler/v1/status
+      expire_after: 360
       device_class: timestamp
       value_template: >
         {{ value_json.timestamp | default(value_json.boiler.status.last_update) | default('') }}
@@ -18,6 +20,7 @@ mqtt:
     - name: Shelly Boiler Uptime
       unique_id: shelly_boiler_uptime
       state_topic: boiler/v1/status
+      expire_after: 360
       unit_of_measurement: s
       state_class: measurement
       value_template: >
@@ -26,6 +29,7 @@ mqtt:
     - name: Shelly Boiler WiFi RSSI
       unique_id: shelly_boiler_wifi_rssi
       state_topic: boiler/v1/status
+      expire_after: 360
       unit_of_measurement: dBm
       device_class: signal_strength
       state_class: measurement
@@ -35,6 +39,7 @@ mqtt:
     - name: Shelly Boiler RAM Free
       unique_id: shelly_boiler_ram_free
       state_topic: boiler/v1/status
+      expire_after: 360
       unit_of_measurement: B
       device_class: data_size
       state_class: measurement
@@ -44,24 +49,28 @@ mqtt:
     - name: Shelly Boiler Firmware Version
       unique_id: shelly_boiler_firmware_version
       state_topic: boiler/v1/status
+      expire_after: 360
       value_template: >
         {{ value_json.boiler.status.firmware_version | default('') }}
 
     - name: Shelly Boiler Script Version
       unique_id: shelly_boiler_script_version
       state_topic: boiler/v1/status
+      expire_after: 360
       value_template: >
         {{ value_json.boiler.status.script_version | default(value_json.firmware) | default('') }}
 
     - name: Shelly Boiler Last MQTT Seen
       unique_id: shelly_boiler_last_mqtt_seen
       state_topic: boiler/v1/status
+      expire_after: 360
       value_template: >
         {{ value_json.boiler.status.last_mqtt_seen | default('') }}
 
     - name: Shelly Boiler Last Controller Age
       unique_id: shelly_boiler_last_controller_age
       state_topic: boiler/v1/status
+      expire_after: 360
       unit_of_measurement: s
       state_class: measurement
       value_template: >
@@ -70,6 +79,7 @@ mqtt:
     - name: Shelly Boiler Watchdog Reboots
       unique_id: shelly_boiler_watchdog_reboots
       state_topic: boiler/v1/status
+      expire_after: 360
       state_class: total_increasing
       value_template: >
         {{ value_json.boiler.status.watchdog_reboots | default(0) }}
@@ -77,12 +87,14 @@ mqtt:
     - name: Shelly Boiler Watchdog Reason
       unique_id: shelly_boiler_watchdog_reason
       state_topic: boiler/v1/status
+      expire_after: 360
       value_template: >
         {{ value_json.boiler.status.watchdog_reason | default('') }}
 
     - name: Shelly Boiler Firmware Boots
       unique_id: shelly_boiler_firmware_boots
       state_topic: boiler/v1/status
+      expire_after: 360
       state_class: total_increasing
       value_template: >
         {{ value_json.boiler.status.firmware_boots | default(0) }}
@@ -90,6 +102,7 @@ mqtt:
     - name: Shelly Boiler Runtime
       unique_id: shelly_boiler_runtime
       state_topic: boiler/v1/status
+      expire_after: 360
       unit_of_measurement: s
       state_class: measurement
       value_template: >
@@ -98,6 +111,7 @@ mqtt:
     - name: Shelly Boiler Restart Remaining
       unique_id: shelly_boiler_restart_remaining
       state_topic: boiler/v1/status
+      expire_after: 360
       unit_of_measurement: s
       state_class: measurement
       value_template: >
@@ -106,6 +120,7 @@ mqtt:
     - name: Shelly Boiler Boot Delay Remaining
       unique_id: shelly_boiler_boot_delay_remaining
       state_topic: boiler/v1/status
+      expire_after: 360
       unit_of_measurement: s
       state_class: measurement
       value_template: >
@@ -114,6 +129,7 @@ mqtt:
     - name: Shelly Boiler Stop Hold Remaining
       unique_id: shelly_boiler_stop_hold_remaining
       state_topic: boiler/v1/status
+      expire_after: 360
       unit_of_measurement: s
       state_class: measurement
       value_template: >
@@ -122,18 +138,21 @@ mqtt:
     - name: Shelly Boiler Last Stop Reason
       unique_id: shelly_boiler_last_stop_reason
       state_topic: boiler/v1/status
+      expire_after: 360
       value_template: >
         {{ value_json.boiler.status.last_stop_reason | default('') }}
 
     - name: Shelly Boiler Last Controller Update
       unique_id: shelly_boiler_last_controller_update
       state_topic: boiler/v1/status
+      expire_after: 360
       value_template: >
         {{ value_json.boiler.status.last_controller_update | default('') }}
 
     - name: Shelly Boiler Controller Timeout
       unique_id: shelly_boiler_controller_timeout
       state_topic: boiler/v1/status
+      expire_after: 360
       unit_of_measurement: s
       state_class: measurement
       value_template: >
@@ -142,12 +161,14 @@ mqtt:
     - name: Shelly Boiler Warm Enough Since
       unique_id: shelly_boiler_warm_enough_since
       state_topic: boiler/v1/status
+      expire_after: 360
       value_template: >
         {{ value_json.boiler.status.warm_enough_since | default('') }}
 
     - name: Shelly Boiler Warmup Min Runtime
       unique_id: shelly_boiler_warmup_min_runtime
       state_topic: boiler/v1/status
+      expire_after: 360
       unit_of_measurement: s
       state_class: measurement
       value_template: >
@@ -156,6 +177,7 @@ mqtt:
     - name: Shelly Boiler Starts Today
       unique_id: shelly_boiler_starts_today
       state_topic: boiler/v1/status
+      expire_after: 360
       state_class: total
       value_template: >
         {{ value_json.boiler.status.starts_today | default(0) }}
@@ -163,6 +185,7 @@ mqtt:
     - name: Shelly Boiler Total Starts
       unique_id: shelly_boiler_total_starts
       state_topic: boiler/v1/status
+      expire_after: 360
       state_class: total_increasing
       value_template: >
         {{ value_json.boiler.status.total_starts | default(0) }}
@@ -170,6 +193,7 @@ mqtt:
     - name: Shelly Boiler Total Runtime
       unique_id: shelly_boiler_total_runtime
       state_topic: boiler/v1/status
+      expire_after: 360
       unit_of_measurement: s
       state_class: total_increasing
       value_template: >
@@ -178,6 +202,7 @@ mqtt:
     - name: Shelly Boiler Peak Margin
       unique_id: shelly_boiler_peak_margin
       state_topic: boiler/v1/status
+      expire_after: 360
       unit_of_measurement: W
       device_class: power
       state_class: measurement
@@ -187,6 +212,7 @@ mqtt:
     - name: Shelly Boiler Predicted Quarter Peak
       unique_id: shelly_boiler_predicted_quarter_peak
       state_topic: boiler/v1/status
+      expire_after: 360
       unit_of_measurement: W
       device_class: power
       state_class: measurement
@@ -198,6 +224,7 @@ mqtt:
     - name: Shelly Boiler Relay
       unique_id: shelly_boiler_relay
       state_topic: boiler/v1/status
+      expire_after: 360
       payload_on: 'true'
       payload_off: 'false'
       value_template: >
@@ -206,6 +233,7 @@ mqtt:
     - name: Shelly Boiler Restart Delay Active
       unique_id: shelly_boiler_restart_delay_active
       state_topic: boiler/v1/status
+      expire_after: 360
       payload_on: 'true'
       payload_off: 'false'
       value_template: >
@@ -214,6 +242,7 @@ mqtt:
     - name: Shelly Boiler Boot Delay Active
       unique_id: shelly_boiler_boot_delay_active
       state_topic: boiler/v1/status
+      expire_after: 360
       payload_on: 'true'
       payload_off: 'false'
       value_template: >
@@ -222,6 +251,7 @@ mqtt:
     - name: Shelly Boiler Stop Hold Active
       unique_id: shelly_boiler_stop_hold_active
       state_topic: boiler/v1/status
+      expire_after: 360
       payload_on: 'true'
       payload_off: 'false'
       value_template: >
@@ -230,6 +260,7 @@ mqtt:
     - name: Shelly Boiler Watchdog
       unique_id: shelly_boiler_watchdog
       state_topic: boiler/v1/status
+      expire_after: 360
       payload_on: 'true'
       payload_off: 'false'
       value_template: >
@@ -238,6 +269,7 @@ mqtt:
     - name: Shelly Boiler WiFi Connected
       unique_id: shelly_boiler_wifi_connected
       state_topic: boiler/v1/status
+      expire_after: 360
       payload_on: 'true'
       payload_off: 'false'
       value_template: >
@@ -246,6 +278,7 @@ mqtt:
     - name: Shelly Boiler MQTT Connected
       unique_id: shelly_boiler_mqtt_connected
       state_topic: boiler/v1/status
+      expire_after: 360
       payload_on: 'true'
       payload_off: 'false'
       value_template: >
@@ -254,6 +287,7 @@ mqtt:
     - name: Shelly Boiler Controller Online
       unique_id: shelly_boiler_controller_online
       state_topic: boiler/v1/status
+      expire_after: 360
       payload_on: 'true'
       payload_off: 'false'
       value_template: >
@@ -262,6 +296,7 @@ mqtt:
     - name: Shelly Boiler Warm Enough
       unique_id: shelly_boiler_warm_enough
       state_topic: boiler/v1/status
+      expire_after: 360
       payload_on: 'true'
       payload_off: 'false'
       value_template: >

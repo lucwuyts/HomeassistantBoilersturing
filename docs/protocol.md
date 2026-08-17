@@ -131,7 +131,8 @@ De exacte beslissing blijft in de Shelly-firmware. Home Assistant stuurt geen re
 
 ## Statusbericht
 
-Shelly publiceert retained met QoS 1 naar `boiler/v1/status`.
+Shelly publiceert niet-retained met QoS 1 naar `boiler/v1/status`.
+Home Assistant laat de MQTT statusentities verlopen wanneer er langer dan 360 seconden geen nieuw statusbericht binnenkomt.
 
 Voorbeeld:
 
