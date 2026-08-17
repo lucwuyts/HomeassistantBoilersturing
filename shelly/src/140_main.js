@@ -36,13 +36,19 @@ function main()
     Timer.set(
         CONFIG.WATCHDOG_INTERVAL,
         true,
-        heartbeatTask
+        function()
+        {
+            safeCall("heartbeatTask", heartbeatTask);
+        }
     );
 
     Timer.set(
         CONFIG.RUNTIME_INTERVAL,
         true,
-        systemTimerTask
+        function()
+        {
+            safeCall("systemTimerTask", systemTimerTask);
+        }
     );
 
     setState(STATE.IDLE);
@@ -52,4 +58,4 @@ function main()
 
 //-----------------------------------------------------------------------------
 
-main();
+safeCall("main", main);

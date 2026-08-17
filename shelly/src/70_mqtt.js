@@ -138,7 +138,10 @@ function mqttInit()
 
     MQTT.subscribe(
         TOPIC.CONTROLLER,
-        processControllerMessage
+        safeCallback(
+            "processControllerMessage",
+            processControllerMessage
+        )
     );
 
     logInfo("Subscribed to " + TOPIC.CONTROLLER);

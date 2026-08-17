@@ -31,6 +31,18 @@ function copyPersistentToStatus()
 
     boiler.status.last_watchdog_reboot =
         persistent.last_watchdog_reboot || 0;
+
+    boiler.status.script_error_count =
+        persistent.script_error_count || 0;
+
+    boiler.status.last_script_error =
+        persistent.last_script_error || "";
+
+    boiler.status.last_script_error_context =
+        persistent.last_script_error_context || "";
+
+    boiler.status.last_script_error_time =
+        persistent.last_script_error_time || "";
 }
 
 //-----------------------------------------------------------------------------
@@ -57,6 +69,18 @@ function copyStatusToPersistent()
 
     persistent.last_watchdog_reboot =
         boiler.status.last_watchdog_reboot;
+
+    persistent.script_error_count =
+        boiler.status.script_error_count;
+
+    persistent.last_script_error =
+        boiler.status.last_script_error;
+
+    persistent.last_script_error_context =
+        boiler.status.last_script_error_context;
+
+    persistent.last_script_error_time =
+        boiler.status.last_script_error_time;
 }
 
 //-----------------------------------------------------------------------------
@@ -178,7 +202,15 @@ function loadPersistentData()
 
             watchdog_reason : "",
 
-            last_watchdog_reboot : 0
+            last_watchdog_reboot : 0,
+
+            script_error_count : 0,
+
+            last_script_error : "",
+
+            last_script_error_context : "",
+
+            last_script_error_time : ""
         };
 
         savePersistentData();

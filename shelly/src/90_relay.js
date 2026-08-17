@@ -50,29 +50,32 @@ function syncRelayState()
         {
             id : CONFIG.RELAY_ID
         },
-        function(result, error_code, error_message)
-        {
-            relaySyncInProgress = false;
-
-            if (error_code !== 0)
+        safeCallback(
+            "Switch.Get",
+            function(result, error_code, error_message)
             {
-                logError("Relay state read failed: " + error_message);
+                relaySyncInProgress = false;
 
-                return;
+                if (error_code !== 0)
+                {
+                    logError("Relay state read failed: " + error_message);
+
+                    return;
+                }
+
+                if (!result || typeof result.output !== "boolean")
+                {
+                    logError("Relay state read returned invalid data");
+
+                    return;
+                }
+
+                if (applyRelayState(result.output, "switch"))
+                {
+                    evaluateController();
+                }
             }
-
-            if (!result || typeof result.output !== "boolean")
-            {
-                logError("Relay state read returned invalid data");
-
-                return;
-            }
-
-            if (applyRelayState(result.output, "switch"))
-            {
-                evaluateController();
-            }
-        }
+        )
     );
 }
 
@@ -86,21 +89,24 @@ function setRelay(on)
             id : CONFIG.RELAY_ID,
             on : on
         },
-        function(result, error_code, error_message)
-        {
-            if (error_code !== 0)
+        safeCallback(
+            "Switch.Set",
+            function(result, error_code, error_message)
             {
-                logError("Relay switch failed: " + error_message);
+                if (error_code !== 0)
+                {
+                    logError("Relay switch failed: " + error_message);
 
-                publishStatus();
+                    publishStatus();
 
-                return;
+                    return;
+                }
+
+                applyRelayState(on, "controller");
+
+                logInfo("Relay switched " + (on ? "ON" : "OFF"));
             }
-
-            applyRelayState(on, "controller");
-
-            logInfo("Relay switched " + (on ? "ON" : "OFF"));
-        }
+        )
     );
 }
 

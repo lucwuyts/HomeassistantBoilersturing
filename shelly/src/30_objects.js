@@ -81,6 +81,14 @@ let boiler =
 
         last_watchdog_reboot   : 0,
 
+        script_error_count     : 0,
+
+        last_script_error      : "",
+
+        last_script_error_context : "",
+
+        last_script_error_time : "",
+
         watchdog_problem_since : 0,
 
         uptime                 : 0,
@@ -163,5 +171,13 @@ let persistent =
 
     watchdog_reason : "",
 
-    last_watchdog_reboot : 0
+    last_watchdog_reboot : 0,
+
+    script_error_count : 0,
+
+    last_script_error : "",
+
+    last_script_error_context : "",
+
+    last_script_error_time : ""
 };

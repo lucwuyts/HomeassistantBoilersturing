@@ -223,41 +223,47 @@ function watchdogTask()
     Shelly.call(
         "Shelly.GetStatus",
         {},
-        function(result, error_code, error_message)
-        {
-            if (error_code !== 0)
+        safeCallback(
+            "Shelly.GetStatus",
+            function(result, error_code, error_message)
             {
-                handleWatchdogReason(
-                    "diagnostics failed: " + error_message
-                );
-
-                publishStatus();
-
-                return;
-            }
-
-            updateDiagnostics(result);
-
-            Shelly.call(
-                "Shelly.GetDeviceInfo",
-                {},
-                function(info, info_error_code, info_error_message)
+                if (error_code !== 0)
                 {
-                    if (info_error_code === 0)
-                    {
-                        updateDeviceInfo(info);
-                    }
-                    else
-                    {
-                        logWarning(
-                            "Device info failed: " +
-                            info_error_message
-                        );
-                    }
+                    handleWatchdogReason(
+                        "diagnostics failed: " + error_message
+                    );
 
-                    publishWatchdogStatus();
+                    publishStatus();
+
+                    return;
                 }
-            );
-        }
+
+                updateDiagnostics(result);
+
+                Shelly.call(
+                    "Shelly.GetDeviceInfo",
+                    {},
+                    safeCallback(
+                        "Shelly.GetDeviceInfo",
+                        function(info, info_error_code, info_error_message)
+                        {
+                            if (info_error_code === 0)
+                            {
+                                updateDeviceInfo(info);
+                            }
+                            else
+                            {
+                                logWarning(
+                                    "Device info failed: " +
+                                    info_error_message
+                                );
+                            }
+
+                            publishWatchdogStatus();
+                        }
+                    )
+                );
+            }
+        )
     );
 }
