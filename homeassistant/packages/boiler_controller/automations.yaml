@@ -98,7 +98,7 @@ automation:
         metadata: {}
         data:
           text: >
-            Shelly - geen antwoord meer sedert
+            Shelly boilercontroller - geen antwoord meer sedert
             {{ states('sensor.boiler_shelly_last_seen') }}
 
       - service: persistent_notification.create
