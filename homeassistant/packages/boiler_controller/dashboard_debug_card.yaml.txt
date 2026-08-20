@@ -133,6 +133,14 @@ views:
                     name: Watchdog reboots
                   - entity: sensor.shelly_boiler_watchdog_reason
                     name: Watchdog reden
+                  - entity: sensor.shelly_boiler_script_error_count
+                    name: Script fouten
+                  - entity: sensor.shelly_boiler_last_script_error_context
+                    name: Laatste scriptfout context
+                  - entity: sensor.shelly_boiler_last_script_error
+                    name: Laatste scriptfout
+                  - entity: sensor.shelly_boiler_last_script_error_time
+                    name: Laatste scriptfout tijd
       - type: grid
         cards:
           - type: heading

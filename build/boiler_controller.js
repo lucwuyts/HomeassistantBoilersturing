@@ -10,7 +10,7 @@
 const FIRMWARE =
 {
     NAME        : "Boiler Controller",
-    VERSION     : "2026.08.17-01",
+    VERSION     : "2026.08.20-01",
     API         : 1
 };
 
@@ -33,6 +33,8 @@ const CONFIG =
     WATCHDOG_REBOOT_GAP   : 3600000,
     BOOT_DELAY            : 30,
     STOP_HOLD             : 300,
+    SCRIPT_ERROR_REBOOT_LIMIT : 5,
+    SCRIPT_ERROR_MAX_LENGTH   : 120,
     RELAY_ID              : 0,
     WARMUP_MIN_RUNTIME    : 300,
     DEFAULT_MAX_RUNTIME   : 10800,
@@ -168,6 +170,14 @@ let boiler =
 
         last_watchdog_reboot   : 0,
 
+        script_error_count     : 0,
+
+        last_script_error      : "",
+
+        last_script_error_context : "",
+
+        last_script_error_time : "",
+
         watchdog_problem_since : 0,
 
         uptime                 : 0,
@@ -250,7 +260,15 @@ let persistent =
 
     watchdog_reason : "",
 
-    last_watchdog_reboot : 0
+    last_watchdog_reboot : 0,
+
+    script_error_count : 0,
+
+    last_script_error : "",
+
+    last_script_error_context : "",
+
+    last_script_error_time : ""
 };
 
 /******************************************************************************
@@ -376,6 +394,122 @@ function dateKey()
     );
 }
 
+//-----------------------------------------------------------------------------
+
+let scriptErrorHandling = false;
+
+//-----------------------------------------------------------------------------
+
+function errorToText(error)
+{
+    let text = "";
+
+    if (error && error.message)
+    {
+        text = "" + error.message;
+    }
+    else
+    {
+        text = "" + error;
+    }
+
+    if (text.length > CONFIG.SCRIPT_ERROR_MAX_LENGTH)
+    {
+        return text.substr(0, CONFIG.SCRIPT_ERROR_MAX_LENGTH);
+    }
+
+    return text;
+}
+
+//-----------------------------------------------------------------------------
+
+function recordScriptError(context, error)
+{
+    if (scriptErrorHandling)
+    {
+        logError("Nested script error in " + context + ": " + errorToText(error));
+
+        return;
+    }
+
+    scriptErrorHandling = true;
+
+    try
+    {
+        boiler.status.script_error_count++;
+
+        boiler.status.last_script_error = errorToText(error);
+
+        boiler.status.last_script_error_context = context;
+
+        boiler.status.last_script_error_time = isoTimestamp();
+
+        boiler.status.watchdog_reason = "script error: " + context;
+
+        logError(
+            "Script error in " +
+            context +
+            ": " +
+            boiler.status.last_script_error
+        );
+
+        savePersistentData();
+
+        try
+        {
+            publishStatus();
+        }
+        catch(publishError)
+        {
+            logError(
+                "Status publish after script error failed: " +
+                errorToText(publishError)
+            );
+        }
+
+        if (boiler.status.script_error_count >=
+            CONFIG.SCRIPT_ERROR_REBOOT_LIMIT &&
+            canWatchdogReboot())
+        {
+            performWatchdogReboot("script error: " + context);
+        }
+    }
+    finally
+    {
+        scriptErrorHandling = false;
+    }
+}
+
+//-----------------------------------------------------------------------------
+
+function safeCall(context, callback)
+{
+    try
+    {
+        callback();
+    }
+    catch(error)
+    {
+        recordScriptError(context, error);
+    }
+}
+
+//-----------------------------------------------------------------------------
+
+function safeCallback(context, callback)
+{
+    return function(a, b, c)
+    {
+        safeCall(
+            context,
+            function()
+            {
+                callback(a, b, c);
+            }
+        );
+    };
+}
+
 /******************************************************************************
  *
  * Boiler Controller Firmware (BCF)
@@ -409,6 +543,18 @@ function copyPersistentToStatus()
 
     boiler.status.last_watchdog_reboot =
         persistent.last_watchdog_reboot || 0;
+
+    boiler.status.script_error_count =
+        persistent.script_error_count || 0;
+
+    boiler.status.last_script_error =
+        persistent.last_script_error || "";
+
+    boiler.status.last_script_error_context =
+        persistent.last_script_error_context || "";
+
+    boiler.status.last_script_error_time =
+        persistent.last_script_error_time || "";
 }
 
 //-----------------------------------------------------------------------------
@@ -435,6 +581,18 @@ function copyStatusToPersistent()
 
     persistent.last_watchdog_reboot =
         boiler.status.last_watchdog_reboot;
+
+    persistent.script_error_count =
+        boiler.status.script_error_count;
+
+    persistent.last_script_error =
+        boiler.status.last_script_error;
+
+    persistent.last_script_error_context =
+        boiler.status.last_script_error_context;
+
+    persistent.last_script_error_time =
+        boiler.status.last_script_error_time;
 }
 
 //-----------------------------------------------------------------------------
@@ -556,7 +714,15 @@ function loadPersistentData()
 
             watchdog_reason : "",
 
-            last_watchdog_reboot : 0
+            last_watchdog_reboot : 0,
+
+            script_error_count : 0,
+
+            last_script_error : "",
+
+            last_script_error_context : "",
+
+            last_script_error_time : ""
         };
 
         savePersistentData();
@@ -722,7 +888,10 @@ function mqttInit()
 
     MQTT.subscribe(
         TOPIC.CONTROLLER,
-        processControllerMessage
+        safeCallback(
+            "processControllerMessage",
+            processControllerMessage
+        )
     );
 
     logInfo("Subscribed to " + TOPIC.CONTROLLER);
@@ -818,6 +987,12 @@ function updateLastStopReason(reason)
 
 let relaySyncInProgress = false;
 
+let relayCommandInProgress = false;
+
+let relayCommandTarget = null;
+
+let relayPendingTarget = null;
+
 //-----------------------------------------------------------------------------
 
 function applyRelayState(on, source)
@@ -847,77 +1022,138 @@ function applyRelayState(on, source)
 
 function syncRelayState()
 {
-    if (relaySyncInProgress)
+    if (relaySyncInProgress || relayCommandInProgress)
     {
         return;
     }
 
     relaySyncInProgress = true;
 
-    Shelly.call(
-        "Switch.Get",
-        {
-            id : CONFIG.RELAY_ID
-        },
-        function(result, error_code, error_message)
-        {
-            relaySyncInProgress = false;
-
-            if (error_code !== 0)
+    try
+    {
+        Shelly.call(
+            "Switch.Get",
             {
-                logError("Relay state read failed: " + error_message);
+                id : CONFIG.RELAY_ID
+            },
+            safeCallback(
+                "Switch.Get",
+                function(result, error_code, error_message)
+                {
+                    relaySyncInProgress = false;
 
-                return;
-            }
+                    if (error_code !== 0)
+                    {
+                        logError("Relay state read failed: " + error_message);
 
-            if (!result || typeof result.output !== "boolean")
-            {
-                logError("Relay state read returned invalid data");
+                        return;
+                    }
 
-                return;
-            }
+                    if (!result || typeof result.output !== "boolean")
+                    {
+                        logError("Relay state read returned invalid data");
 
-            if (applyRelayState(result.output, "switch"))
-            {
-                evaluateController();
-            }
-        }
-    );
+                        return;
+                    }
+
+                    if (applyRelayState(result.output, "switch"))
+                    {
+                        evaluateController();
+                    }
+                }
+            )
+        );
+    }
+    catch(error)
+    {
+        relaySyncInProgress = false;
+
+        recordScriptError("Switch.Get call", error);
+    }
 }
 
 //-----------------------------------------------------------------------------
 
 function setRelay(on)
 {
-    Shelly.call(
-        "Switch.Set",
+    if (relayCommandInProgress)
+    {
+        if (relayCommandTarget === on || relayPendingTarget === on)
         {
-            id : CONFIG.RELAY_ID,
-            on : on
-        },
-        function(result, error_code, error_message)
-        {
-            if (error_code !== 0)
-            {
-                logError("Relay switch failed: " + error_message);
-
-                publishStatus();
-
-                return;
-            }
-
-            applyRelayState(on, "controller");
-
-            logInfo("Relay switched " + (on ? "ON" : "OFF"));
+            return;
         }
-    );
+
+        relayPendingTarget = on;
+
+        logInfo("Relay switch " + (on ? "ON" : "OFF") + " queued");
+
+        return;
+    }
+
+    relayCommandInProgress = true;
+
+    relayCommandTarget = on;
+
+    try
+    {
+        Shelly.call(
+            "Switch.Set",
+            {
+                id : CONFIG.RELAY_ID,
+                on : on
+            },
+            safeCallback(
+                "Switch.Set",
+                function(result, error_code, error_message)
+                {
+                    let pending = relayPendingTarget;
+
+                    relayCommandInProgress = false;
+
+                    relayCommandTarget = null;
+
+                    relayPendingTarget = null;
+
+                    if (error_code !== 0)
+                    {
+                        logError("Relay switch failed: " + error_message);
+
+                        publishStatus();
+                    }
+                    else
+                    {
+                        applyRelayState(on, "controller");
+
+                        logInfo("Relay switched " + (on ? "ON" : "OFF"));
+                    }
+
+                    if (pending !== null && pending !== boiler.status.relay)
+                    {
+                        setRelay(pending);
+                    }
+                }
+            )
+        );
+    }
+    catch(error)
+    {
+        relayCommandInProgress = false;
+
+        relayCommandTarget = null;
+
+        relayPendingTarget = null;
+
+        recordScriptError("Switch.Set call", error);
+    }
 }
 
 //-----------------------------------------------------------------------------
 
 function relayOn()
 {
-    if (boiler.status.relay)
+    if (boiler.status.relay ||
+        relayCommandTarget === true ||
+        relayPendingTarget === true)
     {
         return;
     }
@@ -931,7 +1167,9 @@ function relayOn()
 
 function relayOff()
 {
-    if (!boiler.status.relay)
+    if ((!boiler.status.relay && relayCommandTarget !== true) ||
+        relayCommandTarget === false ||
+        relayPendingTarget === false)
     {
         return;
     }
@@ -1645,42 +1883,48 @@ function watchdogTask()
     Shelly.call(
         "Shelly.GetStatus",
         {},
-        function(result, error_code, error_message)
-        {
-            if (error_code !== 0)
+        safeCallback(
+            "Shelly.GetStatus",
+            function(result, error_code, error_message)
             {
-                handleWatchdogReason(
-                    "diagnostics failed: " + error_message
-                );
-
-                publishStatus();
-
-                return;
-            }
-
-            updateDiagnostics(result);
-
-            Shelly.call(
-                "Shelly.GetDeviceInfo",
-                {},
-                function(info, info_error_code, info_error_message)
+                if (error_code !== 0)
                 {
-                    if (info_error_code === 0)
-                    {
-                        updateDeviceInfo(info);
-                    }
-                    else
-                    {
-                        logWarning(
-                            "Device info failed: " +
-                            info_error_message
-                        );
-                    }
+                    handleWatchdogReason(
+                        "diagnostics failed: " + error_message
+                    );
 
-                    publishWatchdogStatus();
+                    publishStatus();
+
+                    return;
                 }
-            );
-        }
+
+                updateDiagnostics(result);
+
+                Shelly.call(
+                    "Shelly.GetDeviceInfo",
+                    {},
+                    safeCallback(
+                        "Shelly.GetDeviceInfo",
+                        function(info, info_error_code, info_error_message)
+                        {
+                            if (info_error_code === 0)
+                            {
+                                updateDeviceInfo(info);
+                            }
+                            else
+                            {
+                                logWarning(
+                                    "Device info failed: " +
+                                    info_error_message
+                                );
+                            }
+
+                            publishWatchdogStatus();
+                        }
+                    )
+                );
+            }
+        )
     );
 }
 
@@ -1736,13 +1980,19 @@ function main()
     Timer.set(
         CONFIG.WATCHDOG_INTERVAL,
         true,
-        heartbeatTask
+        function()
+        {
+            safeCall("heartbeatTask", heartbeatTask);
+        }
     );
 
     Timer.set(
         CONFIG.RUNTIME_INTERVAL,
         true,
-        systemTimerTask
+        function()
+        {
+            safeCall("systemTimerTask", systemTimerTask);
+        }
     );
 
     setState(STATE.IDLE);
@@ -1752,4 +2002,4 @@ function main()
 
 //-----------------------------------------------------------------------------
 
-main();
+safeCall("main", main);

@@ -9,6 +9,12 @@
 
 let relaySyncInProgress = false;
 
+let relayCommandInProgress = false;
+
+let relayCommandTarget = null;
+
+let relayPendingTarget = null;
+
 //-----------------------------------------------------------------------------
 
 function applyRelayState(on, source)
@@ -38,83 +44,138 @@ function applyRelayState(on, source)
 
 function syncRelayState()
 {
-    if (relaySyncInProgress)
+    if (relaySyncInProgress || relayCommandInProgress)
     {
         return;
     }
 
     relaySyncInProgress = true;
 
-    Shelly.call(
-        "Switch.Get",
-        {
-            id : CONFIG.RELAY_ID
-        },
-        safeCallback(
+    try
+    {
+        Shelly.call(
             "Switch.Get",
-            function(result, error_code, error_message)
             {
-                relaySyncInProgress = false;
-
-                if (error_code !== 0)
+                id : CONFIG.RELAY_ID
+            },
+            safeCallback(
+                "Switch.Get",
+                function(result, error_code, error_message)
                 {
-                    logError("Relay state read failed: " + error_message);
+                    relaySyncInProgress = false;
 
-                    return;
+                    if (error_code !== 0)
+                    {
+                        logError("Relay state read failed: " + error_message);
+
+                        return;
+                    }
+
+                    if (!result || typeof result.output !== "boolean")
+                    {
+                        logError("Relay state read returned invalid data");
+
+                        return;
+                    }
+
+                    if (applyRelayState(result.output, "switch"))
+                    {
+                        evaluateController();
+                    }
                 }
+            )
+        );
+    }
+    catch(error)
+    {
+        relaySyncInProgress = false;
 
-                if (!result || typeof result.output !== "boolean")
-                {
-                    logError("Relay state read returned invalid data");
-
-                    return;
-                }
-
-                if (applyRelayState(result.output, "switch"))
-                {
-                    evaluateController();
-                }
-            }
-        )
-    );
+        recordScriptError("Switch.Get call", error);
+    }
 }
 
 //-----------------------------------------------------------------------------
 
 function setRelay(on)
 {
-    Shelly.call(
-        "Switch.Set",
+    if (relayCommandInProgress)
+    {
+        if (relayCommandTarget === on || relayPendingTarget === on)
         {
-            id : CONFIG.RELAY_ID,
-            on : on
-        },
-        safeCallback(
+            return;
+        }
+
+        relayPendingTarget = on;
+
+        logInfo("Relay switch " + (on ? "ON" : "OFF") + " queued");
+
+        return;
+    }
+
+    relayCommandInProgress = true;
+
+    relayCommandTarget = on;
+
+    try
+    {
+        Shelly.call(
             "Switch.Set",
-            function(result, error_code, error_message)
             {
-                if (error_code !== 0)
+                id : CONFIG.RELAY_ID,
+                on : on
+            },
+            safeCallback(
+                "Switch.Set",
+                function(result, error_code, error_message)
                 {
-                    logError("Relay switch failed: " + error_message);
+                    let pending = relayPendingTarget;
 
-                    publishStatus();
+                    relayCommandInProgress = false;
 
-                    return;
+                    relayCommandTarget = null;
+
+                    relayPendingTarget = null;
+
+                    if (error_code !== 0)
+                    {
+                        logError("Relay switch failed: " + error_message);
+
+                        publishStatus();
+                    }
+                    else
+                    {
+                        applyRelayState(on, "controller");
+
+                        logInfo("Relay switched " + (on ? "ON" : "OFF"));
+                    }
+
+                    if (pending !== null && pending !== boiler.status.relay)
+                    {
+                        setRelay(pending);
+                    }
                 }
+            )
+        );
+    }
+    catch(error)
+    {
+        relayCommandInProgress = false;
 
-                applyRelayState(on, "controller");
+        relayCommandTarget = null;
 
-                logInfo("Relay switched " + (on ? "ON" : "OFF"));
-            }
-        )
-    );
+        relayPendingTarget = null;
+
+        recordScriptError("Switch.Set call", error);
+    }
 }
 
 //-----------------------------------------------------------------------------
 
 function relayOn()
 {
-    if (boiler.status.relay)
+    if (boiler.status.relay ||
+        relayCommandTarget === true ||
+        relayPendingTarget === true)
     {
         return;
     }
@@ -128,7 +189,9 @@ function relayOn()
 
 function relayOff()
 {
-    if (!boiler.status.relay)
+    if ((!boiler.status.relay && relayCommandTarget !== true) ||
+        relayCommandTarget === false ||
+        relayPendingTarget === false)
     {
         return;
     }

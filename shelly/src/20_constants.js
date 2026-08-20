@@ -18,6 +18,7 @@ const CONFIG =
     BOOT_DELAY            : 30,
     STOP_HOLD             : 300,
     SCRIPT_ERROR_REBOOT_LIMIT : 5,
+    SCRIPT_ERROR_MAX_LENGTH   : 120,
     RELAY_ID              : 0,
     WARMUP_MIN_RUNTIME    : 300,
     DEFAULT_MAX_RUNTIME   : 10800,

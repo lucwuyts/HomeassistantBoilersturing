@@ -61,12 +61,23 @@ let scriptErrorHandling = false;
 
 function errorToText(error)
 {
+    let text = "";
+
     if (error && error.message)
     {
-        return "" + error.message;
+        text = "" + error.message;
+    }
+    else
+    {
+        text = "" + error;
     }
 
-    return "" + error;
+    if (text.length > CONFIG.SCRIPT_ERROR_MAX_LENGTH)
+    {
+        return text.substr(0, CONFIG.SCRIPT_ERROR_MAX_LENGTH);
+    }
+
+    return text;
 }
 
 //-----------------------------------------------------------------------------
