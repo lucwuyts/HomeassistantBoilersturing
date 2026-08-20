@@ -9,7 +9,24 @@
 
 function isoTimestamp()
 {
-    return new Date().toISOString();
+    let now = new Date();
+
+    return (
+        now.getUTCFullYear() +
+        "-" +
+        twoDigits(now.getUTCMonth() + 1) +
+        "-" +
+        twoDigits(now.getUTCDate()) +
+        "T" +
+        twoDigits(now.getUTCHours()) +
+        ":" +
+        twoDigits(now.getUTCMinutes()) +
+        ":" +
+        twoDigits(now.getUTCSeconds()) +
+        "." +
+        threeDigits(now.getUTCMilliseconds()) +
+        "Z"
+    );
 }
 
 //-----------------------------------------------------------------------------
@@ -24,6 +41,23 @@ function timestampMs()
 function twoDigits(value)
 {
     if (value < 10)
+    {
+        return "0" + value;
+    }
+
+    return "" + value;
+}
+
+//-----------------------------------------------------------------------------
+
+function threeDigits(value)
+{
+    if (value < 10)
+    {
+        return "00" + value;
+    }
+
+    if (value < 100)
     {
         return "0" + value;
     }
