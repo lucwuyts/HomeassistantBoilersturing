@@ -11,22 +11,51 @@ function isoTimestamp()
 {
     let now = new Date();
 
+    if (!hasDateMethod(now, "getFullYear") ||
+        !hasDateMethod(now, "getMonth") ||
+        !hasDateMethod(now, "getDate") ||
+        !hasDateMethod(now, "getHours") ||
+        !hasDateMethod(now, "getMinutes") ||
+        !hasDateMethod(now, "getSeconds") ||
+        !hasDateMethod(now, "getMilliseconds"))
+    {
+        return timestampFallback(now);
+    }
+
     return (
-        now.getUTCFullYear() +
+        now.getFullYear() +
         "-" +
-        twoDigits(now.getUTCMonth() + 1) +
+        twoDigits(now.getMonth() + 1) +
         "-" +
-        twoDigits(now.getUTCDate()) +
+        twoDigits(now.getDate()) +
         "T" +
-        twoDigits(now.getUTCHours()) +
+        twoDigits(now.getHours()) +
         ":" +
-        twoDigits(now.getUTCMinutes()) +
+        twoDigits(now.getMinutes()) +
         ":" +
-        twoDigits(now.getUTCSeconds()) +
+        twoDigits(now.getSeconds()) +
         "." +
-        threeDigits(now.getUTCMilliseconds()) +
-        "Z"
+        threeDigits(now.getMilliseconds())
     );
+}
+
+//-----------------------------------------------------------------------------
+
+function hasDateMethod(date, name)
+{
+    return typeof date[name] === "function";
+}
+
+//-----------------------------------------------------------------------------
+
+function timestampFallback(date)
+{
+    if (hasDateMethod(date, "getTime"))
+    {
+        return "" + date.getTime();
+    }
+
+    return "timestamp unavailable";
 }
 
 //-----------------------------------------------------------------------------
