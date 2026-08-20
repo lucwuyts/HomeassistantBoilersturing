@@ -9,53 +9,7 @@
 
 function isoTimestamp()
 {
-    let now = new Date();
-
-    if (!hasDateMethod(now, "getFullYear") ||
-        !hasDateMethod(now, "getMonth") ||
-        !hasDateMethod(now, "getDate") ||
-        !hasDateMethod(now, "getHours") ||
-        !hasDateMethod(now, "getMinutes") ||
-        !hasDateMethod(now, "getSeconds") ||
-        !hasDateMethod(now, "getMilliseconds"))
-    {
-        return timestampFallback(now);
-    }
-
-    return (
-        now.getFullYear() +
-        "-" +
-        twoDigits(now.getMonth() + 1) +
-        "-" +
-        twoDigits(now.getDate()) +
-        "T" +
-        twoDigits(now.getHours()) +
-        ":" +
-        twoDigits(now.getMinutes()) +
-        ":" +
-        twoDigits(now.getSeconds()) +
-        "." +
-        threeDigits(now.getMilliseconds())
-    );
-}
-
-//-----------------------------------------------------------------------------
-
-function hasDateMethod(date, name)
-{
-    return typeof date[name] === "function";
-}
-
-//-----------------------------------------------------------------------------
-
-function timestampFallback(date)
-{
-    if (hasDateMethod(date, "getTime"))
-    {
-        return "" + date.getTime();
-    }
-
-    return "timestamp unavailable";
+    return "" + timestampMs();
 }
 
 //-----------------------------------------------------------------------------
@@ -98,22 +52,7 @@ function threeDigits(value)
 
 function dateKey()
 {
-    let now = new Date();
-
-    let year = now.getFullYear();
-
-    if (year < 2024)
-    {
-        return "";
-    }
-
-    return (
-        year +
-        "-" +
-        twoDigits(now.getMonth() + 1) +
-        "-" +
-        twoDigits(now.getDate())
-    );
+    return "" + Math.floor(timestampMs() / 86400000);
 }
 
 //-----------------------------------------------------------------------------

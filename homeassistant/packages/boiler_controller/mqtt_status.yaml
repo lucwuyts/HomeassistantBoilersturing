@@ -15,7 +15,7 @@ mqtt:
       expire_after: 360
       device_class: timestamp
       value_template: >
-        {{ value_json.timestamp | default(value_json.boiler.status.last_update) | default('') }}
+        {{ now().isoformat() }}
 
     - name: Shelly Boiler Uptime
       unique_id: shelly_boiler_uptime

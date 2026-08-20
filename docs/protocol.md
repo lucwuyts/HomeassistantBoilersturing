@@ -133,6 +133,7 @@ De exacte beslissing blijft in de Shelly-firmware. Home Assistant stuurt geen re
 
 Shelly publiceert niet-retained met QoS 1 naar `boiler/v1/status`.
 Home Assistant laat de MQTT statusentities verlopen wanneer er langer dan 360 seconden geen nieuw statusbericht binnenkomt.
+Home Assistant gebruikt zijn eigen ontvangsttijd voor `sensor.boiler_shelly_last_seen`; Shelly-timestamps zijn alleen diagnosewaarden.
 
 Voorbeeld:
 
@@ -141,7 +142,7 @@ Voorbeeld:
   "api": 1,
   "source": "Shelly",
   "firmware": "0.2.0",
-  "timestamp": "2026-07-03T12:00:10.000Z",
+  "timestamp": "1785751210000",
   "boiler": {
     "config": {
       "heating_enabled": true,
@@ -153,7 +154,7 @@ Voorbeeld:
       "relay": true,
       "runtime": 123,
       "starts_today": 4,
-      "starts_today_date": "2026-07-03",
+      "starts_today_date": "20691",
       "total_starts": 27,
       "total_runtime": 34122,
       "uptime": 86400,
