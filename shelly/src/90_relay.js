@@ -54,12 +54,12 @@ function syncRelayState()
     try
     {
         Shelly.call(
-            "Switch.Get",
+            "Switch.GetStatus",
             {
                 id : CONFIG.RELAY_ID
             },
             safeCallback(
-                "Switch.Get",
+                "Switch.GetStatus",
                 function(result, error_code, error_message)
                 {
                     relaySyncInProgress = false;
@@ -90,7 +90,7 @@ function syncRelayState()
     {
         relaySyncInProgress = false;
 
-        recordScriptError("Switch.Get call", error);
+        recordScriptError("Switch.GetStatus call", error);
     }
 }
 
