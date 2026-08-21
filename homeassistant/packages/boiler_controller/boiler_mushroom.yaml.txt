@@ -1,0 +1,86 @@
+type: custom:mod-card
+card:
+  type: custom:mushroom-template-badge
+  entity: binary_sensor.shelly_boiler_relay
+
+  content: >
+    {% set offline = is_state('binary_sensor.boiler_shelly_offline', 'on') %}
+    {% set heating = is_state('binary_sensor.shelly_boiler_relay', 'on') %}
+
+    {% if offline %}
+      OFFLINE
+    {% elif heating %}
+      WARMEN
+    {% else %}
+      STANDBY
+    {% endif %}
+
+  label: Boiler
+
+  icon: >
+    {% set offline = is_state('binary_sensor.boiler_shelly_offline', 'on') %}
+    {% set heating = is_state('binary_sensor.shelly_boiler_relay', 'on') %}
+
+    {% if offline %}
+      mdi:lan-disconnect
+    {% elif heating %}
+      mdi:water-boiler
+    {% else %}
+      mdi:water-boiler-off
+    {% endif %}
+
+  color: >
+    {% set offline = is_state('binary_sensor.boiler_shelly_offline', 'on') %}
+    {% set heating = is_state('binary_sensor.shelly_boiler_relay', 'on') %}
+
+    {% if offline %}
+      red
+    {% elif heating %}
+      green
+    {% else %}
+      grey
+    {% endif %}
+
+  tap_action:
+    action: more-info
+
+card_mod:
+  style:
+    mushroom-template-badge$: |
+      ha-state-icon {
+        {% set offline = is_state('binary_sensor.boiler_shelly_offline', 'on') %}
+
+        {% if offline %}
+          animation: boiler-pulse 1s ease-in-out infinite;
+        {% endif %}
+      }
+
+      .info .content {
+        {% set offline = is_state('binary_sensor.boiler_shelly_offline', 'on') %}
+
+        {% if offline %}
+          animation: boiler-text-pulse 1s ease-in-out infinite;
+          color: var(--red-color);
+          font-weight: 700;
+        {% endif %}
+      }
+
+      @keyframes boiler-pulse {
+        0%, 100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 0.25;
+          transform: scale(1.25);
+        }
+      }
+
+      @keyframes boiler-text-pulse {
+        0%, 100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.25;
+        }
+      }
