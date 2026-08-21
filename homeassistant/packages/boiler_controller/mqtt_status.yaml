@@ -9,14 +9,6 @@ mqtt:
       value_template: >
         {{ value_json.boiler.status.state | default('unknown') }}
 
-    - name: Boiler Shelly Last Seen
-      unique_id: boiler_shelly_last_seen
-      state_topic: boiler/v1/status
-      expire_after: 360
-      device_class: timestamp
-      value_template: >
-        {{ now().isoformat() }}
-
     - name: Shelly Boiler Uptime
       unique_id: shelly_boiler_uptime
       state_topic: boiler/v1/status

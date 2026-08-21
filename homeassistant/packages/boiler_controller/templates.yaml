@@ -1,5 +1,18 @@
 template:
 
+  - trigger:
+
+      - platform: mqtt
+        topic: boiler/v1/status
+
+    sensor:
+
+      - name: Boiler Shelly Last Seen
+        unique_id: boiler_shelly_last_seen
+        device_class: timestamp
+        state: >
+          {{ now().isoformat() }}
+
   - binary_sensor:
 
       - name: Boiler Superdal
