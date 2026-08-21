@@ -1,18 +1,5 @@
 template:
 
-  - trigger:
-
-      - platform: mqtt
-        topic: boiler/v1/status
-
-    sensor:
-
-      - name: Boiler Shelly Last Seen
-        unique_id: boiler_shelly_last_seen
-        device_class: timestamp
-        state: >
-          {{ now().isoformat() }}
-
   - binary_sensor:
 
       - name: Boiler Superdal
@@ -40,15 +27,21 @@ template:
         unique_id: boiler_shelly_offline
         device_class: problem
         state: >
-          {% set last_seen = states('sensor.boiler_shelly_last_seen') %}
-
-          {% if last_seen in ['unknown', 'unavailable', 'none', ''] %}
-            true
-          {% else %}
-            {{ (now() - as_datetime(last_seen)).total_seconds() > 300 }}
-          {% endif %}
+          {% set uptime = states('sensor.shelly_boiler_uptime') %}
+          {{ uptime in ['unknown', 'unavailable', 'none', ''] }}
 
   - sensor:
+
+      - name: Boiler Shelly Last Seen
+        unique_id: boiler_shelly_last_seen
+        device_class: timestamp
+        state: >
+          {% set uptime = states('sensor.shelly_boiler_uptime') %}
+          {% if uptime in ['unknown', 'unavailable', 'none', ''] %}
+            {{ '' }}
+          {% else %}
+            {{ states.sensor.shelly_boiler_uptime.last_changed.isoformat() }}
+          {% endif %}
 
       - name: Boiler Predicted Quarter Peak W
         unique_id: boiler_predicted_quarter_peak_w
