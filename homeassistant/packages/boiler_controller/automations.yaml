@@ -116,7 +116,6 @@ automation:
             Controleer Shelly Pro 1 / wifi / voeding.
           recipients:
             - luc.wuyts@a-d-e.net
-            - kurt@transportdecock.be
           html: >
             <!DOCTYPE html>
             <html>
