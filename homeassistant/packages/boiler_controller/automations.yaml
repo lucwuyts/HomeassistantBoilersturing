@@ -105,7 +105,18 @@ automation:
 
     action:
 
+      - service: notify.email
+        continue_on_error: true
+        data:
+          title: "Shelly boilercontroller offline"
+          message: >
+            Shelly boilercontroller is langer dan 5 minuten offline.
+            Laatste heartbeat:
+            {{ states('sensor.boiler_shelly_last_seen') }}.
+            Controleer Shelly Pro 1 / wifi / voeding.
+
       - service: script.whatsapp_callmebot_checked_send
+        continue_on_error: true
         metadata: {}
         data:
           text: >
@@ -144,6 +155,7 @@ automation:
     action:
 
       - service: script.whatsapp_callmebot_checked_send
+        continue_on_error: true
         metadata: {}
         data:
           text: >
