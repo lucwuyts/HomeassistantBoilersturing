@@ -108,12 +108,34 @@ automation:
       - service: pyscript.send_mail
         continue_on_error: true
         data:
-          title: "Shelly boilercontroller offline"
+          subject: "Shelly boilercontroller offline"
           message: >
             Shelly boilercontroller is langer dan 5 minuten offline.
             Laatste heartbeat:
             {{ states('sensor.boiler_shelly_last_seen') }}.
             Controleer Shelly Pro 1 / wifi / voeding.
+          recipients:
+            - luc.wuyts@a-d-e.net
+            - kurt@transportdecock.be
+          html: >
+            <!DOCTYPE html>
+            <html>
+            <body>
+            <h1>Shelly boilercontroller offline</h1>
+            <p>
+              De Shelly boilercontroller is langer dan 5 minuten offline.
+            </p>
+            <p>
+              Laatste heartbeat:
+              <b>{{ states('sensor.boiler_shelly_last_seen') }}</b>
+            </p>
+            <p>
+              Controleer Shelly Pro 1 / wifi / voeding.
+            </p>
+            <br>
+            <i>Dit bericht werd automatisch verzonden.</i>
+            </body>
+            </html>
 
       - service: script.whatsapp_callmebot_checked_send
         continue_on_error: true

@@ -33,6 +33,7 @@ De package verwacht deze bestaande bronentities:
 
 Als de WhatsApp alert niet gebruikt wordt, verwijder of vervang dan de acties met `script.whatsapp_callmebot_checked_send` in `automations.yaml`.
 Als je e-mailservice anders heet dan `pyscript.send_mail`, pas dan die servicenaam aan in `automations.yaml`.
+De e-mailactie gebruikt `subject`, `message`, `recipients` en `html`, conform de bestaande `pyscript.send_mail` service.
 
 ## MQTT topics
 
