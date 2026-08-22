@@ -105,7 +105,7 @@ automation:
 
     action:
 
-      - service: notify.email
+      - service: pyscript.send_mail
         continue_on_error: true
         data:
           title: "Shelly boilercontroller offline"

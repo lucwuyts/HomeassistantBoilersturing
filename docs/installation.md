@@ -29,10 +29,10 @@ De package verwacht deze bestaande bronentities:
 | `sensor.peak_current_average_quarterly_demand_2` | Lopende kwartiergemiddelde waarde in kW |
 | `input_boolean.energy_new_quarter` | Puls bij start van een nieuw kwartier |
 | `script.whatsapp_callmebot_checked_send` | Optionele WhatsApp alert voor Shelly offline/online |
-| `notify.email` | Optionele e-mailalert voor Shelly offline |
+| `pyscript.send_mail` | Optionele e-mailalert voor Shelly offline |
 
 Als de WhatsApp alert niet gebruikt wordt, verwijder of vervang dan de acties met `script.whatsapp_callmebot_checked_send` in `automations.yaml`.
-Als je e-mailnotify service anders heet dan `notify.email`, pas dan die servicenaam aan in `automations.yaml`.
+Als je e-mailservice anders heet dan `pyscript.send_mail`, pas dan die servicenaam aan in `automations.yaml`.
 
 ## MQTT topics
 
