@@ -34,6 +34,8 @@ function updateControllerAge()
 
 function updateDiagnostics(status)
 {
+    syncClockFromStatus(status);
+
     if (status.sys)
     {
         boiler.status.uptime = status.sys.uptime || 0;
@@ -140,6 +142,11 @@ function canWatchdogReboot()
     }
 
     if (boiler.status.last_watchdog_reboot === 0)
+    {
+        return true;
+    }
+
+    if (timestampMs() < boiler.status.last_watchdog_reboot)
     {
         return true;
     }

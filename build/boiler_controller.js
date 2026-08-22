@@ -10,7 +10,7 @@
 const FIRMWARE =
 {
     NAME        : "Boiler Controller",
-    VERSION     : "2026.08.20-06",
+    VERSION     : "2026.08.22-02",
     API         : 1
 };
 
@@ -348,6 +348,39 @@ function logTrace(text)
  *
  ******************************************************************************/
 
+let monotonicMs = 0;
+
+let wallClockSeconds = 0;
+
+//-----------------------------------------------------------------------------
+
+function advanceClock(ms)
+{
+    monotonicMs += ms;
+}
+
+//-----------------------------------------------------------------------------
+
+function syncClockFromStatus(status)
+{
+    if (!status || !status.sys)
+    {
+        return;
+    }
+
+    if (status.sys.uptime > 0)
+    {
+        monotonicMs = Math.round(status.sys.uptime * 1000);
+    }
+
+    if (status.sys.unixtime > 0)
+    {
+        wallClockSeconds = status.sys.unixtime;
+    }
+}
+
+//-----------------------------------------------------------------------------
+
 function isoTimestamp()
 {
     return "" + timestampMs();
@@ -357,42 +390,18 @@ function isoTimestamp()
 
 function timestampMs()
 {
-    return new Date().getTime();
-}
-
-//-----------------------------------------------------------------------------
-
-function twoDigits(value)
-{
-    if (value < 10)
-    {
-        return "0" + value;
-    }
-
-    return "" + value;
-}
-
-//-----------------------------------------------------------------------------
-
-function threeDigits(value)
-{
-    if (value < 10)
-    {
-        return "00" + value;
-    }
-
-    if (value < 100)
-    {
-        return "0" + value;
-    }
-
-    return "" + value;
+    return monotonicMs;
 }
 
 //-----------------------------------------------------------------------------
 
 function dateKey()
 {
+    if (wallClockSeconds > 0)
+    {
+        return "" + Math.floor(wallClockSeconds / 86400);
+    }
+
     return "" + Math.floor(timestampMs() / 86400000);
 }
 
@@ -1577,6 +1586,8 @@ function checkWarmEnough()
 
 function systemTimerTask()
 {
+    advanceClock(CONFIG.RUNTIME_INTERVAL);
+
     syncRelayState();
 
     checkDailyStatisticsReset();
@@ -1696,6 +1707,8 @@ function updateControllerAge()
 
 function updateDiagnostics(status)
 {
+    syncClockFromStatus(status);
+
     if (status.sys)
     {
         boiler.status.uptime = status.sys.uptime || 0;
@@ -1802,6 +1815,11 @@ function canWatchdogReboot()
     }
 
     if (boiler.status.last_watchdog_reboot === 0)
+    {
+        return true;
+    }
+
+    if (timestampMs() < boiler.status.last_watchdog_reboot)
     {
         return true;
     }

@@ -7,6 +7,39 @@
  *
  ******************************************************************************/
 
+let monotonicMs = 0;
+
+let wallClockSeconds = 0;
+
+//-----------------------------------------------------------------------------
+
+function advanceClock(ms)
+{
+    monotonicMs += ms;
+}
+
+//-----------------------------------------------------------------------------
+
+function syncClockFromStatus(status)
+{
+    if (!status || !status.sys)
+    {
+        return;
+    }
+
+    if (status.sys.uptime > 0)
+    {
+        monotonicMs = Math.round(status.sys.uptime * 1000);
+    }
+
+    if (status.sys.unixtime > 0)
+    {
+        wallClockSeconds = status.sys.unixtime;
+    }
+}
+
+//-----------------------------------------------------------------------------
+
 function isoTimestamp()
 {
     return "" + timestampMs();
@@ -16,42 +49,18 @@ function isoTimestamp()
 
 function timestampMs()
 {
-    return new Date().getTime();
-}
-
-//-----------------------------------------------------------------------------
-
-function twoDigits(value)
-{
-    if (value < 10)
-    {
-        return "0" + value;
-    }
-
-    return "" + value;
-}
-
-//-----------------------------------------------------------------------------
-
-function threeDigits(value)
-{
-    if (value < 10)
-    {
-        return "00" + value;
-    }
-
-    if (value < 100)
-    {
-        return "0" + value;
-    }
-
-    return "" + value;
+    return monotonicMs;
 }
 
 //-----------------------------------------------------------------------------
 
 function dateKey()
 {
+    if (wallClockSeconds > 0)
+    {
+        return "" + Math.floor(wallClockSeconds / 86400);
+    }
+
     return "" + Math.floor(timestampMs() / 86400000);
 }
 

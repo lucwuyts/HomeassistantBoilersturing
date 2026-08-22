@@ -168,9 +168,9 @@ mqtt:
       state_topic: boiler/v1/status
       expire_after: 360
       value_template: >
-        {% set value = value_json.boiler.status.last_controller_update | default(0) | int(0) %}
-        {% if value > 0 %}
-          {{ (value / 1000) | timestamp_custom('%Y-%m-%d %H:%M:%S', true) }}
+        {% set age = value_json.boiler.status.last_controller_age | default(-1) | int(-1) %}
+        {% if age >= 0 %}
+          {{ (as_timestamp(now()) - age) | timestamp_custom('%Y-%m-%d %H:%M:%S', true) }}
         {% else %}
           {{ '' }}
         {% endif %}

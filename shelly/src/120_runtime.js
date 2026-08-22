@@ -9,6 +9,8 @@
 
 function systemTimerTask()
 {
+    advanceClock(CONFIG.RUNTIME_INTERVAL);
+
     syncRelayState();
 
     checkDailyStatisticsReset();

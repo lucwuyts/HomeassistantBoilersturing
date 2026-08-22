@@ -92,6 +92,17 @@ automation:
         to: "on"
         for: "00:01:00"
 
+      - platform: homeassistant
+        event: start
+
+      - platform: event
+        event_type: automation_reloaded
+
+    condition:
+      - condition: state
+        entity_id: binary_sensor.boiler_shelly_offline
+        state: "on"
+
     action:
 
       - service: script.whatsapp_callmebot_checked_send
@@ -158,4 +169,3 @@ automation:
           entity_id: binary_sensor.boiler_shelly_offline
 
     mode: single
-
