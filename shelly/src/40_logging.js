@@ -35,7 +35,7 @@ function log(level, text)
             break;
     }
 
-    print(isoTimestamp() + " " + prefix + text);
+    print(prefix + text);
 }
 
 //-----------------------------------------------------------------------------

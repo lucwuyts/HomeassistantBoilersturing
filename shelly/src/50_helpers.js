@@ -42,7 +42,7 @@ function syncClockFromStatus(status)
 
 function isoTimestamp()
 {
-    return "" + timestampMs();
+    return "" + monotonicMs;
 }
 
 //-----------------------------------------------------------------------------

@@ -15,7 +15,7 @@ function copyKnownFields(source, target, label)
         {
             target[key] = source[key];
 
-            logInfo(label + "." + key + " = " + target[key]);
+            logTrace(label + "." + key + " = " + target[key]);
         }
     }
 }

@@ -10,7 +10,7 @@
 const FIRMWARE =
 {
     NAME        : "Boiler Controller",
-    VERSION     : "2026.08.22-02",
+    VERSION     : "2026.08.26-01",
     API         : 1
 };
 
@@ -308,7 +308,7 @@ function log(level, text)
             break;
     }
 
-    print(isoTimestamp() + " " + prefix + text);
+    print(prefix + text);
 }
 
 //-----------------------------------------------------------------------------
@@ -383,7 +383,7 @@ function syncClockFromStatus(status)
 
 function isoTimestamp()
 {
-    return "" + timestampMs();
+    return "" + monotonicMs;
 }
 
 //-----------------------------------------------------------------------------
@@ -776,7 +776,7 @@ function copyKnownFields(source, target, label)
         {
             target[key] = source[key];
 
-            logInfo(label + "." + key + " = " + target[key]);
+            logTrace(label + "." + key + " = " + target[key]);
         }
     }
 }
