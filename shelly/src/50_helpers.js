@@ -20,26 +20,6 @@ function advanceClock(ms)
 
 //-----------------------------------------------------------------------------
 
-function syncClockFromStatus(status)
-{
-    if (!status || !status.sys)
-    {
-        return;
-    }
-
-    if (status.sys.uptime > 0)
-    {
-        monotonicMs = Math.round(status.sys.uptime * 1000);
-    }
-
-    if (status.sys.unixtime > 0)
-    {
-        wallClockSeconds = status.sys.unixtime;
-    }
-}
-
-//-----------------------------------------------------------------------------
-
 function dateKey()
 {
     if (wallClockSeconds > 0)

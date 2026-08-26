@@ -10,7 +10,7 @@
 const FIRMWARE =
 {
     NAME        : "Boiler Controller",
-    VERSION     : "2026.08.26-02",
+    VERSION     : "2026.08.26-03",
     API         : 1
 };
 
@@ -357,26 +357,6 @@ let wallClockSeconds = 0;
 function advanceClock(ms)
 {
     monotonicMs += ms;
-}
-
-//-----------------------------------------------------------------------------
-
-function syncClockFromStatus(status)
-{
-    if (!status || !status.sys)
-    {
-        return;
-    }
-
-    if (status.sys.uptime > 0)
-    {
-        monotonicMs = Math.round(status.sys.uptime * 1000);
-    }
-
-    if (status.sys.unixtime > 0)
-    {
-        wallClockSeconds = status.sys.unixtime;
-    }
 }
 
 //-----------------------------------------------------------------------------
@@ -1693,10 +1673,18 @@ function updateControllerAge()
 
 function updateDiagnostics(status)
 {
-    syncClockFromStatus(status);
-
     if (status.sys)
     {
+        if (status.sys.uptime > 0)
+        {
+            monotonicMs = Math.round(status.sys.uptime * 1000);
+        }
+
+        if (status.sys.unixtime > 0)
+        {
+            wallClockSeconds = status.sys.unixtime;
+        }
+
         boiler.status.uptime = status.sys.uptime || 0;
 
         boiler.status.ram_free = status.sys.ram_free || 0;
