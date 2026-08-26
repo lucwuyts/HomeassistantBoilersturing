@@ -18,7 +18,7 @@ function setState(newState)
 
     publishStatus();
 
-    logInfo("State -> " + newState);
+    log(DEBUG.INFO, "[INFO] ", "State -> " + newState);
 }
 
 //-----------------------------------------------------------------------------

@@ -55,14 +55,14 @@ function evaluateController()
 {
     if (boiler.status.boot_delay_active)
     {
-        logInfo("Boot delay active");
+        log(DEBUG.INFO, "[INFO] ", "Boot delay active");
 
         return;
     }
 
     if (boiler.status.restart_delay_active)
     {
-        logInfo("Restart delay active");
+        log(DEBUG.INFO, "[INFO] ", "Restart delay active");
 
         forceRelayOff();
 
@@ -71,7 +71,7 @@ function evaluateController()
 
     if (boiler.status.stop_hold_active)
     {
-        logInfo("Stop hold active");
+        log(DEBUG.INFO, "[INFO] ", "Stop hold active");
 
         return;
     }
@@ -90,14 +90,14 @@ function evaluateController()
             stopBoiler(STOP_REASON.WARM_ENOUGH);
         }
 
-        logInfo("Boiler already warm enough");
+        log(DEBUG.INFO, "[INFO] ", "Boiler already warm enough");
 
         return;
     }
 
     if (isPeakLimitExceeded())
     {
-        logWarning("Peak limit exceeded");
+        log(DEBUG.WARNING, "[WARNING] ", "Peak limit exceeded");
 
         if (boiler.status.relay)
         {
@@ -133,7 +133,7 @@ function startBoiler()
 
     boiler.status.last_start = "" + monotonicMs;
 
-    logInfo("Boiler started");
+    log(DEBUG.INFO, "[INFO] ", "Boiler started");
 
     savePersistentData();
 
@@ -163,7 +163,7 @@ function stopBoiler(reason)
         startStopHold();
     }
 
-    logInfo("Boiler stopped (" + reason + ")");
+    log(DEBUG.INFO, "[INFO] ", "Boiler stopped (" + reason + ")");
 
     savePersistentData();
 

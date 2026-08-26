@@ -63,7 +63,7 @@ function recordScriptError(context, error)
 {
     if (scriptErrorHandling)
     {
-        logError("Nested script error in " + context + ": " + errorToText(error));
+        log(DEBUG.ERROR, "[ERROR] ", "Nested script error in " + context + ": " + errorToText(error));
 
         return;
     }
@@ -82,7 +82,7 @@ function recordScriptError(context, error)
 
         boiler.status.watchdog_reason = "script error: " + context;
 
-        logError(
+        log(DEBUG.ERROR, "[ERROR] ",
             "Script error in " +
             context +
             ": " +
@@ -97,7 +97,7 @@ function recordScriptError(context, error)
         }
         catch(publishError)
         {
-            logError(
+            log(DEBUG.ERROR, "[ERROR] ",
                 "Status publish after script error failed: " +
                 errorToText(publishError)
             );

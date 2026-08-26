@@ -7,61 +7,12 @@
  *
  ******************************************************************************/
 
-function log(level, text)
+function log(level, prefix, text)
 {
     if (level > CONFIG.DEBUG_LEVEL)
     {
         return;
     }
 
-    let prefix = "";
-
-    switch(level)
-    {
-        case DEBUG.ERROR:
-            prefix = "[ERROR] ";
-            break;
-
-        case DEBUG.WARNING:
-            prefix = "[WARNING] ";
-            break;
-
-        case DEBUG.INFO:
-            prefix = "[INFO] ";
-            break;
-
-        default:
-            prefix = "[TRACE] ";
-            break;
-    }
-
     print(prefix + text);
-}
-
-//-----------------------------------------------------------------------------
-
-function logError(text)
-{
-    log(DEBUG.ERROR, text);
-}
-
-//-----------------------------------------------------------------------------
-
-function logWarning(text)
-{
-    log(DEBUG.WARNING, text);
-}
-
-//-----------------------------------------------------------------------------
-
-function logInfo(text)
-{
-    log(DEBUG.INFO, text);
-}
-
-//-----------------------------------------------------------------------------
-
-function logTrace(text)
-{
-    log(DEBUG.TRACE, text);
 }

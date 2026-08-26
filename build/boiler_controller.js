@@ -10,7 +10,7 @@
 const FIRMWARE =
 {
     NAME        : "Boiler Controller",
-    VERSION     : "2026.08.26-03",
+    VERSION     : "2026.08.26-05",
     API         : 1
 };
 
@@ -280,63 +280,14 @@ let persistent =
  *
  ******************************************************************************/
 
-function log(level, text)
+function log(level, prefix, text)
 {
     if (level > CONFIG.DEBUG_LEVEL)
     {
         return;
     }
 
-    let prefix = "";
-
-    switch(level)
-    {
-        case DEBUG.ERROR:
-            prefix = "[ERROR] ";
-            break;
-
-        case DEBUG.WARNING:
-            prefix = "[WARNING] ";
-            break;
-
-        case DEBUG.INFO:
-            prefix = "[INFO] ";
-            break;
-
-        default:
-            prefix = "[TRACE] ";
-            break;
-    }
-
     print(prefix + text);
-}
-
-//-----------------------------------------------------------------------------
-
-function logError(text)
-{
-    log(DEBUG.ERROR, text);
-}
-
-//-----------------------------------------------------------------------------
-
-function logWarning(text)
-{
-    log(DEBUG.WARNING, text);
-}
-
-//-----------------------------------------------------------------------------
-
-function logInfo(text)
-{
-    log(DEBUG.INFO, text);
-}
-
-//-----------------------------------------------------------------------------
-
-function logTrace(text)
-{
-    log(DEBUG.TRACE, text);
 }
 
 /******************************************************************************
@@ -404,7 +355,7 @@ function recordScriptError(context, error)
 {
     if (scriptErrorHandling)
     {
-        logError("Nested script error in " + context + ": " + errorToText(error));
+        log(DEBUG.ERROR, "[ERROR] ", "Nested script error in " + context + ": " + errorToText(error));
 
         return;
     }
@@ -423,7 +374,7 @@ function recordScriptError(context, error)
 
         boiler.status.watchdog_reason = "script error: " + context;
 
-        logError(
+        log(DEBUG.ERROR, "[ERROR] ",
             "Script error in " +
             context +
             ": " +
@@ -438,7 +389,7 @@ function recordScriptError(context, error)
         }
         catch(publishError)
         {
-            logError(
+            log(DEBUG.ERROR, "[ERROR] ",
                 "Status publish after script error failed: " +
                 errorToText(publishError)
             );
@@ -585,7 +536,7 @@ function savePersistentData()
         JSON.stringify(persistent)
     );
 
-    logTrace("Persistent data saved");
+    log(DEBUG.TRACE, "[TRACE] ", "Persistent data saved");
 }
 
 //-----------------------------------------------------------------------------
@@ -602,7 +553,7 @@ function resetStatistics()
 
     savePersistentData();
 
-    logInfo("Statistics reset");
+    log(DEBUG.INFO, "[INFO] ", "Statistics reset");
 }
 
 //-----------------------------------------------------------------------------
@@ -615,7 +566,7 @@ function resetDailyStatistics()
 
     savePersistentData();
 
-    logInfo("Daily statistics reset");
+    log(DEBUG.INFO, "[INFO] ", "Daily statistics reset");
 }
 
 //-----------------------------------------------------------------------------
@@ -654,7 +605,7 @@ function loadPersistentData()
 
     if (json === null)
     {
-        logInfo("No persistent data found");
+        log(DEBUG.INFO, "[INFO] ", "No persistent data found");
 
         savePersistentData();
 
@@ -667,7 +618,7 @@ function loadPersistentData()
     }
     catch(error)
     {
-        logWarning("Persistent data corrupted");
+        log(DEBUG.WARNING, "[WARNING] ", "Persistent data corrupted");
 
         persistent =
         {
@@ -709,20 +660,20 @@ function loadPersistentData()
 
     if (persistent.version !== STORAGE.VERSION)
     {
-        logWarning("Persistent data version mismatch");
+        log(DEBUG.WARNING, "[WARNING] ", "Persistent data version mismatch");
     }
 
     copyPersistentToStatus();
 
-    logInfo("Persistent data loaded");
+    log(DEBUG.INFO, "[INFO] ", "Persistent data loaded");
 
-    logInfo("Firmware boots : " + boiler.status.firmware_boots);
+    log(DEBUG.INFO, "[INFO] ", "Firmware boots : " + boiler.status.firmware_boots);
 
-    logInfo("Starts today   : " + boiler.status.starts_today);
+    log(DEBUG.INFO, "[INFO] ", "Starts today   : " + boiler.status.starts_today);
 
-    logInfo("Total starts   : " + boiler.status.total_starts);
+    log(DEBUG.INFO, "[INFO] ", "Total starts   : " + boiler.status.total_starts);
 
-    logInfo("Total runtime  : " + boiler.status.total_runtime + " s");
+    log(DEBUG.INFO, "[INFO] ", "Total runtime  : " + boiler.status.total_runtime + " s");
 }
 
 /******************************************************************************
@@ -742,7 +693,7 @@ function copyKnownFields(source, target, label)
         {
             target[key] = source[key];
 
-            logTrace(label + "." + key + " = " + target[key]);
+            log(DEBUG.TRACE, "[TRACE] ", label + "." + key + " = " + target[key]);
         }
     }
 }
@@ -768,7 +719,7 @@ function markControllerOnline()
 {
     if (!boiler.status.controller_online)
     {
-        logInfo("Controller online");
+        log(DEBUG.INFO, "[INFO] ", "Controller online");
     }
 
     boiler.status.controller_online = true;
@@ -784,7 +735,7 @@ function markControllerOnline()
 
 function processControllerMessage(topic, message)
 {
-    logInfo("Controller message received");
+    log(DEBUG.INFO, "[INFO] ", "Controller message received");
 
     updateLastMqttSeen();
 
@@ -796,14 +747,14 @@ function processControllerMessage(topic, message)
     }
     catch(error)
     {
-        logError("Invalid JSON");
+        log(DEBUG.ERROR, "[ERROR] ", "Invalid JSON");
 
         return;
     }
 
     if (!data.boiler)
     {
-        logError("Missing boiler object");
+        log(DEBUG.ERROR, "[ERROR] ", "Missing boiler object");
 
         return;
     }
@@ -819,7 +770,7 @@ function processControllerMessage(topic, message)
     {
         if (!data.boiler.command)
         {
-            logError("Missing config object");
+            log(DEBUG.ERROR, "[ERROR] ", "Missing config object");
 
             return;
         }
@@ -861,7 +812,7 @@ function processControllerMessage(topic, message)
 
 function mqttInit()
 {
-    logInfo("MQTT framework initialized");
+    log(DEBUG.INFO, "[INFO] ", "MQTT framework initialized");
 
     MQTT.subscribe(
         TOPIC.CONTROLLER,
@@ -871,7 +822,7 @@ function mqttInit()
         )
     );
 
-    logInfo("Subscribed to " + TOPIC.CONTROLLER);
+    log(DEBUG.INFO, "[INFO] ", "Subscribed to " + TOPIC.CONTROLLER);
 }
 
 //-----------------------------------------------------------------------------
@@ -906,7 +857,7 @@ function publishStatus()
         payload
     );
 
-    logTrace("Status published");
+    log(DEBUG.TRACE, "[TRACE] ", "Status published");
 }
 
 /******************************************************************************
@@ -929,7 +880,7 @@ function setState(newState)
 
     publishStatus();
 
-    logInfo("State -> " + newState);
+    log(DEBUG.INFO, "[INFO] ", "State -> " + newState);
 }
 
 //-----------------------------------------------------------------------------
@@ -988,7 +939,7 @@ function applyRelayState(on, source)
         boiler.status.runtime = 0;
     }
 
-    logInfo("Relay state synced " + (on ? "ON" : "OFF") + " (" + source + ")");
+    log(DEBUG.INFO, "[INFO] ", "Relay state synced " + (on ? "ON" : "OFF") + " (" + source + ")");
 
     publishStatus();
 
@@ -1021,14 +972,14 @@ function syncRelayState()
 
                     if (error_code !== 0)
                     {
-                        logError("Relay state read failed: " + error_message);
+                        log(DEBUG.ERROR, "[ERROR] ", "Relay state read failed: " + error_message);
 
                         return;
                     }
 
                     if (!result || typeof result.output !== "boolean")
                     {
-                        logError("Relay state read returned invalid data");
+                        log(DEBUG.ERROR, "[ERROR] ", "Relay state read returned invalid data");
 
                         return;
                     }
@@ -1062,7 +1013,7 @@ function setRelay(on)
 
         relayPendingTarget = on;
 
-        logInfo("Relay switch " + (on ? "ON" : "OFF") + " queued");
+        log(DEBUG.INFO, "[INFO] ", "Relay switch " + (on ? "ON" : "OFF") + " queued");
 
         return;
     }
@@ -1093,7 +1044,7 @@ function setRelay(on)
 
                     if (error_code !== 0)
                     {
-                        logError("Relay switch failed: " + error_message);
+                        log(DEBUG.ERROR, "[ERROR] ", "Relay switch failed: " + error_message);
 
                         publishStatus();
                     }
@@ -1101,7 +1052,7 @@ function setRelay(on)
                     {
                         applyRelayState(on, "controller");
 
-                        logInfo("Relay switched " + (on ? "ON" : "OFF"));
+                        log(DEBUG.INFO, "[INFO] ", "Relay switched " + (on ? "ON" : "OFF"));
                     }
 
                     if (pending !== null && pending !== boiler.status.relay)
@@ -1135,7 +1086,7 @@ function relayOn()
         return;
     }
 
-    logInfo("Relay switch ON requested");
+    log(DEBUG.INFO, "[INFO] ", "Relay switch ON requested");
 
     setRelay(true);
 }
@@ -1151,7 +1102,7 @@ function relayOff()
         return;
     }
 
-    logInfo("Relay switch OFF requested");
+    log(DEBUG.INFO, "[INFO] ", "Relay switch OFF requested");
 
     setRelay(false);
 }
@@ -1160,7 +1111,7 @@ function relayOff()
 
 function forceRelayOff()
 {
-    logInfo("Relay force OFF requested");
+    log(DEBUG.INFO, "[INFO] ", "Relay force OFF requested");
 
     setRelay(false);
 }
@@ -1186,7 +1137,7 @@ function startRestartDelay()
     boiler.status.restart_remaining =
         boiler.config.restart_delay;
 
-    logInfo(
+    log(DEBUG.INFO, "[INFO] ",
         "Restart delay started (" +
         boiler.status.restart_remaining +
         " s)"
@@ -1210,7 +1161,7 @@ function startBootDelay()
 
     boiler.status.boot_delay_remaining = CONFIG.BOOT_DELAY;
 
-    logInfo(
+    log(DEBUG.INFO, "[INFO] ",
         "Boot delay started (" +
         boiler.status.boot_delay_remaining +
         " s)"
@@ -1237,7 +1188,7 @@ function updateBootDelay()
 
     boiler.status.boot_delay_remaining = 0;
 
-    logInfo("Boot delay expired");
+    log(DEBUG.INFO, "[INFO] ", "Boot delay expired");
 
     publishStatus();
 
@@ -1259,7 +1210,7 @@ function startStopHold()
 
     boiler.status.stop_hold_remaining = boiler.config.stop_hold;
 
-    logInfo(
+    log(DEBUG.INFO, "[INFO] ",
         "Stop hold started (" +
         boiler.status.stop_hold_remaining +
         " s)"
@@ -1286,7 +1237,7 @@ function updateStopHold()
 
     boiler.status.stop_hold_remaining = 0;
 
-    logInfo("Stop hold expired");
+    log(DEBUG.INFO, "[INFO] ", "Stop hold expired");
 
     publishStatus();
 
@@ -1350,14 +1301,14 @@ function evaluateController()
 {
     if (boiler.status.boot_delay_active)
     {
-        logInfo("Boot delay active");
+        log(DEBUG.INFO, "[INFO] ", "Boot delay active");
 
         return;
     }
 
     if (boiler.status.restart_delay_active)
     {
-        logInfo("Restart delay active");
+        log(DEBUG.INFO, "[INFO] ", "Restart delay active");
 
         forceRelayOff();
 
@@ -1366,7 +1317,7 @@ function evaluateController()
 
     if (boiler.status.stop_hold_active)
     {
-        logInfo("Stop hold active");
+        log(DEBUG.INFO, "[INFO] ", "Stop hold active");
 
         return;
     }
@@ -1385,14 +1336,14 @@ function evaluateController()
             stopBoiler(STOP_REASON.WARM_ENOUGH);
         }
 
-        logInfo("Boiler already warm enough");
+        log(DEBUG.INFO, "[INFO] ", "Boiler already warm enough");
 
         return;
     }
 
     if (isPeakLimitExceeded())
     {
-        logWarning("Peak limit exceeded");
+        log(DEBUG.WARNING, "[WARNING] ", "Peak limit exceeded");
 
         if (boiler.status.relay)
         {
@@ -1428,7 +1379,7 @@ function startBoiler()
 
     boiler.status.last_start = "" + monotonicMs;
 
-    logInfo("Boiler started");
+    log(DEBUG.INFO, "[INFO] ", "Boiler started");
 
     savePersistentData();
 
@@ -1458,7 +1409,7 @@ function stopBoiler(reason)
         startStopHold();
     }
 
-    logInfo("Boiler stopped (" + reason + ")");
+    log(DEBUG.INFO, "[INFO] ", "Boiler stopped (" + reason + ")");
 
     savePersistentData();
 
@@ -1485,7 +1436,7 @@ function resetWarmEnough()
 
     boiler.status.warm_enough_since = "";
 
-    logInfo("Warm enough flag reset");
+    log(DEBUG.INFO, "[INFO] ", "Warm enough flag reset");
 
     savePersistentData();
 
@@ -1500,7 +1451,7 @@ function markWarmEnough()
 
     boiler.status.warm_enough_since = "" + monotonicMs;
 
-    logInfo("Boiler warm enough detected");
+    log(DEBUG.INFO, "[INFO] ", "Boiler warm enough detected");
 }
 
 //-----------------------------------------------------------------------------
@@ -1577,7 +1528,7 @@ function systemTimerTask()
 
         if (boiler.status.runtime >= boiler.config.max_runtime)
         {
-            logWarning("Maximum runtime exceeded");
+            log(DEBUG.WARNING, "[WARNING] ", "Maximum runtime exceeded");
 
             startRestartDelay();
 
@@ -1600,7 +1551,7 @@ function systemTimerTask()
 
             boiler.status.restart_remaining = 0;
 
-            logInfo("Restart delay expired");
+            log(DEBUG.INFO, "[INFO] ", "Restart delay expired");
 
             publishStatus();
 
@@ -1632,7 +1583,7 @@ function checkControllerWatchdog()
 
     boiler.status.watchdog = false;
 
-    logWarning("Controller offline");
+    log(DEBUG.WARNING, "[WARNING] ", "Controller offline");
 
     publishStatus();
 }
@@ -1767,7 +1718,7 @@ function resetWatchdogProblem()
 
     boiler.status.watchdog_reason = "";
 
-    logInfo("Watchdog healthy");
+    log(DEBUG.INFO, "[INFO] ", "Watchdog healthy");
 }
 
 //-----------------------------------------------------------------------------
@@ -1816,7 +1767,7 @@ function performWatchdogReboot(reason)
 
     publishStatus();
 
-    logError("Watchdog reboot: " + reason);
+    log(DEBUG.ERROR, "[ERROR] ", "Watchdog reboot: " + reason);
 
     Shelly.call("Shelly.Reboot");
 }
@@ -1847,7 +1798,7 @@ function handleWatchdogReason(reason)
 
         boiler.status.watchdog_reason = reason;
 
-        logWarning("Watchdog problem: " + reason);
+        log(DEBUG.WARNING, "[WARNING] ", "Watchdog problem: " + reason);
 
         return;
     }
@@ -1862,7 +1813,7 @@ function handleWatchdogReason(reason)
 
     if (!canWatchdogReboot())
     {
-        logWarning("Watchdog reboot suppressed: " + reason);
+        log(DEBUG.WARNING, "[WARNING] ", "Watchdog reboot suppressed: " + reason);
 
         return;
     }
@@ -1907,7 +1858,7 @@ function watchdogTask()
                             }
                             else
                             {
-                                logWarning(
+                                log(DEBUG.WARNING, "[WARNING] ",
                                     "Device info failed: " +
                                     info_error_message
                                 );
@@ -1947,13 +1898,13 @@ function heartbeatTask()
 
 function main()
 {
-    logInfo("========================================");
+    log(DEBUG.INFO, "[INFO] ", "========================================");
 
-    logInfo(FIRMWARE.NAME);
+    log(DEBUG.INFO, "[INFO] ", FIRMWARE.NAME);
 
-    logInfo("Version : " + FIRMWARE.VERSION);
+    log(DEBUG.INFO, "[INFO] ", "Version : " + FIRMWARE.VERSION);
 
-    logInfo("========================================");
+    log(DEBUG.INFO, "[INFO] ", "========================================");
 
     loadPersistentData();
 
@@ -1991,7 +1942,7 @@ function main()
 
     setState(STATE.IDLE);
 
-    logInfo("Startup completed");
+    log(DEBUG.INFO, "[INFO] ", "Startup completed");
 }
 
 //-----------------------------------------------------------------------------

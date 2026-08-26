@@ -13,7 +13,7 @@ function startStopHold()
 
     boiler.status.stop_hold_remaining = boiler.config.stop_hold;
 
-    logInfo(
+    log(DEBUG.INFO, "[INFO] ",
         "Stop hold started (" +
         boiler.status.stop_hold_remaining +
         " s)"
@@ -40,7 +40,7 @@ function updateStopHold()
 
     boiler.status.stop_hold_remaining = 0;
 
-    logInfo("Stop hold expired");
+    log(DEBUG.INFO, "[INFO] ", "Stop hold expired");
 
     publishStatus();
 

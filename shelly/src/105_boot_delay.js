@@ -13,7 +13,7 @@ function startBootDelay()
 
     boiler.status.boot_delay_remaining = CONFIG.BOOT_DELAY;
 
-    logInfo(
+    log(DEBUG.INFO, "[INFO] ",
         "Boot delay started (" +
         boiler.status.boot_delay_remaining +
         " s)"
@@ -40,7 +40,7 @@ function updateBootDelay()
 
     boiler.status.boot_delay_remaining = 0;
 
-    logInfo("Boot delay expired");
+    log(DEBUG.INFO, "[INFO] ", "Boot delay expired");
 
     publishStatus();
 

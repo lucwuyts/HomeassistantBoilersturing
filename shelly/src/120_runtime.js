@@ -34,7 +34,7 @@ function systemTimerTask()
 
         if (boiler.status.runtime >= boiler.config.max_runtime)
         {
-            logWarning("Maximum runtime exceeded");
+            log(DEBUG.WARNING, "[WARNING] ", "Maximum runtime exceeded");
 
             startRestartDelay();
 
@@ -57,7 +57,7 @@ function systemTimerTask()
 
             boiler.status.restart_remaining = 0;
 
-            logInfo("Restart delay expired");
+            log(DEBUG.INFO, "[INFO] ", "Restart delay expired");
 
             publishStatus();
 
@@ -89,7 +89,7 @@ function checkControllerWatchdog()
 
     boiler.status.watchdog = false;
 
-    logWarning("Controller offline");
+    log(DEBUG.WARNING, "[WARNING] ", "Controller offline");
 
     publishStatus();
 }

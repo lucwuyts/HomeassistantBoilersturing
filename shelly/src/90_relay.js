@@ -33,7 +33,7 @@ function applyRelayState(on, source)
         boiler.status.runtime = 0;
     }
 
-    logInfo("Relay state synced " + (on ? "ON" : "OFF") + " (" + source + ")");
+    log(DEBUG.INFO, "[INFO] ", "Relay state synced " + (on ? "ON" : "OFF") + " (" + source + ")");
 
     publishStatus();
 
@@ -66,14 +66,14 @@ function syncRelayState()
 
                     if (error_code !== 0)
                     {
-                        logError("Relay state read failed: " + error_message);
+                        log(DEBUG.ERROR, "[ERROR] ", "Relay state read failed: " + error_message);
 
                         return;
                     }
 
                     if (!result || typeof result.output !== "boolean")
                     {
-                        logError("Relay state read returned invalid data");
+                        log(DEBUG.ERROR, "[ERROR] ", "Relay state read returned invalid data");
 
                         return;
                     }
@@ -107,7 +107,7 @@ function setRelay(on)
 
         relayPendingTarget = on;
 
-        logInfo("Relay switch " + (on ? "ON" : "OFF") + " queued");
+        log(DEBUG.INFO, "[INFO] ", "Relay switch " + (on ? "ON" : "OFF") + " queued");
 
         return;
     }
@@ -138,7 +138,7 @@ function setRelay(on)
 
                     if (error_code !== 0)
                     {
-                        logError("Relay switch failed: " + error_message);
+                        log(DEBUG.ERROR, "[ERROR] ", "Relay switch failed: " + error_message);
 
                         publishStatus();
                     }
@@ -146,7 +146,7 @@ function setRelay(on)
                     {
                         applyRelayState(on, "controller");
 
-                        logInfo("Relay switched " + (on ? "ON" : "OFF"));
+                        log(DEBUG.INFO, "[INFO] ", "Relay switched " + (on ? "ON" : "OFF"));
                     }
 
                     if (pending !== null && pending !== boiler.status.relay)
@@ -180,7 +180,7 @@ function relayOn()
         return;
     }
 
-    logInfo("Relay switch ON requested");
+    log(DEBUG.INFO, "[INFO] ", "Relay switch ON requested");
 
     setRelay(true);
 }
@@ -196,7 +196,7 @@ function relayOff()
         return;
     }
 
-    logInfo("Relay switch OFF requested");
+    log(DEBUG.INFO, "[INFO] ", "Relay switch OFF requested");
 
     setRelay(false);
 }
@@ -205,7 +205,7 @@ function relayOff()
 
 function forceRelayOff()
 {
-    logInfo("Relay force OFF requested");
+    log(DEBUG.INFO, "[INFO] ", "Relay force OFF requested");
 
     setRelay(false);
 }

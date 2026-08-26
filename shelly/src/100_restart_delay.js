@@ -19,7 +19,7 @@ function startRestartDelay()
     boiler.status.restart_remaining =
         boiler.config.restart_delay;
 
-    logInfo(
+    log(DEBUG.INFO, "[INFO] ",
         "Restart delay started (" +
         boiler.status.restart_remaining +
         " s)"

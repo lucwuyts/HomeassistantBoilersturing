@@ -9,13 +9,13 @@
 
 function main()
 {
-    logInfo("========================================");
+    log(DEBUG.INFO, "[INFO] ", "========================================");
 
-    logInfo(FIRMWARE.NAME);
+    log(DEBUG.INFO, "[INFO] ", FIRMWARE.NAME);
 
-    logInfo("Version : " + FIRMWARE.VERSION);
+    log(DEBUG.INFO, "[INFO] ", "Version : " + FIRMWARE.VERSION);
 
-    logInfo("========================================");
+    log(DEBUG.INFO, "[INFO] ", "========================================");
 
     loadPersistentData();
 
@@ -53,7 +53,7 @@ function main()
 
     setState(STATE.IDLE);
 
-    logInfo("Startup completed");
+    log(DEBUG.INFO, "[INFO] ", "Startup completed");
 }
 
 //-----------------------------------------------------------------------------

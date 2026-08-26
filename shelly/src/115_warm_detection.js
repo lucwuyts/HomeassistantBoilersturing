@@ -18,7 +18,7 @@ function resetWarmEnough()
 
     boiler.status.warm_enough_since = "";
 
-    logInfo("Warm enough flag reset");
+    log(DEBUG.INFO, "[INFO] ", "Warm enough flag reset");
 
     savePersistentData();
 
@@ -33,7 +33,7 @@ function markWarmEnough()
 
     boiler.status.warm_enough_since = "" + monotonicMs;
 
-    logInfo("Boiler warm enough detected");
+    log(DEBUG.INFO, "[INFO] ", "Boiler warm enough detected");
 }
 
 //-----------------------------------------------------------------------------

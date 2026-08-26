@@ -96,7 +96,7 @@ function savePersistentData()
         JSON.stringify(persistent)
     );
 
-    logTrace("Persistent data saved");
+    log(DEBUG.TRACE, "[TRACE] ", "Persistent data saved");
 }
 
 //-----------------------------------------------------------------------------
@@ -113,7 +113,7 @@ function resetStatistics()
 
     savePersistentData();
 
-    logInfo("Statistics reset");
+    log(DEBUG.INFO, "[INFO] ", "Statistics reset");
 }
 
 //-----------------------------------------------------------------------------
@@ -126,7 +126,7 @@ function resetDailyStatistics()
 
     savePersistentData();
 
-    logInfo("Daily statistics reset");
+    log(DEBUG.INFO, "[INFO] ", "Daily statistics reset");
 }
 
 //-----------------------------------------------------------------------------
@@ -165,7 +165,7 @@ function loadPersistentData()
 
     if (json === null)
     {
-        logInfo("No persistent data found");
+        log(DEBUG.INFO, "[INFO] ", "No persistent data found");
 
         savePersistentData();
 
@@ -178,7 +178,7 @@ function loadPersistentData()
     }
     catch(error)
     {
-        logWarning("Persistent data corrupted");
+        log(DEBUG.WARNING, "[WARNING] ", "Persistent data corrupted");
 
         persistent =
         {
@@ -220,18 +220,18 @@ function loadPersistentData()
 
     if (persistent.version !== STORAGE.VERSION)
     {
-        logWarning("Persistent data version mismatch");
+        log(DEBUG.WARNING, "[WARNING] ", "Persistent data version mismatch");
     }
 
     copyPersistentToStatus();
 
-    logInfo("Persistent data loaded");
+    log(DEBUG.INFO, "[INFO] ", "Persistent data loaded");
 
-    logInfo("Firmware boots : " + boiler.status.firmware_boots);
+    log(DEBUG.INFO, "[INFO] ", "Firmware boots : " + boiler.status.firmware_boots);
 
-    logInfo("Starts today   : " + boiler.status.starts_today);
+    log(DEBUG.INFO, "[INFO] ", "Starts today   : " + boiler.status.starts_today);
 
-    logInfo("Total starts   : " + boiler.status.total_starts);
+    log(DEBUG.INFO, "[INFO] ", "Total starts   : " + boiler.status.total_starts);
 
-    logInfo("Total runtime  : " + boiler.status.total_runtime + " s");
+    log(DEBUG.INFO, "[INFO] ", "Total runtime  : " + boiler.status.total_runtime + " s");
 }

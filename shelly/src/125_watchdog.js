@@ -128,7 +128,7 @@ function resetWatchdogProblem()
 
     boiler.status.watchdog_reason = "";
 
-    logInfo("Watchdog healthy");
+    log(DEBUG.INFO, "[INFO] ", "Watchdog healthy");
 }
 
 //-----------------------------------------------------------------------------
@@ -177,7 +177,7 @@ function performWatchdogReboot(reason)
 
     publishStatus();
 
-    logError("Watchdog reboot: " + reason);
+    log(DEBUG.ERROR, "[ERROR] ", "Watchdog reboot: " + reason);
 
     Shelly.call("Shelly.Reboot");
 }
@@ -208,7 +208,7 @@ function handleWatchdogReason(reason)
 
         boiler.status.watchdog_reason = reason;
 
-        logWarning("Watchdog problem: " + reason);
+        log(DEBUG.WARNING, "[WARNING] ", "Watchdog problem: " + reason);
 
         return;
     }
@@ -223,7 +223,7 @@ function handleWatchdogReason(reason)
 
     if (!canWatchdogReboot())
     {
-        logWarning("Watchdog reboot suppressed: " + reason);
+        log(DEBUG.WARNING, "[WARNING] ", "Watchdog reboot suppressed: " + reason);
 
         return;
     }
@@ -268,7 +268,7 @@ function watchdogTask()
                             }
                             else
                             {
-                                logWarning(
+                                log(DEBUG.WARNING, "[WARNING] ",
                                     "Device info failed: " +
                                     info_error_message
                                 );

@@ -15,7 +15,7 @@ function copyKnownFields(source, target, label)
         {
             target[key] = source[key];
 
-            logTrace(label + "." + key + " = " + target[key]);
+            log(DEBUG.TRACE, "[TRACE] ", label + "." + key + " = " + target[key]);
         }
     }
 }
@@ -41,7 +41,7 @@ function markControllerOnline()
 {
     if (!boiler.status.controller_online)
     {
-        logInfo("Controller online");
+        log(DEBUG.INFO, "[INFO] ", "Controller online");
     }
 
     boiler.status.controller_online = true;
@@ -57,7 +57,7 @@ function markControllerOnline()
 
 function processControllerMessage(topic, message)
 {
-    logInfo("Controller message received");
+    log(DEBUG.INFO, "[INFO] ", "Controller message received");
 
     updateLastMqttSeen();
 
@@ -69,14 +69,14 @@ function processControllerMessage(topic, message)
     }
     catch(error)
     {
-        logError("Invalid JSON");
+        log(DEBUG.ERROR, "[ERROR] ", "Invalid JSON");
 
         return;
     }
 
     if (!data.boiler)
     {
-        logError("Missing boiler object");
+        log(DEBUG.ERROR, "[ERROR] ", "Missing boiler object");
 
         return;
     }
@@ -92,7 +92,7 @@ function processControllerMessage(topic, message)
     {
         if (!data.boiler.command)
         {
-            logError("Missing config object");
+            log(DEBUG.ERROR, "[ERROR] ", "Missing config object");
 
             return;
         }
@@ -134,7 +134,7 @@ function processControllerMessage(topic, message)
 
 function mqttInit()
 {
-    logInfo("MQTT framework initialized");
+    log(DEBUG.INFO, "[INFO] ", "MQTT framework initialized");
 
     MQTT.subscribe(
         TOPIC.CONTROLLER,
@@ -144,7 +144,7 @@ function mqttInit()
         )
     );
 
-    logInfo("Subscribed to " + TOPIC.CONTROLLER);
+    log(DEBUG.INFO, "[INFO] ", "Subscribed to " + TOPIC.CONTROLLER);
 }
 
 //-----------------------------------------------------------------------------
@@ -179,6 +179,6 @@ function publishStatus()
         payload
     );
 
-    logTrace("Status published");
+    log(DEBUG.TRACE, "[TRACE] ", "Status published");
 }
 
