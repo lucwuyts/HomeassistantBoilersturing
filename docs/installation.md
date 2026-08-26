@@ -59,7 +59,8 @@ Het resultaat staat in:
 build/boiler_controller.js
 ```
 
-Upload dit volledige bestand als Shelly script. De buildversie gebruikt het formaat:
+Upload dit volledige bestand als Shelly script. De build-output is geminified om minder geheugen op de Shelly te gebruiken; de bronbestanden in `shelly/src` blijven leesbaar.
+De buildversie gebruikt het formaat:
 
 ```text
 YYYY.MM.DD-NN
