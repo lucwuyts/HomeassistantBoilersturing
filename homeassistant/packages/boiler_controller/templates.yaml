@@ -36,11 +36,11 @@ template:
         unique_id: boiler_shelly_last_seen
         device_class: timestamp
         state: >
-          {% set uptime = states('sensor.shelly_boiler_uptime') %}
-          {% if uptime in ['unknown', 'unavailable', 'none', ''] %}
-            {{ '' }}
+          {% set uptime_entity = states.sensor.shelly_boiler_uptime %}
+          {% if uptime_entity is defined %}
+            {{ uptime_entity.last_changed.isoformat() }}
           {% else %}
-            {{ states.sensor.shelly_boiler_uptime.last_changed.isoformat() }}
+            {{ none }}
           {% endif %}
 
       - name: Boiler Predicted Quarter Peak W

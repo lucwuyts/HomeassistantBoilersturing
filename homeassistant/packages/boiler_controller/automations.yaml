@@ -105,6 +105,15 @@ automation:
 
     action:
 
+      - variables:
+          shelly_last_seen_text: >
+            {% set seen = states('sensor.boiler_shelly_last_seen') %}
+            {% if seen in ['unknown', 'unavailable', 'none', ''] %}
+              onbekend
+            {% else %}
+              {{ as_timestamp(seen) | timestamp_custom('%d-%m-%Y %H:%M:%S', true) }}
+            {% endif %}
+
       - service: pyscript.send_mail
         continue_on_error: true
         data:
@@ -112,7 +121,7 @@ automation:
           message: >
             Shelly boilercontroller is langer dan 5 minuten offline.
             Laatste heartbeat:
-            {{ states('sensor.boiler_shelly_last_seen') }}.
+            {{ shelly_last_seen_text }}.
             Controleer Shelly Pro 1 / wifi / voeding.
           recipients:
             - luc.wuyts@a-d-e.net
@@ -126,7 +135,7 @@ automation:
             </p>
             <p>
               Laatste heartbeat:
-              <b>{{ states('sensor.boiler_shelly_last_seen') }}</b>
+              <b>{{ shelly_last_seen_text }}</b>
             </p>
             <p>
               Controleer Shelly Pro 1 / wifi / voeding.
@@ -142,7 +151,7 @@ automation:
         data:
           text: >
             Shelly boilercontroller - geen antwoord meer sedert
-            {{ states('sensor.boiler_shelly_last_seen') }}
+            {{ shelly_last_seen_text }}
 
       - service: persistent_notification.create
         data:
@@ -175,13 +184,22 @@ automation:
 
     action:
 
+      - variables:
+          shelly_last_seen_text: >
+            {% set seen = states('sensor.boiler_shelly_last_seen') %}
+            {% if seen in ['unknown', 'unavailable', 'none', ''] %}
+              onbekend
+            {% else %}
+              {{ as_timestamp(seen) | timestamp_custom('%d-%m-%Y %H:%M:%S', true) }}
+            {% endif %}
+
       - service: script.whatsapp_callmebot_checked_send
         continue_on_error: true
         metadata: {}
         data:
           text: >
             Shelly - opnieuw bereikbaar sinds
-            {{ states('sensor.boiler_shelly_last_seen') }}
+            {{ shelly_last_seen_text }}
 
       - service: persistent_notification.dismiss
         data:
