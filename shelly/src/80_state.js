@@ -37,7 +37,7 @@ function updateLastStopReason(reason)
 
     boiler.status.last_stop_reason = reason;
 
-    boiler.status.last_stop = isoTimestamp();
+    boiler.status.last_stop = "" + monotonicMs;
 
     return true;
 }

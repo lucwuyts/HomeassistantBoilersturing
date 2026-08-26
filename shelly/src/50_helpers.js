@@ -40,20 +40,6 @@ function syncClockFromStatus(status)
 
 //-----------------------------------------------------------------------------
 
-function isoTimestamp()
-{
-    return "" + monotonicMs;
-}
-
-//-----------------------------------------------------------------------------
-
-function timestampMs()
-{
-    return monotonicMs;
-}
-
-//-----------------------------------------------------------------------------
-
 function dateKey()
 {
     if (wallClockSeconds > 0)
@@ -61,7 +47,7 @@ function dateKey()
         return "" + Math.floor(wallClockSeconds / 86400);
     }
 
-    return "" + Math.floor(timestampMs() / 86400000);
+    return "" + Math.floor(monotonicMs / 86400000);
 }
 
 //-----------------------------------------------------------------------------
@@ -112,7 +98,7 @@ function recordScriptError(context, error)
 
         boiler.status.last_script_error_context = context;
 
-        boiler.status.last_script_error_time = isoTimestamp();
+        boiler.status.last_script_error_time = "" + monotonicMs;
 
         boiler.status.watchdog_reason = "script error: " + context;
 

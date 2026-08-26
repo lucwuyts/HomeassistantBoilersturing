@@ -10,7 +10,7 @@
 const FIRMWARE =
 {
     NAME        : "Boiler Controller",
-    VERSION     : "2026.08.26-01",
+    VERSION     : "2026.08.26-02",
     API         : 1
 };
 
@@ -381,20 +381,6 @@ function syncClockFromStatus(status)
 
 //-----------------------------------------------------------------------------
 
-function isoTimestamp()
-{
-    return "" + monotonicMs;
-}
-
-//-----------------------------------------------------------------------------
-
-function timestampMs()
-{
-    return monotonicMs;
-}
-
-//-----------------------------------------------------------------------------
-
 function dateKey()
 {
     if (wallClockSeconds > 0)
@@ -402,7 +388,7 @@ function dateKey()
         return "" + Math.floor(wallClockSeconds / 86400);
     }
 
-    return "" + Math.floor(timestampMs() / 86400000);
+    return "" + Math.floor(monotonicMs / 86400000);
 }
 
 //-----------------------------------------------------------------------------
@@ -453,7 +439,7 @@ function recordScriptError(context, error)
 
         boiler.status.last_script_error_context = context;
 
-        boiler.status.last_script_error_time = isoTimestamp();
+        boiler.status.last_script_error_time = "" + monotonicMs;
 
         boiler.status.watchdog_reason = "script error: " + context;
 
@@ -809,9 +795,9 @@ function markControllerOnline()
 
     boiler.status.watchdog = true;
 
-    boiler.status.last_controller_update = isoTimestamp();
+    boiler.status.last_controller_update = "" + monotonicMs;
 
-    boiler.status.last_controller_seen = timestampMs();
+    boiler.status.last_controller_seen = monotonicMs;
 }
 
 //-----------------------------------------------------------------------------
@@ -924,7 +910,7 @@ function mqttPublish(topic, object)
 
 function publishStatus()
 {
-    boiler.status.last_update = isoTimestamp();
+    boiler.status.last_update = "" + monotonicMs;
 
     let payload =
     {
@@ -982,7 +968,7 @@ function updateLastStopReason(reason)
 
     boiler.status.last_stop_reason = reason;
 
-    boiler.status.last_stop = isoTimestamp();
+    boiler.status.last_stop = "" + monotonicMs;
 
     return true;
 }
@@ -1460,7 +1446,7 @@ function startBoiler()
 
     boiler.status.total_starts++;
 
-    boiler.status.last_start = isoTimestamp();
+    boiler.status.last_start = "" + monotonicMs;
 
     logInfo("Boiler started");
 
@@ -1532,7 +1518,7 @@ function markWarmEnough()
 {
     boiler.status.warm_enough = true;
 
-    boiler.status.warm_enough_since = isoTimestamp();
+    boiler.status.warm_enough_since = "" + monotonicMs;
 
     logInfo("Boiler warm enough detected");
 }
@@ -1657,7 +1643,7 @@ function checkControllerWatchdog()
         return;
     }
 
-    if ((timestampMs() - boiler.status.last_controller_seen) <= CONFIG.CONTROLLER_TIMEOUT)
+    if ((monotonicMs - boiler.status.last_controller_seen) <= CONFIG.CONTROLLER_TIMEOUT)
     {
         return;
     }
@@ -1682,9 +1668,9 @@ function checkControllerWatchdog()
 
 function updateLastMqttSeen()
 {
-    boiler.status.last_mqtt_seen = isoTimestamp();
+    boiler.status.last_mqtt_seen = "" + monotonicMs;
 
-    boiler.status.last_mqtt_seen_ms = timestampMs();
+    boiler.status.last_mqtt_seen_ms = monotonicMs;
 }
 
 //-----------------------------------------------------------------------------
@@ -1699,7 +1685,7 @@ function updateControllerAge()
     }
 
     boiler.status.last_controller_age = Math.round(
-        (timestampMs() - boiler.status.last_controller_seen) / 1000
+        (monotonicMs - boiler.status.last_controller_seen) / 1000
     );
 }
 
@@ -1805,7 +1791,7 @@ function canWatchdogReboot()
     if (uptime <= 0 && boiler.status.watchdog_problem_since > 0)
     {
         uptime = Math.round(
-            (timestampMs() - boiler.status.watchdog_problem_since) / 1000
+            (monotonicMs - boiler.status.watchdog_problem_since) / 1000
         );
     }
 
@@ -1819,12 +1805,12 @@ function canWatchdogReboot()
         return true;
     }
 
-    if (timestampMs() < boiler.status.last_watchdog_reboot)
+    if (monotonicMs < boiler.status.last_watchdog_reboot)
     {
         return true;
     }
 
-    return (timestampMs() - boiler.status.last_watchdog_reboot) >
+    return (monotonicMs - boiler.status.last_watchdog_reboot) >
         CONFIG.WATCHDOG_REBOOT_GAP;
 }
 
@@ -1836,7 +1822,7 @@ function performWatchdogReboot(reason)
 
     boiler.status.watchdog_reason = reason;
 
-    boiler.status.last_watchdog_reboot = timestampMs();
+    boiler.status.last_watchdog_reboot = monotonicMs;
 
     savePersistentData();
 
@@ -1869,7 +1855,7 @@ function handleWatchdogReason(reason)
 
     if (boiler.status.watchdog_problem_since === 0)
     {
-        boiler.status.watchdog_problem_since = timestampMs();
+        boiler.status.watchdog_problem_since = monotonicMs;
 
         boiler.status.watchdog_reason = reason;
 
@@ -1880,7 +1866,7 @@ function handleWatchdogReason(reason)
 
     boiler.status.watchdog_reason = reason;
 
-    if ((timestampMs() - boiler.status.watchdog_problem_since) <
+    if ((monotonicMs - boiler.status.watchdog_problem_since) <
         CONFIG.WATCHDOG_TIMEOUT)
     {
         return;

@@ -31,7 +31,7 @@ function markWarmEnough()
 {
     boiler.status.warm_enough = true;
 
-    boiler.status.warm_enough_since = isoTimestamp();
+    boiler.status.warm_enough_since = "" + monotonicMs;
 
     logInfo("Boiler warm enough detected");
 }

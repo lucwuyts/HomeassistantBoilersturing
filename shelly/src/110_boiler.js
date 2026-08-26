@@ -131,7 +131,7 @@ function startBoiler()
 
     boiler.status.total_starts++;
 
-    boiler.status.last_start = isoTimestamp();
+    boiler.status.last_start = "" + monotonicMs;
 
     logInfo("Boiler started");
 

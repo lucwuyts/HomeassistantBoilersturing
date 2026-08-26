@@ -80,7 +80,7 @@ function checkControllerWatchdog()
         return;
     }
 
-    if ((timestampMs() - boiler.status.last_controller_seen) <= CONFIG.CONTROLLER_TIMEOUT)
+    if ((monotonicMs - boiler.status.last_controller_seen) <= CONFIG.CONTROLLER_TIMEOUT)
     {
         return;
     }

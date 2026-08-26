@@ -48,9 +48,9 @@ function markControllerOnline()
 
     boiler.status.watchdog = true;
 
-    boiler.status.last_controller_update = isoTimestamp();
+    boiler.status.last_controller_update = "" + monotonicMs;
 
-    boiler.status.last_controller_seen = timestampMs();
+    boiler.status.last_controller_seen = monotonicMs;
 }
 
 //-----------------------------------------------------------------------------
@@ -163,7 +163,7 @@ function mqttPublish(topic, object)
 
 function publishStatus()
 {
-    boiler.status.last_update = isoTimestamp();
+    boiler.status.last_update = "" + monotonicMs;
 
     let payload =
     {

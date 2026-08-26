@@ -9,9 +9,9 @@
 
 function updateLastMqttSeen()
 {
-    boiler.status.last_mqtt_seen = isoTimestamp();
+    boiler.status.last_mqtt_seen = "" + monotonicMs;
 
-    boiler.status.last_mqtt_seen_ms = timestampMs();
+    boiler.status.last_mqtt_seen_ms = monotonicMs;
 }
 
 //-----------------------------------------------------------------------------
@@ -26,7 +26,7 @@ function updateControllerAge()
     }
 
     boiler.status.last_controller_age = Math.round(
-        (timestampMs() - boiler.status.last_controller_seen) / 1000
+        (monotonicMs - boiler.status.last_controller_seen) / 1000
     );
 }
 
@@ -132,7 +132,7 @@ function canWatchdogReboot()
     if (uptime <= 0 && boiler.status.watchdog_problem_since > 0)
     {
         uptime = Math.round(
-            (timestampMs() - boiler.status.watchdog_problem_since) / 1000
+            (monotonicMs - boiler.status.watchdog_problem_since) / 1000
         );
     }
 
@@ -146,12 +146,12 @@ function canWatchdogReboot()
         return true;
     }
 
-    if (timestampMs() < boiler.status.last_watchdog_reboot)
+    if (monotonicMs < boiler.status.last_watchdog_reboot)
     {
         return true;
     }
 
-    return (timestampMs() - boiler.status.last_watchdog_reboot) >
+    return (monotonicMs - boiler.status.last_watchdog_reboot) >
         CONFIG.WATCHDOG_REBOOT_GAP;
 }
 
@@ -163,7 +163,7 @@ function performWatchdogReboot(reason)
 
     boiler.status.watchdog_reason = reason;
 
-    boiler.status.last_watchdog_reboot = timestampMs();
+    boiler.status.last_watchdog_reboot = monotonicMs;
 
     savePersistentData();
 
@@ -196,7 +196,7 @@ function handleWatchdogReason(reason)
 
     if (boiler.status.watchdog_problem_since === 0)
     {
-        boiler.status.watchdog_problem_since = timestampMs();
+        boiler.status.watchdog_problem_since = monotonicMs;
 
         boiler.status.watchdog_reason = reason;
 
@@ -207,7 +207,7 @@ function handleWatchdogReason(reason)
 
     boiler.status.watchdog_reason = reason;
 
-    if ((timestampMs() - boiler.status.watchdog_problem_since) <
+    if ((monotonicMs - boiler.status.watchdog_problem_since) <
         CONFIG.WATCHDOG_TIMEOUT)
     {
         return;
