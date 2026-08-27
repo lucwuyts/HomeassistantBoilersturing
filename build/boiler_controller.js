@@ -1,7 +1,7 @@
 const FIRMWARE =
 {
 NAME        : "Boiler Controller",
-VERSION     : "2026.08.27-03",
+VERSION     : "2026.08.27-04",
 API         : 1
 };
 const CONFIG =
@@ -17,7 +17,7 @@ STOP_HOLD             : 300,
 SCRIPT_ERROR_REBOOT_LIMIT : 5,
 SCRIPT_ERROR_MAX_LENGTH   : 120,
 RELAY_ID              : 0,
-RELAY_SYNC_INTERVAL   : 60000,
+RELAY_SYNC_INTERVAL   : 300000,
 WARMUP_MIN_RUNTIME    : 300,
 DEFAULT_MAX_RUNTIME   : 10800,
 DEBUG_LEVEL           : 2,
@@ -990,6 +990,7 @@ boiler.status.watchdog = false;
 log(DEBUG.WARNING, "[WARNING] ", "Controller offline");
 publishStatus();
 }
+let deviceInfoLoaded = false;
 function updateLastMqttSeen()
 {
 boiler.status.last_mqtt_seen = "" + monotonicMs;
@@ -1048,6 +1049,7 @@ info.fw_id ||
 info.version ||
 boiler.status.firmware_version;
 boiler.status.script_version = FIRMWARE.VERSION;
+deviceInfoLoaded = true;
 }
 function publishWatchdogStatus()
 {
@@ -1160,6 +1162,11 @@ publishStatus();
 return;
 }
 updateDiagnostics(result);
+if (deviceInfoLoaded)
+{
+publishWatchdogStatus();
+return;
+}
 Shelly.call(
 "Shelly.GetDeviceInfo",
 {},

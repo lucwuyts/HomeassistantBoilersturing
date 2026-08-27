@@ -7,6 +7,10 @@
  *
  ******************************************************************************/
 
+let deviceInfoLoaded = false;
+
+//-----------------------------------------------------------------------------
+
 function updateLastMqttSeen()
 {
     boiler.status.last_mqtt_seen = "" + monotonicMs;
@@ -87,6 +91,8 @@ function updateDeviceInfo(info)
         boiler.status.firmware_version;
 
     boiler.status.script_version = FIRMWARE.VERSION;
+
+    deviceInfoLoaded = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -254,6 +260,13 @@ function watchdogTask()
                 }
 
                 updateDiagnostics(result);
+
+                if (deviceInfoLoaded)
+                {
+                    publishWatchdogStatus();
+
+                    return;
+                }
 
                 Shelly.call(
                     "Shelly.GetDeviceInfo",
