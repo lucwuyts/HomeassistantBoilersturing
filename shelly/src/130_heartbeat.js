@@ -6,8 +6,3 @@
  * Description : Heartbeat manager
  *
  ******************************************************************************/
-
-function heartbeatTask()
-{
-    watchdogTask();
-}

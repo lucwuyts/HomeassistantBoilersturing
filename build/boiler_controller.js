@@ -1,7 +1,7 @@
 const FIRMWARE =
 {
 NAME        : "Boiler Controller",
-VERSION     : "2026.08.27-01",
+VERSION     : "2026.08.27-02",
 API         : 1
 };
 const CONFIG =
@@ -1186,10 +1186,6 @@ publishWatchdogStatus();
 )
 );
 }
-function heartbeatTask()
-{
-watchdogTask();
-}
 function main()
 {
 log(DEBUG.INFO, "[INFO] ", "========================================");
@@ -1209,7 +1205,7 @@ CONFIG.WATCHDOG_INTERVAL,
 true,
 function()
 {
-safeCall("heartbeatTask", heartbeatTask);
+safeCall("heartbeatTask", watchdogTask);
 }
 );
 Timer.set(

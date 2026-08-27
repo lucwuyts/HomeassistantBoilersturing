@@ -38,7 +38,7 @@ function main()
         true,
         function()
         {
-            safeCall("heartbeatTask", heartbeatTask);
+            safeCall("heartbeatTask", watchdogTask);
         }
     );
 
