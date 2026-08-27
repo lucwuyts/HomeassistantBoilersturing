@@ -1,7 +1,7 @@
 const FIRMWARE =
 {
 NAME        : "Boiler Controller",
-VERSION     : "2026.08.27-02",
+VERSION     : "2026.08.27-03",
 API         : 1
 };
 const CONFIG =
