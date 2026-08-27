@@ -1,12 +1,13 @@
 const FIRMWARE =
 {
 NAME        : "Boiler Controller",
-VERSION     : "2026.08.27-04",
+VERSION     : "2026.08.27-05",
 API         : 1
 };
 const CONFIG =
 {
 HEARTBEAT_INTERVAL    : 60000,
+DIAGNOSTICS_INTERVAL  : 300000,
 CONTROLLER_TIMEOUT    : 120000,
 WATCHDOG_INTERVAL     : 60000,
 WATCHDOG_TIMEOUT      : 600000,
@@ -991,6 +992,7 @@ log(DEBUG.WARNING, "[WARNING] ", "Controller offline");
 publishStatus();
 }
 let deviceInfoLoaded = false;
+let lastDiagnosticsSync = -CONFIG.DIAGNOSTICS_INTERVAL;
 function updateLastMqttSeen()
 {
 boiler.status.last_mqtt_seen = "" + monotonicMs;
@@ -1146,6 +1148,14 @@ performWatchdogReboot(reason);
 }
 function watchdogTask()
 {
+if ((monotonicMs - lastDiagnosticsSync) < CONFIG.DIAGNOSTICS_INTERVAL)
+{
+updateControllerAge();
+evaluateSoftwareWatchdog();
+publishStatus();
+return;
+}
+lastDiagnosticsSync = monotonicMs;
 Shelly.call(
 "Shelly.GetStatus",
 {},

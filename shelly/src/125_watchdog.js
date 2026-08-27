@@ -9,6 +9,8 @@
 
 let deviceInfoLoaded = false;
 
+let lastDiagnosticsSync = -CONFIG.DIAGNOSTICS_INTERVAL;
+
 //-----------------------------------------------------------------------------
 
 function updateLastMqttSeen()
@@ -241,6 +243,19 @@ function handleWatchdogReason(reason)
 
 function watchdogTask()
 {
+    if ((monotonicMs - lastDiagnosticsSync) < CONFIG.DIAGNOSTICS_INTERVAL)
+    {
+        updateControllerAge();
+
+        evaluateSoftwareWatchdog();
+
+        publishStatus();
+
+        return;
+    }
+
+    lastDiagnosticsSync = monotonicMs;
+
     Shelly.call(
         "Shelly.GetStatus",
         {},
