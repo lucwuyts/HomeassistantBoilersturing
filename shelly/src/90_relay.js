@@ -15,6 +15,8 @@ let relayCommandTarget = null;
 
 let relayPendingTarget = null;
 
+let lastRelaySync = -CONFIG.RELAY_SYNC_INTERVAL;
+
 //-----------------------------------------------------------------------------
 
 function applyRelayState(on, source)
@@ -48,6 +50,13 @@ function syncRelayState()
     {
         return;
     }
+
+    if ((monotonicMs - lastRelaySync) < CONFIG.RELAY_SYNC_INTERVAL)
+    {
+        return;
+    }
+
+    lastRelaySync = monotonicMs;
 
     relaySyncInProgress = true;
 

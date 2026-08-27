@@ -1,7 +1,7 @@
 const FIRMWARE =
 {
 NAME        : "Boiler Controller",
-VERSION     : "2026.08.26-06",
+VERSION     : "2026.08.27-01",
 API         : 1
 };
 const CONFIG =
@@ -17,6 +17,7 @@ STOP_HOLD             : 300,
 SCRIPT_ERROR_REBOOT_LIMIT : 5,
 SCRIPT_ERROR_MAX_LENGTH   : 120,
 RELAY_ID              : 0,
+RELAY_SYNC_INTERVAL   : 60000,
 WARMUP_MIN_RUNTIME    : 300,
 DEFAULT_MAX_RUNTIME   : 10800,
 DEBUG_LEVEL           : 2,
@@ -554,6 +555,7 @@ let relaySyncInProgress = false;
 let relayCommandInProgress = false;
 let relayCommandTarget = null;
 let relayPendingTarget = null;
+let lastRelaySync = -CONFIG.RELAY_SYNC_INTERVAL;
 function applyRelayState(on, source)
 {
 if (boiler.status.relay === on)
@@ -576,6 +578,11 @@ if (relaySyncInProgress || relayCommandInProgress)
 {
 return;
 }
+if ((monotonicMs - lastRelaySync) < CONFIG.RELAY_SYNC_INTERVAL)
+{
+return;
+}
+lastRelaySync = monotonicMs;
 relaySyncInProgress = true;
 try
 {
