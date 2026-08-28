@@ -23,6 +23,8 @@ function main()
 
     savePersistentData();
 
+    relayInit();
+
     forceRelayOff();
 
     startBootDelay();

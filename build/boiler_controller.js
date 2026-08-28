@@ -1,7 +1,7 @@
 const FIRMWARE =
 {
 NAME        : "Boiler Controller",
-VERSION     : "2026.08.27-05",
+VERSION     : "2026.08.28-01",
 API         : 1
 };
 const CONFIG =
@@ -18,7 +18,6 @@ STOP_HOLD             : 300,
 SCRIPT_ERROR_REBOOT_LIMIT : 5,
 SCRIPT_ERROR_MAX_LENGTH   : 120,
 RELAY_ID              : 0,
-RELAY_SYNC_INTERVAL   : 300000,
 WARMUP_MIN_RUNTIME    : 300,
 DEFAULT_MAX_RUNTIME   : 10800,
 DEBUG_LEVEL           : 2,
@@ -552,11 +551,9 @@ boiler.status.last_stop_reason = reason;
 boiler.status.last_stop = "" + monotonicMs;
 return true;
 }
-let relaySyncInProgress = false;
 let relayCommandInProgress = false;
 let relayCommandTarget = null;
 let relayPendingTarget = null;
-let lastRelaySync = -CONFIG.RELAY_SYNC_INTERVAL;
 function applyRelayState(on, source)
 {
 if (boiler.status.relay === on)
@@ -573,52 +570,46 @@ log(DEBUG.INFO, "[INFO] ", "Relay state synced " + (on ? "ON" : "OFF") + " (" + 
 publishStatus();
 return true;
 }
-function syncRelayState()
+function handleRelayStatus(status)
 {
-if (relaySyncInProgress || relayCommandInProgress)
+if (!status ||
+status.component !== ("switch:" + CONFIG.RELAY_ID) ||
+!status.delta ||
+typeof status.delta.output !== "boolean")
 {
 return;
 }
-if ((monotonicMs - lastRelaySync) < CONFIG.RELAY_SYNC_INTERVAL)
-{
-return;
-}
-lastRelaySync = monotonicMs;
-relaySyncInProgress = true;
-try
-{
-Shelly.call(
-"Switch.GetStatus",
-{
-id : CONFIG.RELAY_ID
-},
-safeCallback(
-"Switch.GetStatus",
-function(result, error_code, error_message)
-{
-relaySyncInProgress = false;
-if (error_code !== 0)
-{
-log(DEBUG.ERROR, "[ERROR] ", "Relay state read failed: " + error_message);
-return;
-}
-if (!result || typeof result.output !== "boolean")
-{
-log(DEBUG.ERROR, "[ERROR] ", "Relay state read returned invalid data");
-return;
-}
-if (applyRelayState(result.output, "switch"))
+if (applyRelayState(status.delta.output, "status"))
 {
 evaluateController();
 }
 }
+function readInitialRelayState()
+{
+let status = Shelly.getComponentStatus("switch", CONFIG.RELAY_ID);
+if (!status || typeof status.output !== "boolean")
+{
+log(DEBUG.WARNING, "[WARNING] ", "Initial relay state unavailable");
+return;
+}
+applyRelayState(status.output, "initial");
+}
+function relayInit()
+{
+try
+{
+readInitialRelayState();
+Shelly.addStatusHandler(
+safeCallback(
+"relayStatusHandler",
+handleRelayStatus
 )
 );
+log(DEBUG.INFO, "[INFO] ", "Relay status handler registered");
 }
 catch(error)
 {
-relaySyncInProgress = false;
-recordScriptError("Switch.GetStatus call", error);
+recordScriptError("Shelly.addStatusHandler relay", error);
 }
 }
 function setRelay(on)
@@ -935,7 +926,6 @@ return true;
 function systemTimerTask()
 {
 advanceClock(CONFIG.RUNTIME_INTERVAL);
-syncRelayState();
 checkDailyStatisticsReset();
 checkControllerWatchdog();
 updateBootDelay();
@@ -1212,6 +1202,7 @@ log(DEBUG.INFO, "[INFO] ", "========================================");
 loadPersistentData();
 boiler.status.firmware_boots++;
 savePersistentData();
+relayInit();
 forceRelayOff();
 startBootDelay();
 mqttInit();

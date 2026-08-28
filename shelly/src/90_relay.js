@@ -7,15 +7,11 @@
  *
  ******************************************************************************/
 
-let relaySyncInProgress = false;
-
 let relayCommandInProgress = false;
 
 let relayCommandTarget = null;
 
 let relayPendingTarget = null;
-
-let lastRelaySync = -CONFIG.RELAY_SYNC_INTERVAL;
 
 //-----------------------------------------------------------------------------
 
@@ -44,62 +40,58 @@ function applyRelayState(on, source)
 
 //-----------------------------------------------------------------------------
 
-function syncRelayState()
+function handleRelayStatus(status)
 {
-    if (relaySyncInProgress || relayCommandInProgress)
+    if (!status ||
+        status.component !== ("switch:" + CONFIG.RELAY_ID) ||
+        !status.delta ||
+        typeof status.delta.output !== "boolean")
     {
         return;
     }
 
-    if ((monotonicMs - lastRelaySync) < CONFIG.RELAY_SYNC_INTERVAL)
+    if (applyRelayState(status.delta.output, "status"))
     {
+        evaluateController();
+    }
+}
+
+//-----------------------------------------------------------------------------
+
+function readInitialRelayState()
+{
+    let status = Shelly.getComponentStatus("switch", CONFIG.RELAY_ID);
+
+    if (!status || typeof status.output !== "boolean")
+    {
+        log(DEBUG.WARNING, "[WARNING] ", "Initial relay state unavailable");
+
         return;
     }
 
-    lastRelaySync = monotonicMs;
+    applyRelayState(status.output, "initial");
+}
 
-    relaySyncInProgress = true;
+//-----------------------------------------------------------------------------
 
+function relayInit()
+{
     try
     {
-        Shelly.call(
-            "Switch.GetStatus",
-            {
-                id : CONFIG.RELAY_ID
-            },
+        readInitialRelayState();
+
+        Shelly.addStatusHandler(
             safeCallback(
-                "Switch.GetStatus",
-                function(result, error_code, error_message)
-                {
-                    relaySyncInProgress = false;
-
-                    if (error_code !== 0)
-                    {
-                        log(DEBUG.ERROR, "[ERROR] ", "Relay state read failed: " + error_message);
-
-                        return;
-                    }
-
-                    if (!result || typeof result.output !== "boolean")
-                    {
-                        log(DEBUG.ERROR, "[ERROR] ", "Relay state read returned invalid data");
-
-                        return;
-                    }
-
-                    if (applyRelayState(result.output, "switch"))
-                    {
-                        evaluateController();
-                    }
-                }
+                "relayStatusHandler",
+                handleRelayStatus
             )
         );
+
+        log(DEBUG.INFO, "[INFO] ", "Relay status handler registered");
     }
     catch(error)
     {
-        relaySyncInProgress = false;
-
-        recordScriptError("Switch.GetStatus call", error);
+        recordScriptError("Shelly.addStatusHandler relay", error);
     }
 }
 
