@@ -138,10 +138,17 @@ function mqttInit()
 
     MQTT.subscribe(
         TOPIC.CONTROLLER,
-        safeCallback(
-            "processControllerMessage",
-            processControllerMessage
-        )
+        function(topic, message)
+        {
+            try
+            {
+                processControllerMessage(topic, message);
+            }
+            catch(error)
+            {
+                recordScriptError("processControllerMessage", error);
+            }
+        }
     );
 
     log(DEBUG.INFO, "[INFO] ", "Subscribed to " + TOPIC.CONTROLLER);

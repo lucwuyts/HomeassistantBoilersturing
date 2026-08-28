@@ -1,7 +1,7 @@
 const FIRMWARE =
 {
 NAME        : "Boiler Controller",
-VERSION     : "2026.08.28-01",
+VERSION     : "2026.08.28-02",
 API         : 1
 };
 const CONFIG =
@@ -237,30 +237,6 @@ finally
 scriptErrorHandling = false;
 }
 }
-function safeCall(context, callback)
-{
-try
-{
-callback();
-}
-catch(error)
-{
-recordScriptError(context, error);
-}
-}
-function safeCallback(context, callback)
-{
-return function(a, b, c)
-{
-safeCall(
-context,
-function()
-{
-callback(a, b, c);
-}
-);
-};
-}
 function copyPersistentToStatus()
 {
 boiler.status.firmware_boots = persistent.firmware_boots;
@@ -494,10 +470,17 @@ function mqttInit()
 log(DEBUG.INFO, "[INFO] ", "MQTT framework initialized");
 MQTT.subscribe(
 TOPIC.CONTROLLER,
-safeCallback(
-"processControllerMessage",
-processControllerMessage
-)
+function(topic, message)
+{
+try
+{
+processControllerMessage(topic, message);
+}
+catch(error)
+{
+recordScriptError("processControllerMessage", error);
+}
+}
 );
 log(DEBUG.INFO, "[INFO] ", "Subscribed to " + TOPIC.CONTROLLER);
 }
@@ -600,10 +583,17 @@ try
 {
 readInitialRelayState();
 Shelly.addStatusHandler(
-safeCallback(
-"relayStatusHandler",
-handleRelayStatus
-)
+function(status)
+{
+try
+{
+handleRelayStatus(status);
+}
+catch(error)
+{
+recordScriptError("relayStatusHandler", error);
+}
+}
 );
 log(DEBUG.INFO, "[INFO] ", "Relay status handler registered");
 }
@@ -634,9 +624,9 @@ Shelly.call(
 id : CONFIG.RELAY_ID,
 on : on
 },
-safeCallback(
-"Switch.Set",
 function(result, error_code, error_message)
+{
+try
 {
 let pending = relayPendingTarget;
 relayCommandInProgress = false;
@@ -657,7 +647,11 @@ if (pending !== null && pending !== boiler.status.relay)
 setRelay(pending);
 }
 }
-)
+catch(error)
+{
+recordScriptError("Switch.Set", error);
+}
+}
 );
 }
 catch(error)
@@ -1149,9 +1143,9 @@ lastDiagnosticsSync = monotonicMs;
 Shelly.call(
 "Shelly.GetStatus",
 {},
-safeCallback(
-"Shelly.GetStatus",
 function(result, error_code, error_message)
+{
+try
 {
 if (error_code !== 0)
 {
@@ -1170,9 +1164,9 @@ return;
 Shelly.call(
 "Shelly.GetDeviceInfo",
 {},
-safeCallback(
-"Shelly.GetDeviceInfo",
 function(info, info_error_code, info_error_message)
+{
+try
 {
 if (info_error_code === 0)
 {
@@ -1187,10 +1181,18 @@ info_error_message
 }
 publishWatchdogStatus();
 }
-)
+catch(error)
+{
+recordScriptError("Shelly.GetDeviceInfo", error);
+}
+}
 );
 }
-)
+catch(error)
+{
+recordScriptError("Shelly.GetStatus", error);
+}
+}
 );
 }
 function main()
@@ -1213,7 +1215,14 @@ CONFIG.WATCHDOG_INTERVAL,
 true,
 function()
 {
-safeCall("heartbeatTask", watchdogTask);
+try
+{
+watchdogTask();
+}
+catch(error)
+{
+recordScriptError("heartbeatTask", error);
+}
 }
 );
 Timer.set(
@@ -1221,10 +1230,24 @@ CONFIG.RUNTIME_INTERVAL,
 true,
 function()
 {
-safeCall("systemTimerTask", systemTimerTask);
+try
+{
+systemTimerTask();
+}
+catch(error)
+{
+recordScriptError("systemTimerTask", error);
+}
 }
 );
 setState(STATE.IDLE);
 log(DEBUG.INFO, "[INFO] ", "Startup completed");
 }
-safeCall("main", main);
+try
+{
+main();
+}
+catch(error)
+{
+recordScriptError("main", error);
+}

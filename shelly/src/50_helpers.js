@@ -115,33 +115,3 @@ function recordScriptError(context, error)
         scriptErrorHandling = false;
     }
 }
-
-//-----------------------------------------------------------------------------
-
-function safeCall(context, callback)
-{
-    try
-    {
-        callback();
-    }
-    catch(error)
-    {
-        recordScriptError(context, error);
-    }
-}
-
-//-----------------------------------------------------------------------------
-
-function safeCallback(context, callback)
-{
-    return function(a, b, c)
-    {
-        safeCall(
-            context,
-            function()
-            {
-                callback(a, b, c);
-            }
-        );
-    };
-}

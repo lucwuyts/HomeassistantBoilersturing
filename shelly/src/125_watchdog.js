@@ -259,9 +259,9 @@ function watchdogTask()
     Shelly.call(
         "Shelly.GetStatus",
         {},
-        safeCallback(
-            "Shelly.GetStatus",
-            function(result, error_code, error_message)
+        function(result, error_code, error_message)
+        {
+            try
             {
                 if (error_code !== 0)
                 {
@@ -286,9 +286,9 @@ function watchdogTask()
                 Shelly.call(
                     "Shelly.GetDeviceInfo",
                     {},
-                    safeCallback(
-                        "Shelly.GetDeviceInfo",
-                        function(info, info_error_code, info_error_message)
+                    function(info, info_error_code, info_error_message)
+                    {
+                        try
                         {
                             if (info_error_code === 0)
                             {
@@ -304,9 +304,17 @@ function watchdogTask()
 
                             publishWatchdogStatus();
                         }
-                    )
+                        catch(error)
+                        {
+                            recordScriptError("Shelly.GetDeviceInfo", error);
+                        }
+                    }
                 );
             }
-        )
+            catch(error)
+            {
+                recordScriptError("Shelly.GetStatus", error);
+            }
+        }
     );
 }

@@ -40,7 +40,14 @@ function main()
         true,
         function()
         {
-            safeCall("heartbeatTask", watchdogTask);
+            try
+            {
+                watchdogTask();
+            }
+            catch(error)
+            {
+                recordScriptError("heartbeatTask", error);
+            }
         }
     );
 
@@ -49,7 +56,14 @@ function main()
         true,
         function()
         {
-            safeCall("systemTimerTask", systemTimerTask);
+            try
+            {
+                systemTimerTask();
+            }
+            catch(error)
+            {
+                recordScriptError("systemTimerTask", error);
+            }
         }
     );
 
@@ -60,4 +74,11 @@ function main()
 
 //-----------------------------------------------------------------------------
 
-safeCall("main", main);
+try
+{
+    main();
+}
+catch(error)
+{
+    recordScriptError("main", error);
+}

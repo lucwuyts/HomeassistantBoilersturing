@@ -81,10 +81,17 @@ function relayInit()
         readInitialRelayState();
 
         Shelly.addStatusHandler(
-            safeCallback(
-                "relayStatusHandler",
-                handleRelayStatus
-            )
+            function(status)
+            {
+                try
+                {
+                    handleRelayStatus(status);
+                }
+                catch(error)
+                {
+                    recordScriptError("relayStatusHandler", error);
+                }
+            }
         );
 
         log(DEBUG.INFO, "[INFO] ", "Relay status handler registered");
@@ -125,9 +132,9 @@ function setRelay(on)
                 id : CONFIG.RELAY_ID,
                 on : on
             },
-            safeCallback(
-                "Switch.Set",
-                function(result, error_code, error_message)
+            function(result, error_code, error_message)
+            {
+                try
                 {
                     let pending = relayPendingTarget;
 
@@ -155,7 +162,11 @@ function setRelay(on)
                         setRelay(pending);
                     }
                 }
-            )
+                catch(error)
+                {
+                    recordScriptError("Switch.Set", error);
+                }
+            }
         );
     }
     catch(error)
