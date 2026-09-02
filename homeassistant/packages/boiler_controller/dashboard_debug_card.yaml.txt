@@ -99,7 +99,7 @@ views:
                 entities:
                   - entity: binary_sensor.boiler_shelly_offline
                     name: Shelly offline
-                  - entity: sensor.boiler_shelly_last_seen
+                  - entity: sensor.boiler_shelly_last_seen_2
                     name: Laatste heartbeat
                   - entity: binary_sensor.shelly_boiler_controller_online
                     name: Controller online
