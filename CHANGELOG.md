@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026.09.06
+- Shelly offline/online WhatsApp CallMeBot alerts zijn vervangen door Pushover; de bestaande mailmelding bij offline blijft bestaan.
+- Alerttimestamp ondersteunt tijdelijk zowel `sensor.boiler_shelly_last_seen` als `sensor.boiler_shelly_last_seen_2`, omdat Home Assistant bij een entity registry-conflict een `_2` suffix kan maken.
+
 ## 2026.08.28-02
 - Shelly build-output wordt geminified om minder scriptgeheugen te gebruiken; de bronbestanden blijven leesbaar.
 - `Switch.GetStatus` polling is vervangen door `Shelly.addStatusHandler`, zodat relaiswijzigingen eventgedreven verwerkt worden in plaats van via getimede RPC-queries.

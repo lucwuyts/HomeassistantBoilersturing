@@ -109,6 +109,9 @@ automation:
           shelly_last_seen_text: >
             {% set seen = states('sensor.boiler_shelly_last_seen') %}
             {% if seen in ['unknown', 'unavailable', 'none', ''] %}
+              {% set seen = states('sensor.boiler_shelly_last_seen_2') %}
+            {% endif %}
+            {% if seen in ['unknown', 'unavailable', 'none', ''] %}
               onbekend
             {% else %}
               {{ as_timestamp(seen) | timestamp_custom('%d-%m-%Y %H:%M:%S', true) }}
@@ -145,13 +148,16 @@ automation:
             </body>
             </html>
 
-      - service: script.whatsapp_callmebot_checked_send
+      - action: notify.pushover
         continue_on_error: true
-        metadata: {}
         data:
-          text: >
+          title: "Shelly boilercontroller offline"
+          message: >
             Shelly boilercontroller - geen antwoord meer sedert
-            {{ shelly_last_seen_text }}
+            {{ shelly_last_seen_text }}.
+            Controleer Shelly Pro 1 / wifi / voeding.
+          data:
+            priority: 1
 
       - service: persistent_notification.create
         data:
@@ -188,18 +194,23 @@ automation:
           shelly_last_seen_text: >
             {% set seen = states('sensor.boiler_shelly_last_seen') %}
             {% if seen in ['unknown', 'unavailable', 'none', ''] %}
+              {% set seen = states('sensor.boiler_shelly_last_seen_2') %}
+            {% endif %}
+            {% if seen in ['unknown', 'unavailable', 'none', ''] %}
               onbekend
             {% else %}
               {{ as_timestamp(seen) | timestamp_custom('%d-%m-%Y %H:%M:%S', true) }}
             {% endif %}
 
-      - service: script.whatsapp_callmebot_checked_send
+      - action: notify.pushover
         continue_on_error: true
-        metadata: {}
         data:
-          text: >
+          title: "Shelly boilercontroller online"
+          message: >
             Shelly - opnieuw bereikbaar sinds
             {{ shelly_last_seen_text }}
+          data:
+            priority: 0
 
       - service: persistent_notification.dismiss
         data:
