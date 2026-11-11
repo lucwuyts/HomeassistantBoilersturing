@@ -71,6 +71,8 @@ views:
                 entities:
                   - entity: sensor.boiler_house_power
                     name: Huisverbruik
+                  - entity: sensor.boiler_meter_total_energy
+                    name: Meter dag + nacht
                   - entity: sensor.boiler_power
                     name: Boiler vermogen
                   - entity: sensor.boiler_predicted_quarter_peak_w

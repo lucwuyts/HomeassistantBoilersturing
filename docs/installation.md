@@ -25,13 +25,15 @@ De package verwacht deze bestaande bronentities:
 
 | Entity | Doel |
 | ------ | ---- |
-| `sensor.verbruik_boven_4` | Actueel totaal woningverbruik in W |
+| `sensor.verbruik_ade` | Actueel totaalvermogen van de nieuwe meter in W |
+| `sensor.verbruik_beneden_2` | Dagverbruik nieuwe meter in kWh |
+| `sensor.verbruik_beneden_3` | Nachtverbruik nieuwe meter in kWh |
 | `sensor.peak_current_average_quarterly_demand` | Lopende kwartiergemiddelde waarde in kW |
 | `input_boolean.energy_new_quarter` | Puls bij start van een nieuw kwartier |
 | `script.whatsapp_callmebot_checked_send` | Optionele WhatsApp alert voor Shelly offline/online |
 | `pyscript.send_mail` | Optionele e-mailalert voor Shelly offline |
 
-Voor de kwartierpiekbeveiliging zijn twee metingen van de nieuwe hoofdmeter nodig: het actuele totale afnamevermogen in W en het lopende gemiddelde vermogen van het huidige kwartier in kW. De kwartiergemiddelde sensor moet tijdens het kwartier bijwerken en opnieuw beginnen bij de kwartiergrens. Koppel die aan `sensor.verbruik_boven_4` en `sensor.peak_current_average_quarterly_demand`; de huidige `input_boolean.energy_new_quarter` wordt gebruikt als kwartierpuls door de Shelly-controller.
+De boiler gebruikt `sensor.verbruik_ade` als actuele vermogensmeting. `sensor.verbruik_beneden_2` en `sensor.verbruik_beneden_3` worden opgeteld in `sensor.boiler_meter_total_energy` voor het totale dag- en nachtverbruik in kWh. De kwartierpiekbeveiliging gebruikt daarnaast `sensor.peak_current_average_quarterly_demand` en `input_boolean.energy_new_quarter` van de netmeter.
 
 Als de WhatsApp alert niet gebruikt wordt, verwijder of vervang dan de acties met `script.whatsapp_callmebot_checked_send` in `automations.yaml`.
 Als je e-mailservice anders heet dan `pyscript.send_mail`, pas dan die servicenaam aan in `automations.yaml`.

@@ -16,7 +16,7 @@ Home Assistant doet:
 - gebruikersparameters beheren;
 - MQTT-bericht naar `boiler/v1/controller` publiceren.
 
-Verwarmen is toegestaan vanaf `input_datetime.boiler_day_start_time` (standaard 11:00). Er is geen vast einduur of tariefvenster. De dagelijkse `warm_enough`-reset gebeurt op het ingestelde startuur. De piekberekening gebruikt het actuele huisvermogen en de lopende kwartiergemiddelde waarde van de hoofdmeter.
+Verwarmen is toegestaan vanaf `input_datetime.boiler_day_start_time` (standaard 11:00). Er is geen vast einduur of tariefvenster. De dagelijkse `warm_enough`-reset gebeurt op het ingestelde startuur. Het actuele vermogen komt van `sensor.verbruik_ade`; Shelly krijgt ook een versheidsvlag en kan een oude vermogenswaarde niet gebruiken om `warm_enough` te zetten. De dag- en nachtenergieregisters worden samengevoegd in `sensor.boiler_meter_total_energy`.
 
 Home Assistant doet niet:
 

@@ -70,6 +70,20 @@ template:
             {{ (average_so_far_w * elapsed / 3600) | round(1) }}
           {% endif %}
 
+      - name: Boiler Meter Total Energy
+        unique_id: boiler_meter_total_energy
+        unit_of_measurement: kWh
+        device_class: energy
+        state_class: total_increasing
+        state: >
+          {% set day = states('sensor.verbruik_beneden_2') %}
+          {% set night = states('sensor.verbruik_beneden_3') %}
+          {% if is_number(day) and is_number(night) %}
+            {{ (day | float + night | float) | round(3) }}
+          {% else %}
+            {{ none }}
+          {% endif %}
+
       - name: Boiler Quarter Max Energy Wh
         unique_id: boiler_quarter_max_energy_wh
         unit_of_measurement: Wh
@@ -194,7 +208,7 @@ template:
         unit_of_measurement: W
         device_class: power
         state: >
-          {% set source_state = states('sensor.verbruik_boven_4') %}
+          {% set source_state = states('sensor.verbruik_ade') %}
           {% set source_w = source_state | float(0) %}
           {% set previous_w = this.state | float(0) if this is defined else 0 %}
 

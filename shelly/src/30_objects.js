@@ -36,6 +36,8 @@ let boiler =
 
         house_power            : 0,
 
+        house_power_valid      : false,
+
         quarter_elapsed_seconds   : 0,
 
         quarter_remaining_seconds : 0,

@@ -69,6 +69,8 @@ Home Assistant levert de duur via `boiler.config.stop_hold`; Shelly beheert de t
 
 Shelly detecteert zelf of de boiler warm genoeg is. Home Assistant gebruikt `warm_enough` alleen voor weergave, diagnose en grafieken.
 
+De detectie gebruikt de actuele vermogensmeting van de nieuwe meter. Home Assistant stuurt `house_power_valid` alleen wanneer die meting numeriek is en in de laatste minuut is bijgewerkt. Shelly zet `warm_enough` niet op basis van een oude of onbeschikbare meetwaarde.
+
 `heating_enabled` wordt `true` vanaf het ingestelde dagelijkse startuur. Als `warm_enough` actief is, blijft Shelly lokaal in `IDLE` en wordt het relais niet opnieuw ingeschakeld.
 
 De vlag wordt niet automatisch gereset wanneer `heating_enabled` opnieuw `true` wordt. Home Assistant stuurt dagelijks op het ingestelde startuur een expliciet `reset_warm_enough` command.

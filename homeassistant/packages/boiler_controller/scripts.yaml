@@ -64,6 +64,12 @@ script:
           boiler_power: >
             {{ states('sensor.boiler_power') | float(0) | round(0) }}
 
+          house_power_valid: >
+            {% set meter = states.sensor.verbruik_ade %}
+            {{ meter is defined
+               and is_number(meter.state)
+               and (as_timestamp(now()) - as_timestamp(meter.last_updated)) < 60 }}
+
           house_power: >
             {{ states('sensor.boiler_house_power') | float(0) | round(0) }}
 
@@ -204,6 +210,7 @@ script:
                   "peak_margin": {{ peak_margin }},
                   "boiler_power": {{ boiler_power }},
                   "house_power": {{ house_power }},
+                  "house_power_valid": {{ house_power_valid | lower }},
                   "quarter_elapsed_seconds": {{ quarter_elapsed_seconds }},
                   "quarter_remaining_seconds": {{ quarter_remaining_seconds }},
                   "quarter_energy_wh": {{ quarter_energy_wh }},

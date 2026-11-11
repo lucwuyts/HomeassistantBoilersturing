@@ -50,6 +50,11 @@ function isWarmEnoughDetected()
         return false;
     }
 
+    if (!boiler.energy.house_power_valid)
+    {
+        return false;
+    }
+
     if (boiler.energy.boiler_power <= 0)
     {
         return false;

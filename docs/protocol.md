@@ -36,6 +36,7 @@ Voorbeeld:
       "peak_margin": -200,
       "boiler_power": 1500,
       "house_power": 2700,
+      "house_power_valid": true,
       "quarter_elapsed_seconds": 450,
       "quarter_remaining_seconds": 450,
       "quarter_energy_wh": 480,
@@ -70,6 +71,7 @@ Voorbeeld:
 | `peak_margin` | number | W | `peak_limit - predicted_quarter_peak` |
 | `boiler_power` | number | W | Verwacht vermogen van de boiler |
 | `house_power` | number | W | Actueel woningverbruik volgens HA |
+| `house_power_valid` | boolean | | `true` wanneer HA een actuele numerieke waarde van de vermogenssensor heeft; voorkomt warm-detectie op basis van een oude waarde |
 | `quarter_elapsed_seconds` | number | seconden | Verstreken seconden in het huidige kwartier |
 | `quarter_remaining_seconds` | number | seconden | Resterende seconden in het huidige kwartier |
 | `quarter_energy_wh` | number | Wh | Gemeten kwartierenergie tot nu toe |

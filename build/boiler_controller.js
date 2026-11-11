@@ -1,7 +1,7 @@
 const FIRMWARE =
 {
 NAME        : "Boiler Controller",
-VERSION     : "2026.08.28-02",
+VERSION     : "2026.11.11-01",
 API         : 1
 };
 const CONFIG =
@@ -75,6 +75,7 @@ peak_limit             : 0,
 peak_margin            : 0,
 boiler_power           : 0,
 house_power            : 0,
+house_power_valid      : false,
 quarter_elapsed_seconds   : 0,
 quarter_remaining_seconds : 0,
 quarter_energy_wh         : 0,
@@ -898,6 +899,10 @@ if (!boiler.status.relay)
 return false;
 }
 if (boiler.status.runtime < CONFIG.WARMUP_MIN_RUNTIME)
+{
+return false;
+}
+if (!boiler.energy.house_power_valid)
 {
 return false;
 }
