@@ -69,9 +69,9 @@ Home Assistant levert de duur via `boiler.config.stop_hold`; Shelly beheert de t
 
 Shelly detecteert zelf of de boiler warm genoeg is. Home Assistant gebruikt `warm_enough` alleen voor weergave, diagnose en grafieken.
 
-`heating_enabled` mag tijdens superdal en nachttarief `true` blijven. Als `warm_enough` actief is, blijft Shelly lokaal in `IDLE` en wordt het relais niet opnieuw ingeschakeld.
+`heating_enabled` wordt `true` vanaf het ingestelde dagelijkse startuur. Als `warm_enough` actief is, blijft Shelly lokaal in `IDLE` en wordt het relais niet opnieuw ingeschakeld.
 
-De vlag wordt niet automatisch gereset wanneer `heating_enabled` opnieuw `true` wordt. Home Assistant stuurt alleen bij de start van een nieuwe superdalcyclus een expliciet `reset_warm_enough` command.
+De vlag wordt niet automatisch gereset wanneer `heating_enabled` opnieuw `true` wordt. Home Assistant stuurt dagelijks op het ingestelde startuur een expliciet `reset_warm_enough` command.
 
 ## Watchdog
 

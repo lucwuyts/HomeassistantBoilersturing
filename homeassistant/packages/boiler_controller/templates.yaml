@@ -2,29 +2,12 @@ template:
 
   - binary_sensor:
 
-      - name: Boiler Superdal
-        unique_id: boiler_superdal
-        state: >
-          {% set start = states('input_datetime.boiler_day_start_time') %}
-          {% set now_time = now().strftime('%H:%M:%S') %}
-          {{ start not in ['unknown', 'unavailable', 'none', '']
-             and now_time >= start and now().hour < 17 }}
-
-      - name: Boiler Nachtuur
-        unique_id: boiler_nachtuur
-        state: >
-          {{ now().hour >= 22 or now().hour < 7 }}
-
       - name: Boiler Heating Allowed
         unique_id: boiler_heating_allowed
         state: >
-          {{
-             (
-               is_state('binary_sensor.boiler_superdal', 'on')
-               or
-               is_state('binary_sensor.boiler_nachtuur', 'on')
-             )
-          }}
+          {% set start = states('input_datetime.boiler_day_start_time') %}
+          {{ start not in ['unknown', 'unavailable', 'none', '']
+             and now().strftime('%H:%M:%S') >= start }}
 
       - name: Boiler Shelly Offline
         unique_id: boiler_shelly_offline
@@ -279,7 +262,7 @@ template:
           {% if reason == 0 %}
             OK
           {% elif reason == 1 %}
-            Geen superdaluren
+            Voor het ingestelde startuur
           {% elif reason == 3 %}
             Boiler vandaag reeds verwarmd
           {% elif reason == 4 %}

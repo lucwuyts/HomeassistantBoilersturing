@@ -7,7 +7,7 @@ Reason codes beschrijven waarom verwarmen wel of niet toegestaan is. Home Assist
 | Code | Omschrijving |
 | ---- | ------------ |
 | 0 | Verwarmen toegestaan |
-| 1 | Buiten superdal/gunstige periode |
+| 1 | Vóór het ingestelde startuur |
 | 3 | Boiler vandaag reeds verwarmd |
 | 4 | Wachttijd of planning actief |
 | 5 | Verwachte kwartierpiek te hoog |

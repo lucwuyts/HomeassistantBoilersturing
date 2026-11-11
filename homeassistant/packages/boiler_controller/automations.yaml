@@ -38,19 +38,16 @@ automation:
   #
   # BC004
   #
-  - id: boiler_reset_warm_enough_on_superdal
-    alias: "BC004 - Reset Warm Enough On Superdal"
+  - id: boiler_reset_warm_enough_on_start_time
+    alias: "BC004 - Reset Warm Enough On Start Time"
 
     trigger:
       - platform: state
-        entity_id: binary_sensor.boiler_superdal
+        entity_id: binary_sensor.boiler_heating_allowed
         to: "on"
 
       - platform: time
         at: input_datetime.boiler_day_start_time
-
-      - platform: state
-        entity_id: input_datetime.boiler_day_start_time
 
       - platform: homeassistant
         event: start
@@ -60,7 +57,7 @@ automation:
 
     condition:
       - condition: state
-        entity_id: binary_sensor.boiler_superdal
+        entity_id: binary_sensor.boiler_heating_allowed
         state: "on"
 
       - condition: state

@@ -278,8 +278,7 @@ script:
   # Reset Shelly warm-enough vlag.
   #
   # Dit gebeurt bewust als apart niet-retained command. De vlag
-  # hoort alleen bij een nieuwe superdalcyclus gereset te worden,
-  # niet bij elk tariefvenster waarin verwarmen toegestaan is.
+  # wordt op het ingestelde dagelijkse startuur gereset.
   #
   #############################################################
 

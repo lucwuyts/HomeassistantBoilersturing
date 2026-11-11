@@ -33,8 +33,4 @@ test/               Test- en protocolvoorbeelden
 
 ## Redenen achter deze automatisering
 
-Door het afsluiten van een nieuw contract bij onze energieleverancier beschikken we over een periode met een superdaltarief. Tijdens die periode kost elektriciteit minder dan de helft van het normale nachttarief.
-
-![Overzicht van het superdaltarief](docs/assets/luminus-superdal.png)
-
-Dat maakt dit het ideale moment om de boiler te verwarmen. Tegelijk moet vermeden worden dat de kwartierpiek te hoog wordt wanneer er ook andere verbruikers actief zijn. Home Assistant berekent daarom continu een voorspelling van het kwartierverbruik. De Shelly gebruikt die informatie lokaal om de boiler tijdelijk uit te schakelen wanneer de ingestelde pieklimiet dreigt overschreden te worden.
+Het dagelijkse startuur om de boiler te verwarmen is instelbaar via `input_datetime.boiler_day_start_time`. De boilersturing gebruikt dit startuur om de verwarming toe te staan. Tegelijk moet vermeden worden dat de kwartierpiek te hoog wordt wanneer er ook andere verbruikers actief zijn. Home Assistant berekent daarom continu een voorspelling van het kwartierverbruik. De Shelly gebruikt die informatie lokaal om de boiler tijdelijk uit te schakelen wanneer de ingestelde pieklimiet dreigt overschreden te worden.

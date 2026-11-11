@@ -75,7 +75,7 @@ Controleer in Home Assistant:
 - `sensor.shelly_boiler_script_version` toont de nieuwe buildversie.
 - `sensor.shelly_boiler_state` wordt gevuld.
 - `binary_sensor.shelly_boiler_relay` volgt het echte relais.
-- `sensor.boiler_predicted_quarter_peak_w` en `sensor.boiler_quarter_energy_wh` blijven ook buiten superdal/nachtuur berekenen.
+- `sensor.boiler_predicted_quarter_peak_w` en `sensor.boiler_quarter_energy_wh` blijven ook vóór het ingestelde startuur berekenen.
 - `binary_sensor.boiler_shelly_offline` blijft `off` zolang Shelly heartbeat binnenkomt.
 
 Controleer op MQTT:

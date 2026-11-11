@@ -105,7 +105,7 @@ Voorbeeld:
 | Veld | Type | Betekenis |
 | ---- | ---- | --------- |
 | `reset_statistics` | boolean | Reset Shelly verwarmingsstatistieken `starts_today`, `total_starts` en `total_runtime` |
-| `reset_warm_enough` | boolean | Reset Shelly `warm_enough` vlag bij start van een nieuwe superdalcyclus |
+| `reset_warm_enough` | boolean | Reset Shelly `warm_enough` vlag op het ingestelde dagelijkse startuur |
 
 Commands worden niet retained gepubliceerd. Een reset mag niet opnieuw uitgevoerd worden na een MQTT- of Shelly-herstart.
 

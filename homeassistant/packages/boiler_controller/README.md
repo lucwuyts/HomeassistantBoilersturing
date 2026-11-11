@@ -10,13 +10,13 @@ Home Assistant is planner en databron. Shelly blijft de controller die lokaal be
 
 Home Assistant doet:
 
-- superdal en andere planningsvoorwaarden bepalen;
+- het dagelijkse startmoment op basis van een instelbare tijdhelper bepalen;
 - kwartierpiek voorspellen;
 - piekmarge en kwartierenergie-headroom berekenen;
 - gebruikersparameters beheren;
 - MQTT-bericht naar `boiler/v1/controller` publiceren.
 
-Het dagvenster loopt vanaf `input_datetime.boiler_day_start_time` (standaard 11:00) tot 17:00. Het startuur is instelbaar met uren en minuten in Home Assistant. Het nachttariefvenster blijft 22:00-07:00. De piekberekening gebruikt het actuele huisvermogen en de lopende kwartiergemiddelde waarde van de hoofdmeter.
+Verwarmen is toegestaan vanaf `input_datetime.boiler_day_start_time` (standaard 11:00). Er is geen vast einduur of tariefvenster. De dagelijkse `warm_enough`-reset gebeurt op het ingestelde startuur. De piekberekening gebruikt het actuele huisvermogen en de lopende kwartiergemiddelde waarde van de hoofdmeter.
 
 Home Assistant doet niet:
 

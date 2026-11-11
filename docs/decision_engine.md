@@ -11,7 +11,7 @@ Home Assistant berekent planning en energiewaarden. Shelly neemt de lokale contr
 Home Assistant bepaalt:
 
 - of de gebruiker/controller verwarmen toestaat;
-- of het huidige moment binnen superdal, nachttarief of een andere gunstige periode valt;
+- of het ingestelde dagelijkse startuur al bereikt is;
 - de voorspelde kwartierpiek;
 - de pieklimiet;
 - de piekmarge;
@@ -101,7 +101,7 @@ Home Assistant geeft dus geen direct stopcommando; het levert de meetwaarden waa
 
 ## Warm genoeg
 
-Home Assistant stuurt `heating_enabled` op basis van planning en tarief. Tijdens superdal en nachttarief mag deze waarde dus `true` zijn, ook wanneer Shelly eerder `warm_enough` meldde.
+Home Assistant stuurt `heating_enabled` op basis van het ingestelde startuur. Vanaf dat uur is deze waarde `true`, ook wanneer Shelly eerder `warm_enough` meldde.
 
 Shelly gebruikt `warm_enough` lokaal:
 
@@ -111,7 +111,7 @@ warm_enough true betekent: verwarmen mag volgens HA, maar Shelly start het relai
 
 De vlag is een status- en diagnoseveld voor Home Assistant en Grafana. Ze is geen HA-planningsvoorwaarde.
 
-Home Assistant reset `warm_enough` alleen expliciet bij het begin van een nieuwe superdalcyclus via een niet-retained MQTT-command. Een overgang naar het gewone nachttarief reset deze vlag niet.
+Home Assistant reset `warm_enough` dagelijks op het ingestelde startuur via een niet-retained MQTT-command.
 
 ## Prioriteiten
 
