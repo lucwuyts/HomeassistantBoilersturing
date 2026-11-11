@@ -47,7 +47,10 @@ automation:
         to: "on"
 
       - platform: time
-        at: "11:00:00"
+        at: input_datetime.boiler_day_start_time
+
+      - platform: state
+        entity_id: input_datetime.boiler_day_start_time
 
       - platform: homeassistant
         event: start

@@ -16,7 +16,7 @@ Home Assistant doet:
 - gebruikersparameters beheren;
 - MQTT-bericht naar `boiler/v1/controller` publiceren.
 
-Superdal staat voorlopig vast op 11:00-17:00 in `templates.yaml`.
+Het dagvenster loopt vanaf `input_datetime.boiler_day_start_time` (standaard 11:00) tot 17:00. Het startuur is instelbaar met uren en minuten in Home Assistant. Het nachttariefvenster blijft 22:00-07:00. De piekberekening gebruikt het actuele huisvermogen en de lopende kwartiergemiddelde waarde van de hoofdmeter.
 
 Home Assistant doet niet:
 

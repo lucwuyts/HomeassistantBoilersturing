@@ -50,7 +50,9 @@ views:
                 show_header_toggle: false
                 entities:
                   - entity: binary_sensor.boiler_superdal
-                    name: Superdal
+                    name: Dagvenster actief
+                  - entity: input_datetime.boiler_day_start_time
+                    name: Start dagvenster
                   - entity: binary_sensor.boiler_nachtuur
                     name: Nachtuur
                   - entity: binary_sensor.shelly_boiler_restart_delay_active

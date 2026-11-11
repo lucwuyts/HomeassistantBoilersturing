@@ -85,3 +85,12 @@ input_text:
     name: Boiler Warm Enough Reset Date
     icon: mdi:calendar-check
     max: 10
+
+input_datetime:
+
+  boiler_day_start_time:
+    name: Boiler dagvenster startuur
+    icon: mdi:clock-time-four-outline
+    has_date: false
+    has_time: true
+    initial: "11:00:00"
