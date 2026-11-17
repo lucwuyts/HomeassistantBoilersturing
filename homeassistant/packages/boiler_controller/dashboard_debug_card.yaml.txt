@@ -45,6 +45,15 @@ views:
                     name: HA reden
                   - entity: sensor.boiler_controller_state
                     name: HA controller state
+              - type: button
+                name: Boiler handmatig stoppen
+                icon: mdi:water-off
+                show_state: false
+                tap_action:
+                  action: perform-action
+                  perform_action: script.boiler_force_warm_enough
+                  confirmation:
+                    text: Markeer de boiler als warm genoeg en stop de verwarming?
               - type: entities
                 title: Planning en beveiliging
                 show_header_toggle: false

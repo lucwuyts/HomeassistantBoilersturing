@@ -284,8 +284,8 @@ script:
   #
   # Reset Shelly warm-enough vlag.
   #
-  # Dit gebeurt bewust als apart niet-retained command. De vlag
-  # wordt op het ingestelde dagelijkse startuur gereset.
+  # Dit gebeurt bewust als apart niet-retained command, op het
+  # ingestelde startuur of wanneer dat uur wordt aangepast.
   #
   #############################################################
 
@@ -327,4 +327,43 @@ script:
           message: >
             BOILER CONTROLLER:
             MQTT reset warm enough command published
+
+  boiler_force_warm_enough:
+
+    alias: Boiler Controller - Manual Stop (Warm Enough)
+
+    mode: single
+
+    sequence:
+
+      - service: mqtt.publish
+        data:
+          topic: boiler/v1/controller
+          qos: 1
+          retain: false
+          payload: >
+            {
+              "api": 1,
+              "source": "EnergyManager",
+              "software": "BEM 0.1.0",
+              "timestamp": "{{ now().isoformat() }}",
+              "boiler":
+              {
+                "command":
+                {
+                  "force_warm_enough": true
+                }
+              }
+            }
+
+      - delay: "00:00:01"
+
+      - service: script.boiler_publish_controller
+
+      - service: system_log.write
+        data:
+          level: warning
+          message: >
+            BOILER CONTROLLER:
+            Manual stop requested (warm enough emulated)
 

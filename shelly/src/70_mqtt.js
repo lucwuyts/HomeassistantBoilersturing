@@ -33,6 +33,11 @@ function processControllerCommand(command)
     {
         resetWarmEnough();
     }
+
+    if (command.force_warm_enough === true)
+    {
+        forceWarmEnough();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -97,7 +102,8 @@ function processControllerMessage(topic, message)
             return;
         }
 
-        if (data.boiler.command.reset_warm_enough === true &&
+        if ((data.boiler.command.reset_warm_enough === true ||
+             data.boiler.command.force_warm_enough === true) &&
             boiler.status.controller_config_received)
         {
             evaluateController();

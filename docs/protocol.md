@@ -108,6 +108,7 @@ Voorbeeld:
 | ---- | ---- | --------- |
 | `reset_statistics` | boolean | Reset Shelly verwarmingsstatistieken `starts_today`, `total_starts` en `total_runtime` |
 | `reset_warm_enough` | boolean | Reset Shelly `warm_enough` vlag op het ingestelde dagelijkse startuur |
+| `force_warm_enough` | boolean | Zet Shelly `warm_enough` aan en stopt de boiler met stopreden `Boiler warm enough` |
 
 Commands worden niet retained gepubliceerd. Een reset mag niet opnieuw uitgevoerd worden na een MQTT- of Shelly-herstart.
 

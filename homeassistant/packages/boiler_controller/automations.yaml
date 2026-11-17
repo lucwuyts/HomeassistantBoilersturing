@@ -49,6 +49,9 @@ automation:
       - platform: time
         at: input_datetime.boiler_day_start_time
 
+      - platform: state
+        entity_id: input_datetime.boiler_day_start_time
+
       - platform: event
         event_type: automation_reloaded
 
@@ -61,19 +64,9 @@ automation:
         entity_id: binary_sensor.boiler_shelly_offline
         state: "off"
 
-      - condition: template
-        value_template: >
-          {{ states('input_text.boiler_warm_enough_reset_date') != now().date().isoformat() }}
-
     action:
 
       - service: script.boiler_reset_warm_enough
-
-      - service: input_text.set_value
-        target:
-          entity_id: input_text.boiler_warm_enough_reset_date
-        data:
-          value: "{{ now().date().isoformat() }}"
 
     mode: single
 

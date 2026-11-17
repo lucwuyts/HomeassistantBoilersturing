@@ -27,6 +27,19 @@ function resetWarmEnough()
 
 //-----------------------------------------------------------------------------
 
+function forceWarmEnough()
+{
+    markWarmEnough();
+
+    savePersistentData();
+
+    stopBoiler(STOP_REASON.WARM_ENOUGH);
+
+    publishStatus();
+}
+
+//-----------------------------------------------------------------------------
+
 function markWarmEnough()
 {
     boiler.status.warm_enough = true;

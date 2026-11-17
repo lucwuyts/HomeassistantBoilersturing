@@ -73,7 +73,7 @@ De detectie gebruikt de actuele vermogensmeting van de nieuwe meter. Home Assist
 
 `heating_enabled` wordt `true` vanaf het ingestelde dagelijkse startuur. Als `warm_enough` actief is, blijft Shelly lokaal in `IDLE` en wordt het relais niet opnieuw ingeschakeld.
 
-De vlag wordt niet automatisch gereset wanneer `heating_enabled` opnieuw `true` wordt. Home Assistant stuurt dagelijks op het ingestelde startuur een expliciet `reset_warm_enough` command.
+Home Assistant stuurt bij het ingestelde startuur en wanneer dat startuur wordt aangepast terwijl verwarmen al toegestaan is een expliciet `reset_warm_enough` command. Er is geen dagmarker of resetbeperking.
 
 ## Watchdog
 

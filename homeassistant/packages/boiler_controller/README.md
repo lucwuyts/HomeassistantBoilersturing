@@ -16,7 +16,9 @@ Home Assistant doet:
 - gebruikersparameters beheren;
 - MQTT-bericht naar `boiler/v1/controller` publiceren.
 
-Verwarmen is toegestaan vanaf `input_datetime.boiler_day_start_time` (standaard 11:00). Er is geen vast einduur of tariefvenster. De dagelijkse `warm_enough`-reset gebeurt op het ingestelde startuur. Het actuele vermogen komt van `sensor.verbruik_ade`; Shelly krijgt ook een versheidsvlag en kan een oude vermogenswaarde niet gebruiken om `warm_enough` te zetten. De dag- en nachtenergieregisters worden samengevoegd in `sensor.boiler_meter_total_energy`.
+Verwarmen is toegestaan vanaf `input_datetime.boiler_day_start_time` (eerste standaardwaarde 11:00). De laatst ingestelde tijd wordt door Home Assistant hersteld na een herstart. Er is geen vast einduur of tariefvenster. `warm_enough` wordt op het ingestelde startuur gereset en ook wanneer het startuur wordt aangepast terwijl verwarmen al toegestaan is; er geldt geen dagmarker. Het actuele vermogen komt van `sensor.verbruik_ade`; Shelly krijgt ook een versheidsvlag en kan een oude vermogenswaarde niet gebruiken om `warm_enough` te zetten. De dag- en nachtenergieregisters worden samengevoegd in `sensor.boiler_meter_total_energy`.
+
+De debugkaart heeft een knop om `warm_enough` handmatig te forceren en de boiler te stoppen. Hiervoor moet Shelly-build `2026.11.11-02` of nieuwer actief zijn.
 
 Home Assistant doet niet:
 

@@ -1,7 +1,7 @@
 const FIRMWARE =
 {
 NAME        : "Boiler Controller",
-VERSION     : "2026.11.11-01",
+VERSION     : "2026.11.11-02",
 API         : 1
 };
 const CONFIG =
@@ -398,6 +398,10 @@ if (command.reset_warm_enough === true)
 {
 resetWarmEnough();
 }
+if (command.force_warm_enough === true)
+{
+forceWarmEnough();
+}
 }
 function markControllerOnline()
 {
@@ -441,7 +445,8 @@ if (!data.boiler.command)
 log(DEBUG.ERROR, "[ERROR] ", "Missing config object");
 return;
 }
-if (data.boiler.command.reset_warm_enough === true &&
+if ((data.boiler.command.reset_warm_enough === true ||
+data.boiler.command.force_warm_enough === true) &&
 boiler.status.controller_config_received)
 {
 evaluateController();
@@ -884,6 +889,13 @@ boiler.status.warm_enough = false;
 boiler.status.warm_enough_since = "";
 log(DEBUG.INFO, "[INFO] ", "Warm enough flag reset");
 savePersistentData();
+publishStatus();
+}
+function forceWarmEnough()
+{
+markWarmEnough();
+savePersistentData();
+stopBoiler(STOP_REASON.WARM_ENOUGH);
 publishStatus();
 }
 function markWarmEnough()
