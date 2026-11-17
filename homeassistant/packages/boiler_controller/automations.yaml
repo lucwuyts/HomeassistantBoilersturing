@@ -49,9 +49,6 @@ automation:
       - platform: time
         at: input_datetime.boiler_day_start_time
 
-      - platform: homeassistant
-        event: start
-
       - platform: event
         event_type: automation_reloaded
 
